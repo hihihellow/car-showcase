@@ -1,3 +1,6 @@
+console.log("script.js 有執行");
+console.log("目前網址:", window.location.href);
+console.log("Supabase client ready");
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabaseUrl = "https://sszyqmgrlxpwonfidkcr.supabase.co";
@@ -32,6 +35,9 @@ async function loadCarsFromSupabase() {
     .from("cars")
     .select("*")
     .order("created_at", { ascending: false });
+
+  console.log("cars data:", data);
+  console.log("cars error:", error);
 
   if (error) {
     console.error("讀取 cars 失敗:", error);
