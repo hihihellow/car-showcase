@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>晉嘉精選車庫</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-left">
+      <span class="logo-icon">🚗</span>
+      <span class="logo-text">晉嘉精選車庫</span>
+    </div>
+
+    <div class="topbar-center">
+      <a href="index.html" class="nav-link active">首頁</a>
+      <a href="#carSection" class="nav-link">車輛</a>
+      <a href="#" class="nav-link">服務</a>
+      <a href="#" class="nav-link">關於我們</a>
+    </div>
+
+    <div class="topbar-right">
+      <a href="login.html" class="nav-btn login-btn">登入</a>
+      <a href="login.html" class="nav-btn register-btn">註冊</a>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>優質車輛買賣平台</h1>
+        <p>嚴選優質中古車，線上賞車更方便，快速找到理想車款。</p>
+        <a href="#carSection" class="hero-main-btn">立即看車</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="features">
+    <div class="feature-card">
+      <h3>嚴選車況</h3>
+      <p>精挑細選優質車輛，讓你看車更安心。</p>
+    </div>
+    <div class="feature-card">
+      <h3>多圖展示</h3>
+      <p>每台車都有多角度照片，細節看得更清楚。</p>
+    </div>
+    <div class="feature-card">
+      <h3>快速找車</h3>
+      <p>透過分類、地區與價格篩選，快速找到理想車款。</p>
+    </div>
+  </section>
+
+  <section class="section-title">
+    <h2>全部車輛</h2>
+    <p>歡迎瀏覽目前上架中的精選車款</p>
+  </section>
+
+  <section id="carSection">
+    <section class="filters">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="搜尋品牌或車名，例如 Toyota、Altis"
+      />
+
+      <select id="categoryFilter">
+        <option value="all">全部分類</option>
+        <option value="轎車">轎車</option>
+        <option value="休旅車">休旅車</option>
+        <option value="掀背車">掀背車</option>
+      </select>
+
+      <select id="regionFilter">
+        <option value="all">全部地區</option>
+        <option value="台北市">台北市</option>
+        <option value="新北市">新北市</option>
+        <option value="桃園市">桃園市</option>
+        <option value="台中市">台中市</option>
+      </select>
+
+      <select id="priceFilter">
+        <option value="all">全部價格</option>
+        <option value="0-300000">30萬以下</option>
+        <option value="300001-500000">30萬-50萬</option>
+        <option value="500001-800000">50萬-80萬</option>
+        <option value="800001-9999999">80萬以上</option>
+      </select>
+    </section>
+
+    <main>
+      <div id="carList" class="car-list"></div>
+    </main>
+  </section>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

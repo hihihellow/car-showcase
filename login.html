@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>登入 / 註冊</title>
+</head>
+<body>
+
+<h2>登入</h2>
+
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
+
+<button onclick="login()">登入</button>
+<button onclick="register()">註冊</button>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://sszyqmgrlxpwonfidkcr.supabase.co",
+  "你的 public key"
+);
+
+// 註冊
+async function register() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signUp({ email, password });
+
+  if (error) {
+    alert("註冊失敗：" + error.message);
+  } else {
+    alert("註冊成功！");
+  }
+}
+
+// 登入
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    alert("登入失敗：" + error.message);
+  } else {
+    alert("登入成功！");
+    window.location.href = "index.html";
+  }
+}
+</script>
+
+</body>
+</html>
