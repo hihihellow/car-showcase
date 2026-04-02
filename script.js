@@ -239,51 +239,57 @@ if (carDetail) {
     let currentIndex = 0;
 
     carDetail.innerHTML = `
-      <div class="detail-layout">
-        <div class="detail-left">
-          <div class="detail-image-wrapper carousel">
-            <button class="arrow left" id="prevBtn">❮</button>
-            <img class="detail-image" id="mainImage" src="${galleryImages[0]}" alt="${car.title}">
-            <button class="arrow right" id="nextBtn">❯</button>
-          </div>
+    <div class="detail-container">
 
-          <div class="detail-gallery" id="thumbnails">
-            ${galleryImages.map((img, index) => `
-              <img 
-                src="${img}" 
-                alt="${car.title}" 
-                data-index="${index}"
-                class="${index === 0 ? "active" : ""}"
-              >
-            `).join("")}
-          </div>
+      <!-- 左 -->
+      <div class="detail-left">
+        <div class="detail-image-wrapper carousel">
+          <button class="arrow left" id="prevBtn">❮</button>
+          <img id="mainImage" src="${galleryImages[0]}" class="detail-main-img">
+          <button class="arrow right" id="nextBtn">❯</button>
         </div>
 
-        <div class="detail-right">
-          <div class="detail-content">
-            <h2 class="detail-title">${car.title}</h2>
-            <div class="detail-price">NT$ ${Number(car.price).toLocaleString()}</div>
-            <div class="detail-meta">${car.category}｜${car.region}</div>
-            <div class="detail-desc">${car.description}</div>
-
-            <div class="contact-box">
-              <button class="contact-btn" id="contactSellerBtn">聯絡賣家</button>
-
-              <div class="contact-info" id="contactInfo">
-                <p>📞 0912-345-678</p>
-                <p>LINE：car_seller</p>
-                <p>✉️ seller@example.com</p>
-              </div>
-            </div>
-          </div>
+        <div class="thumbnail-row">
+          ${galleryImages.map((img, index) => `
+            <img 
+              src="${img}" 
+              class="thumb ${index === 0 ? "active" : ""}" 
+              data-index="${index}"
+            >
+          `).join("")}
         </div>
       </div>
+
+      <!-- 右 -->
+      <div class="detail-right">
+
+        <h2 class="car-title">${car.title}</h2>
+
+        <div class="car-tags">
+          ${car.brand} / ${car.model} / ${car.year}
+        </div>
+
+        <div class="car-info">
+          <div><span>里程</span>${car.mileage} km</div>
+          <div><span>顏色</span>${car.color}</div>
+          <div><span>排氣量</span>${car.cc}</div>
+        </div>
+
+        <div class="car-price">
+          NT$ ${Number(car.price).toLocaleString()}
+        </div>
+
+        <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+
+      </div>
+
+    </div>
     `;
 
     const mainImage = document.getElementById("mainImage");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
-    const thumbs = document.querySelectorAll("#thumbnails img");
+    const thumbs = document.querySelectorAll(".thumb");
 
     function updateImage() {
       mainImage.src = galleryImages[currentIndex];
