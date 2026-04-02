@@ -202,16 +202,30 @@ if (addCarBtn) {
 // =========================
 const carDetail = document.getElementById("carDetail");
 
+// =========================
+// 詳細頁功能
+// =========================
+const carDetail = document.getElementById("carDetail");
+
 if (carDetail) {
   const params = new URLSearchParams(window.location.search);
   const carId = Number(params.get("id"));
 
   loadCarsFromSupabase().then(async (data) => {
-  cars = data;
+    cars = data;
 
-  const car = cars.find(item => item.id === carId);
+    const car = cars.find(item => item.id === carId);
 
-  if (car) {
+    if (!car) {
+      carDetail.innerHTML = `
+        <div class="detail-content">
+          <h2 class="detail-title">找不到這台車</h2>
+          <div class="detail-desc">可能已被刪除，或連結有誤。</div>
+        </div>
+      `;
+      return;
+    }
+
     const { data: imageData, error: imageError } = await supabase
       .from("car_images")
       .select("*")
@@ -227,113 +241,121 @@ if (carDetail) {
         ? imageData.map(item => item.image_url)
         : [car.image];
 
-    carDetail.innerHTML = `
-      <div class="detail-image-wrapper">
-        <img class="detail-image" src="${galleryImages[0]}" alt="${car.title}">
-      </div>
-      <div class="detail-content">
-        <h2 class="detail-title">${car.title}</h2>
-        <div class="detail-price">NT$ ${Number(car.price).toLocaleString()}</div>
-        <div class="detail-meta">${car.category}｜${car.region}</div>
-        <div class="detail-desc">${car.description}</div>
+    let currentIndex = 0;
 
-        <div class="detail-gallery">
-          ${galleryImages.map(img => `<img src="${img}" alt="${car.title}">`).join("")}
+    carDetail.innerHTML = `
+      <div class="detail-layout">
+        <div class="detail-left">
+          <div class="detail-image-wrapper carousel">
+            <button class="arrow left" id="prevBtn">❮</button>
+            <img class="detail-image" id="mainImage" src="${galleryImages[0]}" alt="${car.title}">
+            <button class="arrow right" id="nextBtn">❯</button>
+          </div>
+
+          <div class="detail-gallery" id="thumbnails">
+            ${galleryImages.map((img, index) => `
+              <img 
+                src="${img}" 
+                alt="${car.title}" 
+                data-index="${index}"
+                class="${index === 0 ? "active" : ""}"
+              >
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="detail-right">
+          <div class="detail-content">
+            <h2 class="detail-title">${car.title}</h2>
+            <div class="detail-price">NT$ ${Number(car.price).toLocaleString()}</div>
+            <div class="detail-meta">${car.category}｜${car.region}</div>
+            <div class="detail-desc">${car.description}</div>
+
+            <div class="contact-box">
+              <button class="contact-btn" id="contactSellerBtn">聯絡賣家</button>
+
+              <div class="contact-info" id="contactInfo">
+                <p>📞 0912-345-678</p>
+                <p>LINE：car_seller</p>
+                <p>✉️ seller@example.com</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     `;
 
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImage = document.getElementById("lightboxImage");
-    const lightboxClose = document.getElementById("lightboxClose");
+    const mainImage = document.getElementById("mainImage");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const thumbs = document.querySelectorAll("#thumbnails img");
 
-    if (lightboxImage) {
-      lightboxImage.addEventListener("mousemove", (e) => {
-        const rect = lightboxImage.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
+    function updateImage() {
+      mainImage.src = galleryImages[currentIndex];
 
-        lightboxImage.style.transformOrigin = `${x}% ${y}%`;
-        lightboxImage.style.transform = "scale(2)";
-      });
+      thumbs.forEach(thumb => thumb.classList.remove("active"));
+      thumbs[currentIndex].classList.add("active");
+    }
 
-      lightboxImage.addEventListener("mouseleave", () => {
-        lightboxImage.style.transformOrigin = "center center";
-        lightboxImage.style.transform = "scale(1)";
+    if (prevBtn) {
+      prevBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        updateImage();
       });
     }
 
-    const mainImage = carDetail.querySelector(".detail-image");
-    const mainImageWrapper = carDetail.querySelector(".detail-image-wrapper");
-
-    if (mainImage && mainImageWrapper) {
-      mainImageWrapper.addEventListener("mousemove", (e) => {
-        const rect = mainImageWrapper.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-        mainImage.style.transformOrigin = `${x}% ${y}%`;
-        mainImage.style.transform = "scale(2)";
-      });
-
-      mainImageWrapper.addEventListener("mouseleave", () => {
-        mainImage.style.transformOrigin = "center center";
-        mainImage.style.transform = "scale(1)";
+    if (nextBtn) {
+      nextBtn.addEventListener("click", () => {
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        updateImage();
       });
     }
 
-    const galleryThumbs = carDetail.querySelectorAll(".detail-gallery img");
-
-    if (galleryThumbs.length > 0) {
-      galleryThumbs[0].classList.add("active");
-    }
-
-    galleryThumbs.forEach(img => {
-      img.addEventListener("click", () => {
-        if (mainImage) {
-          mainImage.src = img.src;
-          mainImage.style.transformOrigin = "center center";
-          mainImage.style.transform = "scale(1)";
-        }
-
-        galleryThumbs.forEach(item => item.classList.remove("active"));
-        img.classList.add("active");
+    thumbs.forEach(thumb => {
+      thumb.addEventListener("click", () => {
+        currentIndex = Number(thumb.dataset.index);
+        updateImage();
       });
     });
 
-    if (mainImage && lightbox && lightboxImage) {
-      mainImage.addEventListener("click", () => {
-        lightboxImage.src = mainImage.src;
-        lightboxImage.style.transformOrigin = "center center";
-        lightboxImage.style.transform = "scale(1)";
-        lightbox.classList.add("show");
+    const contactSellerBtn = document.getElementById("contactSellerBtn");
+    const contactInfo = document.getElementById("contactInfo");
+
+    if (contactSellerBtn && contactInfo) {
+      contactSellerBtn.addEventListener("click", () => {
+        contactInfo.style.display =
+          contactInfo.style.display === "block" ? "none" : "block";
       });
     }
+  });
+}
+const navLinks = document.querySelectorAll(".nav-link");
+const sections = document.querySelectorAll("#homeSection, #carSection, #serviceSection, #aboutSection");
 
-    if (lightbox && lightboxImage && lightboxClose) {
-      lightboxClose.addEventListener("click", () => {
-        lightbox.classList.remove("show");
-        lightboxImage.src = "";
-        lightboxImage.style.transformOrigin = "center center";
-        lightboxImage.style.transform = "scale(1)";
-      });
+function setActiveNav() {
+  let currentSectionId = "homeSection"; // ⭐ 預設首頁
 
-      lightbox.addEventListener("click", (e) => {
-        if (e.target === lightbox) {
-          lightbox.classList.remove("show");
-          lightboxImage.src = "";
-          lightboxImage.style.transformOrigin = "center center";
-          lightboxImage.style.transform = "scale(1)";
-        }
-      });
+  const scrollY = window.scrollY;
+  const offset = 120;
+
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - offset;
+    const sectionHeight = section.offsetHeight;
+
+    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+      currentSectionId = section.getAttribute("id");
     }
-  } else {
-    carDetail.innerHTML = `
-      <div class="detail-content">
-        <h2 class="detail-title">找不到這台車</h2>
-        <div class="detail-desc">可能已被刪除，或連結有誤。</div>
-      </div>
-    `;
-  }
- });
-} 
+  });
+
+  navLinks.forEach(link => {
+    link.classList.remove("active");
+
+    const href = link.getAttribute("href");
+    if (href === `#${currentSectionId}`) {
+      link.classList.add("active");
+    }
+  });
+}
+
+window.addEventListener("scroll", setActiveNav);
+window.addEventListener("load", setActiveNav);

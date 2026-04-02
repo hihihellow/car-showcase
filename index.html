@@ -14,10 +14,10 @@
     </div>
 
     <div class="topbar-center">
-      <a href="index.html" class="nav-link active">首頁</a>
+      <a href="#homeSection" class="nav-link active">首頁</a>
       <a href="#carSection" class="nav-link">車輛</a>
-      <a href="#" class="nav-link">服務</a>
-      <a href="#" class="nav-link">關於我們</a>
+      <a href="#serviceSection" class="nav-link">服務</a>
+      <a href="#aboutSection" class="nav-link">關於我們</a>
     </div>
 
     <div class="topbar-right">
@@ -26,17 +26,16 @@
     </div>
   </div>
 
-  <header class="hero">
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-      <div class="hero-text">
-        <h1>優質車輛買賣平台</h1>
-        <p>嚴選優質中古車，線上賞車更方便，快速找到理想車款。</p>
-        <a href="#carSection" class="hero-main-btn">立即看車</a>
-      </div>
+  <header class="hero" id="homeSection">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1>優質車輛買賣平台</h1>
+      <p>嚴選優質中古車，線上賞車更方便，快速找到理想車款。</p>
+      <a href="#carSection" class="hero-main-btn">立即看車</a>
     </div>
-  </header>
+  </div>
+</header>
 
   <section class="features">
     <div class="feature-card">
@@ -94,7 +93,17 @@
       <div id="carList" class="car-list"></div>
     </main>
   </section>
+  <section class="section-title" id="serviceSection">
+    <h2>服務</h2>
+    <p>提供快速找車、車況展示與後續功能擴充。</p>
+  </section>
+
+  <section class="section-title" id="aboutSection">
+    <h2>關於我們</h2>
+    <p>晉嘉精選車庫，專注於中古車展示與平台體驗。</p>
+  </section>
 
   <script type="module" src="script.js"></script>
 </body>
 </html>
+<link rel="icon" href="/favicon.ico" />
