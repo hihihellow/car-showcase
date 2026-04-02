@@ -694,3 +694,119 @@ body {
     flex-direction: column;
   }
 }
+
+/* ===== detail 資訊美編 ===== */
+
+.car-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 22px;
+  margin-top: 8px;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spec-item-full {
+  grid-column: 1 / -1;
+}
+
+.spec-label {
+  min-width: 88px;
+  padding: 8px 14px;
+  background: #8192f1;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.spec-value {
+  font-size: 17px;
+  color: #222;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.car-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.price-title {
+  font-size: 22px;
+  color: #333;
+  font-weight: 500;
+}
+
+.car-price {
+  font-size: 56px;
+  line-height: 1;
+  color: #d60000;
+  font-weight: 900;
+}
+
+.price-unit {
+  font-size: 28px;
+  color: #222;
+  font-weight: 700;
+}
+
+.contact-btn {
+  margin-top: 18px;
+  width: 100%;
+  background: #f5c518;
+  border: none;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.contact-btn:hover {
+  background: #e2b200;
+}
+
+.contact-info {
+  margin-top: 14px;
+  display: none;
+  background: #fff8e1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  line-height: 1.8;
+}
+
+.contact-info p {
+  margin: 0;
+}
+
+/* 手機版 */
+@media (max-width: 900px) {
+  .car-spec-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spec-item-full {
+    grid-column: auto;
+  }
+
+  .spec-label {
+    min-width: 84px;
+  }
+
+  .car-price {
+    font-size: 42px;
+  }
+
+  .price-unit {
+    font-size: 24px;
+  }
+}

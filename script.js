@@ -296,21 +296,54 @@ if (carDetail) {
 
         <h2 class="car-title">${car.title}</h2>
 
-        <div class="car-tags">
-          ${car.brand} / ${car.model} / ${car.year}
+        <div class="car-spec-grid">
+
+          <div class="spec-item">
+            <div class="spec-label">廠牌</div>
+            <div class="spec-value">${car.brand || "-"}</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">車型</div>
+            <div class="spec-value">${car.model || "-"}</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">類型</div>
+            <div class="spec-value">${car.category || "-"}</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">排氣量</div>
+            <div class="spec-value">${car.cc || "-"} cc</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">顏色</div>
+            <div class="spec-value">${car.color || "-"}</div>
+          </div>
+
+          <div class="spec-item">
+            <div class="spec-label">出廠年份</div>
+            <div class="spec-value">${car.year || "-"}</div>
+          </div>
+
+          <div class="spec-item spec-item-full">
+            <div class="spec-label">行駛里程</div>
+            <div class="spec-value">
+              ${car.mileage ? Number(car.mileage).toLocaleString() + " 公里" : "-"}
+            </div>
+          </div>
+
         </div>
 
-        <div class="car-info">
-          <div><span>里程</span>${car.mileage} km</div>
-          <div><span>顏色</span>${car.color}</div>
-          <div><span>排氣量</span>${car.cc}</div>
+        <div class="car-price-row">
+          <span class="price-title">售價</span>
+          <span class="car-price">${Number(car.price).toLocaleString()}</span>
+          <span class="price-unit">萬</span>
         </div>
 
-        <div class="car-price">
-          NT$ ${Number(car.price).toLocaleString()}
-        </div>
-
-        <button class="contact-btn" id="contactSellerBtn">聯絡賣家</button>
+        <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
 
         <div class="contact-info" id="contactInfo">
           <p>📞 0912-345-678</p>
