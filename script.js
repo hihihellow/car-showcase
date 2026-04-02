@@ -202,11 +202,6 @@ if (addCarBtn) {
 // =========================
 const carDetail = document.getElementById("carDetail");
 
-// =========================
-// 詳細頁功能
-// =========================
-const carDetail = document.getElementById("carDetail");
-
 if (carDetail) {
   const params = new URLSearchParams(window.location.search);
   const carId = Number(params.get("id"));
