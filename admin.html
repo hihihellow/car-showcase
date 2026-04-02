@@ -15,13 +15,23 @@
   <section class="post-form">
     <h2>新增車輛</h2>
 
-    <input id="titleInput" placeholder="車名，例如 Toyota Altis 2020" />
-    <input id="priceInput" placeholder="價格，例如 450000" />
-    <input id="regionInput" placeholder="地區，例如 新北市" />
-    <input id="categoryInput" placeholder="分類，例如 轎車" />
+    <input id="titleInput" placeholder="車名，例如 Toyota Corolla Cross" />
+    <input id="brandInput" placeholder="廠牌，例如 Toyota" />
+    <input id="modelInput" placeholder="車型，例如 Corolla Cross" />
+    <input id="yearInput" type="number" placeholder="年份，例如 2022" />
+    <input id="ccInput" type="number" placeholder="排氣量，例如 1800" />
+
+    <input id="priceInput" type="number" placeholder="價格，例如 569000" />
+    <input id="regionInput" placeholder="地區，例如 桃園市" />
+    <input id="categoryInput" placeholder="分類，例如 休旅車" />
+
+    <input id="mileageInput" type="number" placeholder="里程，例如 38871" />
+    <input id="colorInput" placeholder="顏色，例如 白色" />
+
     <label for="imageInput">上傳照片（可選多張）</label>
     <input id="imageInput" type="file" accept="image/*" multiple />
-    <input id="descInput" placeholder="簡介，例如 車況良好" />
+
+    <input id="descInput" placeholder="簡介，例如 車況良好、原鈑件" />
 
     <button id="addCarBtn">送出</button>
   </section>

@@ -128,13 +128,32 @@ const addCarBtn = document.getElementById("addCarBtn");
 if (addCarBtn) {
   addCarBtn.addEventListener("click", async () => {
     const title = document.getElementById("titleInput").value.trim();
+    const brand = document.getElementById("brandInput").value.trim();
+    const model = document.getElementById("modelInput").value.trim();
+    const year = Number(document.getElementById("yearInput").value);
+    const cc = Number(document.getElementById("ccInput").value);
+
     const price = Number(document.getElementById("priceInput").value);
     const region = document.getElementById("regionInput").value.trim();
     const category = document.getElementById("categoryInput").value.trim();
+
+    const mileage = Number(document.getElementById("mileageInput").value);
+    const color = document.getElementById("colorInput").value.trim();
+
     const imageFiles = document.getElementById("imageInput").files;
     const description = document.getElementById("descInput").value.trim();
 
-    if (!title || Number.isNaN(price) || !region || !category || !description) {
+    if (
+      !title ||
+      !brand ||
+      !model ||
+      Number.isNaN(year) ||
+      Number.isNaN(cc) ||
+      Number.isNaN(price) ||
+      !region ||
+      !category ||
+      !description
+    ) {
       alert("請把基本欄位填完整");
       return;
     }
@@ -153,9 +172,15 @@ if (addCarBtn) {
       .insert([
         {
           title,
+          brand,
+          model,
+          year,
+          cc,
           price,
           region,
           category,
+          mileage: Number.isNaN(mileage) ? null : mileage,
+          color: color || null,
           description,
           image: images[0]
         }
@@ -188,9 +213,15 @@ if (addCarBtn) {
     alert("刊登成功！回首頁就能看到新車。");
 
     document.getElementById("titleInput").value = "";
+    document.getElementById("brandInput").value = "";
+    document.getElementById("modelInput").value = "";
+    document.getElementById("yearInput").value = "";
+    document.getElementById("ccInput").value = "";
     document.getElementById("priceInput").value = "";
     document.getElementById("regionInput").value = "";
     document.getElementById("categoryInput").value = "";
+    document.getElementById("mileageInput").value = "";
+    document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
     document.getElementById("descInput").value = "";
 
@@ -249,7 +280,7 @@ if (carDetail) {
           <button class="arrow right" id="nextBtn">❯</button>
         </div>
 
-        <div class="thumbnail-row">
+        <div class="thumbnail-row" id="thumbnails">
           ${galleryImages.map((img, index) => `
             <img 
               src="${img}" 
@@ -279,7 +310,13 @@ if (carDetail) {
           NT$ ${Number(car.price).toLocaleString()}
         </div>
 
-        <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+        <button class="contact-btn" id="contactSellerBtn">聯絡賣家</button>
+
+        <div class="contact-info" id="contactInfo">
+          <p>📞 0912-345-678</p>
+          <p>LINE：car_seller</p>
+          <p>✉️ seller@example.com</p>
+        </div>
 
       </div>
 
