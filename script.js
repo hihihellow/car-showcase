@@ -16,7 +16,7 @@ function fileToBase64(file) {
     reader.onerror = reject;
 
     reader.readAsDataURL(file);
-  });
+  });  
 }
 
 let cars = [];
@@ -66,7 +66,7 @@ function renderCars(carArray) {
       <img src="${car.image}" alt="${car.title}">
       <div class="car-content">
         <h2 class="car-title">${car.title}</h2>
-        <div class="car-price">NT$ ${Number(car.price).toLocaleString()}</div>
+        <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
         <div class="car-meta">${car.category}｜${car.region}</div>
         <div class="car-desc">${car.description}</div>
       </div>
@@ -325,7 +325,7 @@ if (carDetail) {
 
           <div class="spec-item">
             <div class="spec-label">出廠年份</div>
-            <div class="spec-value">${car.year || "-"}</div>
+            <div class="spec-value">${car.year ? `${car.year} 年` : "-"}</div>
           </div>
 
           <div class="spec-item spec-item-full">
