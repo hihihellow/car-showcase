@@ -340,7 +340,6 @@ if (carDetail) {
         <div class="car-price-row">
           <span class="price-title">售價</span>
           <span class="car-price">${Number(car.price).toLocaleString()}</span>
-          <span class="price-unit">萬</span>
         </div>
 
         <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
