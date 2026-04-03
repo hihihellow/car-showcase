@@ -702,3 +702,71 @@ body {
   background: #ccc;
   cursor: not-allowed;
 }
+
+/* =========================
+   詳細頁：車輛配備
+========================= */
+.equipment-section {
+  margin-top: 32px;
+  background: #07263a;
+  color: #fff;
+  padding: 28px 32px 36px;
+  border-radius: 14px;
+}
+
+.equipment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #d6d600;
+  padding-bottom: 10px;
+}
+
+.equipment-deco {
+  display: inline-block;
+  width: 42px;
+  height: 18px;
+  background: #d6d600;
+  transform: skewX(-30deg);
+}
+
+.equipment-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.equipment-content {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 20px 36px;
+}
+
+.equipment-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.equipment-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 36px;
+}
+
+.equipment-item {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .equipment-content {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-list {
+    grid-template-columns: 1fr;
+  }
+}

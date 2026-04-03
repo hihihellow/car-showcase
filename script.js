@@ -150,6 +150,7 @@ if (addCarBtn) {
     const color = document.getElementById("colorInput").value.trim();
 
     const imageFiles = document.getElementById("imageInput").files;
+    const equipment = document.getElementById("equipmentInput").value.trim();
     const description = document.getElementById("descInput").value.trim();
 
     if (
@@ -191,6 +192,7 @@ if (addCarBtn) {
           mileage: Number.isNaN(mileage) ? null : mileage,
           color: color || null,
           description,
+          equipment: equipment || null,
           image: images[0]
         }
       ])
@@ -232,6 +234,7 @@ if (addCarBtn) {
     document.getElementById("mileageInput").value = "";
     document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
+    document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
 
     window.location.href = "index.html";
@@ -277,6 +280,12 @@ if (carDetail) {
         : [car.image];
 
     let currentIndex = 0;
+    const equipmentList = car.equipment
+      ? car.equipment
+          .split("\n")
+          .map(item => item.trim())
+          .filter(item => item !== "")
+      : [];
 
     carDetail.innerHTML = `
     <div class="detail-container">
@@ -360,8 +369,22 @@ if (carDetail) {
         </div>
 
       </div>
-
     </div>
+    ${equipmentList.length > 0 ? `
+      <div class="equipment-section">
+        <div class="equipment-header">
+          <span class="equipment-deco"></span>
+          <h3>車輛配備</h3>
+        </div>
+
+        <div class="equipment-content">
+          <div class="equipment-label">重點配備</div>
+          <div class="equipment-list">
+            ${equipmentList.map(item => `<div class="equipment-item">${item}</div>`).join("")}
+          </div>
+        </div>
+      </div>
+    ` : ""}
     `;
 
     const mainImage = document.getElementById("mainImage");
