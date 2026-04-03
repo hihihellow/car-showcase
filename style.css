@@ -718,7 +718,7 @@ body {
 .equipment-label {
   font-size: 18px;
   font-weight: 700;
-  color: #fff;
+  color: #203968;
 }
 
 .equipment-list {
@@ -730,7 +730,7 @@ body {
 .equipment-item {
   font-size: 17px;
   line-height: 1.7;
-  color: #fff;
+  color: #203968;
 }
 
 @media (max-width: 900px) {
