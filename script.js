@@ -24,6 +24,8 @@ let cars = [];
 // =========================
 // 首頁功能
 // =========================
+let currentPage = 1;
+const carsPerPage = 12;
 const carList = document.getElementById("carList");
 const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
@@ -52,34 +54,41 @@ function renderCars(carArray) {
 
   carList.innerHTML = "";
 
-  if (carArray.length === 0) {
+  const start = (currentPage - 1) * carsPerPage;
+  const end = start + carsPerPage;
+  const pageCars = carArray.slice(start, end);
+
+  if (pageCars.length === 0) {
     carList.innerHTML = `<p>目前沒有符合條件的車輛。</p>`;
     return;
   }
 
-  carArray.forEach(car => {
+  pageCars.forEach(car => {
     const card = document.createElement("div");
     card.className = "car-card";
 
-   card.innerHTML = `
-    <a href="detail.html?id=${car.id}" class="car-link">
-      <img src="${car.image}" alt="${car.title}">
-      <div class="car-content">
-        <h2 class="car-title">${car.title}</h2>
-        <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
-        <div class="car-meta">${car.category}｜${car.region}</div>
-        <div class="car-desc">${car.description}</div>
-      </div>
-    </a>
-  `;
+    card.innerHTML = `
+      <a href="detail.html?id=${car.id}" class="car-link">
+        <img src="${car.image}" alt="${car.title}">
+        <div class="car-content">
+          <h2 class="car-title">${car.title}</h2>
+          <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
+          <div class="car-meta">${car.category}｜${car.region}</div>
+        </div>
+      </a>
+    `;
 
     carList.appendChild(card);
   });
+
+  renderPagination(carArray.length);
 }
 
 function filterCars() {
   if (!searchInput || !categoryFilter || !regionFilter || !priceFilter) return;
 
+  currentPage = 1;
+  
   const keyword = searchInput.value.toLowerCase().trim();
   const selectedCategory = categoryFilter.value;
   const selectedRegion = regionFilter.value;
@@ -429,3 +438,33 @@ function setActiveNav() {
 
 window.addEventListener("scroll", setActiveNav);
 window.addEventListener("load", setActiveNav);
+
+function renderPagination(totalCars) {
+  let pagination = document.getElementById("pagination");
+
+  if (!pagination) {
+    pagination = document.createElement("div");
+    pagination.id = "pagination";
+    pagination.style.textAlign = "center";
+    pagination.style.margin = "30px 0";
+    carList.after(pagination);
+  }
+
+  const totalPages = Math.ceil(totalCars / carsPerPage);
+
+  pagination.innerHTML = `
+    <button id="prevPage" ${currentPage === 1 ? "disabled" : ""}>上一頁</button>
+    <span style="margin: 0 10px;">第 ${currentPage} / ${totalPages} 頁</span>
+    <button id="nextPage" ${currentPage === totalPages ? "disabled" : ""}>下一頁</button>
+  `;
+
+  document.getElementById("prevPage")?.addEventListener("click", () => {
+    currentPage--;
+    renderCars(cars);
+  });
+
+  document.getElementById("nextPage")?.addEventListener("click", () => {
+    currentPage++;
+    renderCars(cars);
+  });
+}

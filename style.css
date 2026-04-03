@@ -687,3 +687,18 @@ body {
     height: 70px;
   }
 }
+
+#pagination button {
+  padding: 10px 16px;
+  margin: 0 6px;
+  border: none;
+  background: #f5c518;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#pagination button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
