@@ -608,7 +608,7 @@ body {
 }
 
 .contact-btn:hover {
-  background: #e2b200;
+  background: #d89c2c;
 }
 
 .contact-info {
@@ -699,7 +699,7 @@ body {
   display: inline-block;
   width: 42px;
   height: 18px;
-  background: #d6d600;
+  background: #dc6524;
   transform: skewX(-30deg);
 }
 
