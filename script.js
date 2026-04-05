@@ -20,6 +20,7 @@ function fileToBase64(file) {
 }
 
 let cars = [];
+let filteredCars = [];
 
 // =========================
 // 首頁功能
@@ -94,7 +95,7 @@ function filterCars() {
   const selectedRegion = regionFilter.value;
   const selectedPrice = priceFilter.value;
 
-  const filteredCars = cars.filter(car => {
+  filteredCars = cars.filter(car => {
     const matchKeyword = car.title.toLowerCase().includes(keyword);
 
     const matchCategory =
@@ -118,7 +119,8 @@ function filterCars() {
 if (carList) {
   loadCarsFromSupabase().then((data) => {
     cars = data;
-    renderCars(cars);
+    filteredCars = data;
+    renderCars(filteredCars);
   });
 }
 
@@ -240,6 +242,7 @@ if (addCarBtn) {
     window.location.href = "index.html";
   });
 }
+
 // =========================
 // 詳細頁功能
 // =========================
@@ -483,11 +486,11 @@ function renderPagination(totalCars) {
 
   document.getElementById("prevPage")?.addEventListener("click", () => {
     currentPage--;
-    renderCars(cars);
+    renderCars(filteredCars);
   });
 
   document.getElementById("nextPage")?.addEventListener("click", () => {
     currentPage++;
-    renderCars(cars);
+    renderCars(filteredCars);
   });
 }
