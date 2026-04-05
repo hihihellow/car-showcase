@@ -887,7 +887,7 @@ body {
 /* =========================
    Hero 區塊
 ========================= */
-.hero {
+/*.hero {
   position: relative;
   min-height: 600px;
   background:
