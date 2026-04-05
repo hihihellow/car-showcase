@@ -754,15 +754,15 @@ body {
 
 .header-top {
   background:
-    linear-gradient(rgba(8, 8, 8, 0.55), rgba(8, 8, 8, 0.55)),
-    url("https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat;
+    linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)),
+    url("images/logo.png") center center / 100% 100% no-repeat;
   color: #fff;
 }
 
 .header-top-inner {
   max-width: 1280px;
   margin: 0 auto;
-  min-height: 96px;
+  min-height: 110px;
   padding: 0 48px;
   display: flex;
   align-items: center;
@@ -776,12 +776,24 @@ body {
   min-width: 0;
 }
 
-.brand-banner-logo {
-  height: 78px;
-  width: auto;
-  max-width: 100%;
-  display: block;
-  object-fit: contain;
+.brand-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brand-main-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f8f1d8;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.brand-sub-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .header-actions {
@@ -834,9 +846,10 @@ body {
 }
 
 .header-nav-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
   color: #111;
+  letter-spacing: 1px;
 }
 
 .nav-menu {
