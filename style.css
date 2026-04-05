@@ -1209,3 +1209,55 @@ body {
     font-size: 34px;
   }
 }
+
+/* 最上排直接放 logo、導覽、登入註冊 */
+.header-top-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  min-height: 110px;
+  padding: 0 36px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  column-gap: 48px;
+  box-sizing: border-box;
+}
+
+.top-nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 42px;
+  justify-self: center;
+}
+
+.top-nav-menu .nav-link {
+  position: relative;
+  text-decoration: none;
+  color: #f5f1e6;
+  font-size: 17px;
+  font-weight: 800;
+  padding: 6px 0;
+}
+
+.top-nav-menu .nav-link.active {
+  color: #f4c430;
+}
+
+.top-nav-menu .nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 4px;
+  border-radius: 999px;
+  background: #f4c430;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-self: end;
+}
