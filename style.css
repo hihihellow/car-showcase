@@ -1261,3 +1261,14 @@ body {
   gap: 14px;
   justify-self: end;
 }
+
+html {
+  scroll-behavior: smooth;
+}
+
+#homeSection,
+#carSection,
+#serviceSection,
+#aboutSection {
+  scroll-margin-top: 110px;
+}
