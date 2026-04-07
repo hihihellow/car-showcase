@@ -1032,25 +1032,6 @@ html {
   }
 }
 
-.detail-top-banner {
-  height: 90px;
-  background-image: url("images/logo.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  background-color: #111;
-  border-bottom: 1px solid #e5e5e5;
-}
-
-@media (max-width: 768px) {
-  .detail-top-banner {
-    height: 100px;
-    background-position: center center;
-    background-size: 180% auto;
-    background-repeat: no-repeat;
-    background-color: #111;
-  }
-}
 /* =========================
    頁面載入中
 ========================= */
