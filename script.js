@@ -22,6 +22,7 @@ function fileToBase64(file) {
 let cars = [];
 let filteredCars = [];
 
+
 // =========================
 // 首頁功能
 // =========================
@@ -32,6 +33,13 @@ const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
 const regionFilter = document.getElementById("regionFilter");
 const priceFilter = document.getElementById("priceFilter");
+
+function hidePageLoader() {
+  const loader = document.getElementById("pageLoader");
+  if (loader) {
+    loader.classList.add("hide");
+  }
+}
 
 async function loadCarsFromSupabase() {
   const { data, error } = await supabase
@@ -252,188 +260,197 @@ if (carDetail) {
   const params = new URLSearchParams(window.location.search);
   const carId = Number(params.get("id"));
 
-  loadCarsFromSupabase().then(async (data) => {
-    cars = data;
+  loadCarsFromSupabase()
+    .then(async (data) => {
+      cars = data;
 
-    const car = cars.find(item => item.id === carId);
+      const car = cars.find(item => item.id === carId);
 
-    if (!car) {
+      if (!car) {
+        carDetail.innerHTML = `
+          <div class="detail-content">
+            <h2 class="detail-title">找不到這台車</h2>
+            <div class="detail-desc">可能已被刪除，或連結有誤。</div>
+          </div>
+        `;
+        hidePageLoader();
+        return;
+      }
+
+      const { data: imageData, error: imageError } = await supabase
+        .from("car_images")
+        .select("*")
+        .eq("car_id", car.id)
+        .order("sort_order", { ascending: true });
+
+      if (imageError) {
+        console.error("讀取 car_images 失敗:", imageError);
+      }
+
+      const galleryImages =
+        imageData && imageData.length > 0
+          ? imageData.map(item => item.image_url)
+          : [car.image];
+
+      let currentIndex = 0;
+      const equipmentList = car.equipment
+        ? car.equipment
+            .split("\n")
+            .map(item => item.trim())
+            .filter(item => item !== "")
+        : [];
+
       carDetail.innerHTML = `
-        <div class="detail-content">
-          <h2 class="detail-title">找不到這台車</h2>
-          <div class="detail-desc">可能已被刪除，或連結有誤。</div>
-        </div>
-      `;
-      return;
-    }
+      <div class="detail-container">
 
-    const { data: imageData, error: imageError } = await supabase
-      .from("car_images")
-      .select("*")
-      .eq("car_id", car.id)
-      .order("sort_order", { ascending: true });
+        <!-- 左 -->
+        <div class="detail-left">
+          <div class="detail-image-wrapper carousel">
+            <button class="arrow left" id="prevBtn">❮</button>
+            <img id="mainImage" src="${galleryImages[0]}" class="detail-main-img">
+            <button class="arrow right" id="nextBtn">❯</button>
+          </div>
 
-    if (imageError) {
-      console.error("讀取 car_images 失敗:", imageError);
-    }
-
-    const galleryImages =
-      imageData && imageData.length > 0
-        ? imageData.map(item => item.image_url)
-        : [car.image];
-
-    let currentIndex = 0;
-    const equipmentList = car.equipment
-      ? car.equipment
-          .split("\n")
-          .map(item => item.trim())
-          .filter(item => item !== "")
-      : [];
-
-    carDetail.innerHTML = `
-    <div class="detail-container">
-
-      <!-- 左 -->
-      <div class="detail-left">
-        <div class="detail-image-wrapper carousel">
-          <button class="arrow left" id="prevBtn">❮</button>
-          <img id="mainImage" src="${galleryImages[0]}" class="detail-main-img">
-          <button class="arrow right" id="nextBtn">❯</button>
+          <div class="thumbnail-row" id="thumbnails">
+            ${galleryImages.map((img, index) => `
+              <img 
+                src="${img}" 
+                class="thumb ${index === 0 ? "active" : ""}" 
+                data-index="${index}"
+              >
+            `).join("")}
+          </div>
         </div>
 
-        <div class="thumbnail-row" id="thumbnails">
-          ${galleryImages.map((img, index) => `
-            <img 
-              src="${img}" 
-              class="thumb ${index === 0 ? "active" : ""}" 
-              data-index="${index}"
-            >
-          `).join("")}
+        <!-- 右 -->
+        <div class="detail-right">
+
+          <h2 class="car-title">${car.title}</h2>
+
+          <div class="car-spec-grid">
+
+            <div class="spec-item">
+              <div class="spec-label">廠牌</div>
+              <div class="spec-value">${car.brand || "-"}</div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-label">車型</div>
+              <div class="spec-value">${car.model || "-"}</div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-label">類型</div>
+              <div class="spec-value">${car.category || "-"}</div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-label">排氣量</div>
+              <div class="spec-value">${car.cc || "-"} cc</div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-label">顏色</div>
+              <div class="spec-value">${car.color || "-"}</div>
+            </div>
+
+            <div class="spec-item">
+              <div class="spec-label">出廠年份</div>
+              <div class="spec-value">${car.year ? `${car.year} 年` : "-"}</div>
+            </div>
+
+            <div class="spec-item spec-item-full">
+              <div class="spec-label">行駛里程</div>
+              <div class="spec-value">
+                ${car.mileage ? Number(car.mileage).toLocaleString() + " 公里" : "-"}
+              </div>
+            </div>
+
+          </div>
+
+          <div class="car-price-row">
+            <span class="price-title">售價</span>
+            <span class="car-price">${Number(car.price).toLocaleString()}</span>
+          </div>
+
+          <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+
+          <div class="contact-info" id="contactInfo">
+            <p>📞 0912-345-678</p>
+            <p>LINE：car_seller</p>
+            <p>✉️ seller@example.com</p>
+          </div>
+
         </div>
       </div>
-
-      <!-- 右 -->
-      <div class="detail-right">
-
-        <h2 class="car-title">${car.title}</h2>
-
-        <div class="car-spec-grid">
-
-          <div class="spec-item">
-            <div class="spec-label">廠牌</div>
-            <div class="spec-value">${car.brand || "-"}</div>
+      ${equipmentList.length > 0 ? `
+        <div class="equipment-section">
+          <div class="equipment-header">
+            <span class="equipment-deco"></span>
+            <h3>車輛配備</h3>
           </div>
 
-          <div class="spec-item">
-            <div class="spec-label">車型</div>
-            <div class="spec-value">${car.model || "-"}</div>
-          </div>
-
-          <div class="spec-item">
-            <div class="spec-label">類型</div>
-            <div class="spec-value">${car.category || "-"}</div>
-          </div>
-
-          <div class="spec-item">
-            <div class="spec-label">排氣量</div>
-            <div class="spec-value">${car.cc || "-"} cc</div>
-          </div>
-
-          <div class="spec-item">
-            <div class="spec-label">顏色</div>
-            <div class="spec-value">${car.color || "-"}</div>
-          </div>
-
-          <div class="spec-item">
-            <div class="spec-label">出廠年份</div>
-            <div class="spec-value">${car.year ? `${car.year} 年` : "-"}</div>
-          </div>
-
-          <div class="spec-item spec-item-full">
-            <div class="spec-label">行駛里程</div>
-            <div class="spec-value">
-              ${car.mileage ? Number(car.mileage).toLocaleString() + " 公里" : "-"}
+          <div class="equipment-content">
+            <div class="equipment-label">重點配備</div>
+            <div class="equipment-list">
+              ${equipmentList.map(item => `<div class="equipment-item">${item}</div>`).join("")}
             </div>
           </div>
-
         </div>
+      ` : ""}
+      `;
 
-        <div class="car-price-row">
-          <span class="price-title">售價</span>
-          <span class="car-price">${Number(car.price).toLocaleString()}</span>
-        </div>
+      const mainImage = document.getElementById("mainImage");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const thumbs = document.querySelectorAll(".thumb");
 
-        <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+      function updateImage() {
+        mainImage.src = galleryImages[currentIndex];
 
-        <div class="contact-info" id="contactInfo">
-          <p>📞 0912-345-678</p>
-          <p>LINE：car_seller</p>
-          <p>✉️ seller@example.com</p>
-        </div>
+        thumbs.forEach(thumb => thumb.classList.remove("active"));
+        thumbs[currentIndex].classList.add("active");
+      }
 
-      </div>
-    </div>
-    ${equipmentList.length > 0 ? `
-      <div class="equipment-section">
-        <div class="equipment-header">
-          <span class="equipment-deco"></span>
-          <h3>車輛配備</h3>
-        </div>
+      if (prevBtn) {
+        prevBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+          updateImage();
+        });
+      }
 
-        <div class="equipment-content">
-          <div class="equipment-label">重點配備</div>
-          <div class="equipment-list">
-            ${equipmentList.map(item => `<div class="equipment-item">${item}</div>`).join("")}
-          </div>
-        </div>
-      </div>
-    ` : ""}
-    `;
+      if (nextBtn) {
+        nextBtn.addEventListener("click", () => {
+          currentIndex = (currentIndex + 1) % galleryImages.length;
+          updateImage();
+        });
+      }
 
-    const mainImage = document.getElementById("mainImage");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const thumbs = document.querySelectorAll(".thumb");
-
-    function updateImage() {
-      mainImage.src = galleryImages[currentIndex];
-
-      thumbs.forEach(thumb => thumb.classList.remove("active"));
-      thumbs[currentIndex].classList.add("active");
-    }
-
-    if (prevBtn) {
-      prevBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-        updateImage();
+      thumbs.forEach(thumb => {
+        thumb.addEventListener("click", () => {
+          currentIndex = Number(thumb.dataset.index);
+          updateImage();
+        });
       });
-    }
 
-    if (nextBtn) {
-      nextBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex + 1) % galleryImages.length;
-        updateImage();
-      });
-    }
+      const contactSellerBtn = document.getElementById("contactSellerBtn");
+      const contactInfo = document.getElementById("contactInfo");
 
-    thumbs.forEach(thumb => {
-      thumb.addEventListener("click", () => {
-        currentIndex = Number(thumb.dataset.index);
-        updateImage();
-      });
+      if (contactSellerBtn && contactInfo) {
+        contactSellerBtn.addEventListener("click", () => {
+          contactInfo.style.display =
+            contactInfo.style.display === "block" ? "none" : "block";
+        });
+      }
+
+      hidePageLoader();
+    })
+    .catch((error) => {
+      console.error("詳細頁載入失敗:", error);
+      hidePageLoader();
     });
-
-    const contactSellerBtn = document.getElementById("contactSellerBtn");
-    const contactInfo = document.getElementById("contactInfo");
-
-    if (contactSellerBtn && contactInfo) {
-      contactSellerBtn.addEventListener("click", () => {
-        contactInfo.style.display =
-          contactInfo.style.display === "block" ? "none" : "block";
-      });
-    }
-  });
 }
+
 const navLinks = document.querySelectorAll(".nav-link");
 const sections = document.querySelectorAll("#homeSection, #carSection, #serviceSection, #aboutSection");
 
