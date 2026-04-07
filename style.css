@@ -1036,10 +1036,19 @@ html {
   height: 110px;
   background:
     linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)),
-    url("images/logo.png") center center / cover no-repeat;
+    url("images/logo.png") left center / contain no-repeat;
+  background-color: #111;
   border-bottom: 1px solid #e5e5e5;
 }
 
+@media (max-width: 768px) {
+  .detail-top-banner {
+    height: 78px;
+    background-position: left center;
+    background-size: contain;
+    background-color: #111;
+  }
+}
 /* =========================
    頁面載入中
 ========================= */
