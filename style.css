@@ -1083,3 +1083,168 @@ html {
     transform: rotate(360deg);
   }
 }
+
+/* =========================
+   detail 手機版修正
+========================= */
+@media (max-width: 768px) {
+  .detail-top-banner {
+    height: 88px;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 16px 28px;
+  }
+
+  .detail-left,
+  .detail-right {
+    width: 100%;
+  }
+
+  .detail-image-wrapper {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .detail-main-img,
+  #mainImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumbnail-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .thumbnail-row::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .thumb {
+    flex: 0 0 88px;
+    width: 88px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .car-title {
+    font-size: 24px;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .car-spec-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .spec-item,
+  .spec-item-full {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .spec-label {
+    min-width: auto;
+    width: 96px;
+    padding: 10px 8px;
+    font-size: 15px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .spec-value {
+    font-size: 16px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .car-price-row {
+    margin-top: 18px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .price-title {
+    font-size: 18px;
+  }
+
+  .car-price {
+    font-size: 28px;
+  }
+
+  .contact-btn {
+    width: 100%;
+    font-size: 20px;
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .equipment-section {
+    margin: 24px 16px 32px;
+    padding: 20px 16px 24px;
+    border-radius: 14px;
+  }
+
+  .equipment-header h3 {
+    font-size: 20px;
+  }
+
+  .equipment-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .equipment-label {
+    font-size: 17px;
+  }
+
+  .equipment-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .equipment-item {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .arrow {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .arrow.left {
+    left: 10px;
+  }
+
+  .arrow.right {
+    right: 10px;
+  }
+}
