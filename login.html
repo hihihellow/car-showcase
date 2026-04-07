@@ -1,59 +1,295 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <title>登入 / 註冊</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登入 / 註冊｜澄品汽車</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header class="site-header">
+    <div class="header-top">
+      <div class="header-top-inner">
+        <div class="brand-wrap"></div>
 
-<h2>登入</h2>
+        <nav class="top-nav-menu">
+          <a href="index.html#homeSection" class="nav-link">首頁</a>
+          <a href="index.html#carSection" class="nav-link">車輛</a>
+          <a href="index.html#serviceSection" class="nav-link">服務</a>
+          <a href="index.html#aboutSection" class="nav-link">關於我們</a>
+        </nav>
 
-<input type="email" id="email" placeholder="Email"><br><br>
-<input type="password" id="password" placeholder="Password"><br><br>
+        <div class="header-actions">
+          <a href="login.html" class="header-btn btn-login">登入</a>
+          <a href="login.html" class="header-btn btn-register">註冊</a>
+        </div>
 
-<button onclick="login()">登入</button>
-<button onclick="register()">註冊</button>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="開啟選單">
+          <strong>MENU</strong>
+        </button>
+      </div>
 
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+      <div class="mobile-drawer" id="mobileDrawer">
+        <a href="index.html#homeSection" class="mobile-drawer-link">首頁</a>
+        <a href="index.html#carSection" class="mobile-drawer-link">車輛</a>
+        <a href="index.html#serviceSection" class="mobile-drawer-link">服務</a>
+        <a href="index.html#aboutSection" class="mobile-drawer-link">關於我們</a>
 
-const supabase = createClient(
-  "https://sszyqmgrlxpwonfidkcr.supabase.co",
-  "你的 public key"
-);
+        <div class="mobile-drawer-actions">
+          <a href="login.html" class="header-btn btn-login">登入</a>
+          <a href="login.html" class="header-btn btn-register">註冊</a>
+        </div>
+      </div>
+    </div>
+  </header>
 
-// 註冊
-async function register() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  <main class="auth-page">
+    <section class="auth-shell">
+      <div class="auth-visual">
+        <div class="auth-visual-card">
+          <div class="auth-visual-badge">澄品汽車會員中心</div>
+          <h1>安心看車，快速聯繫</h1>
+          <p>登入會員後可更方便管理收藏、聯繫賣家，後續也能擴充會員專區與預約功能。</p>
 
-  const { error } = await supabase.auth.signUp({ email, password });
+          <ul class="auth-feature-list">
+            <li>快速登入與註冊</li>
+            <li>保留瀏覽與聯絡紀錄</li>
+            <li>後續可擴充會員功能</li>
+          </ul>
+        </div>
+      </div>
 
-  if (error) {
-    alert("註冊失敗：" + error.message);
-  } else {
-    alert("註冊成功！");
-  }
-}
+      <div class="auth-panel">
+        <div class="auth-brand">會員中心</div>
 
-// 登入
-async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab active" id="loginTab">登入</button>
+          <button type="button" class="auth-tab" id="registerTab">註冊</button>
+        </div>
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+        <form id="loginForm" class="auth-form">
+          <div class="auth-form-title">歡迎回來</div>
 
-  if (error) {
-    alert("登入失敗：" + error.message);
-  } else {
-    alert("登入成功！");
-    window.location.href = "index.html";
-  }
-}
-</script>
+          <label class="auth-label" for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" class="auth-input" placeholder="請輸入您的 Email" required />
 
+          <label class="auth-label" for="loginPassword">密碼</label>
+          <input type="password" id="loginPassword" class="auth-input" placeholder="請輸入您的密碼" required />
+
+          <button type="submit" class="auth-submit-btn">登入</button>
+
+          <p class="auth-switch-text">
+            還沒有帳號？
+            <button type="button" class="inline-switch-btn" id="goRegisterBtn">立即註冊</button>
+          </p>
+        </form>
+
+        <form id="registerForm" class="auth-form hidden">
+          <div class="auth-form-title">建立新帳號</div>
+
+          <label class="auth-label" for="registerEmail">Email</label>
+          <input type="email" id="registerEmail" class="auth-input" placeholder="請輸入您的 Email" required />
+
+          <label class="auth-label" for="registerPassword">密碼</label>
+          <input type="password" id="registerPassword" class="auth-input" placeholder="請輸入至少 6 碼密碼" required />
+
+          <label class="auth-label" for="registerPasswordConfirm">確認密碼</label>
+          <input type="password" id="registerPasswordConfirm" class="auth-input" placeholder="請再次輸入密碼" required />
+
+          <label class="auth-check-row">
+            <input type="checkbox" id="agreeTerms" />
+            <span>
+              我已閱讀並同意
+              <button type="button" class="inline-link-btn" id="openTermsBtn">會員條款</button>
+              與
+              <button type="button" class="inline-link-btn" id="openPrivacyBtn">隱私權聲明</button>
+            </span>
+          </label>
+
+          <button type="submit" class="auth-submit-btn">註冊</button>
+
+          <p class="auth-switch-text">
+            已經有帳號？
+            <button type="button" class="inline-switch-btn" id="goLoginBtn">返回登入</button>
+          </p>
+        </form>
+
+        <p id="authMessage" class="auth-message"></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="termsModal" class="policy-modal hidden">
+    <div class="policy-card">
+      <button type="button" class="policy-close" data-close="termsModal">&times;</button>
+      <h3>會員條款</h3>
+      <div class="policy-content">
+        <p>歡迎使用澄品汽車會員服務。會員註冊後，請妥善保管帳號與密碼，不得將帳號借予他人使用。</p>
+        <p>會員提供之資料應為真實且正確，如資料有變更，應主動更新。</p>
+        <p>本站保留調整服務內容與會員制度之權利，如有重大變更將於網站公告。</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="privacyModal" class="policy-modal hidden">
+    <div class="policy-card">
+      <button type="button" class="policy-close" data-close="privacyModal">&times;</button>
+      <h3>隱私權聲明</h3>
+      <div class="policy-content">
+        <p>本站蒐集之會員資料，僅用於帳號管理、聯繫通知與服務優化，不會任意提供給無關第三方。</p>
+        <p>您提供的 Email 與登入資訊，將依服務需求進行必要處理與保存。</p>
+        <p>若您需要刪除帳號或查詢個人資料，可透過網站聯絡方式提出申請。</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+    const supabase = createClient(
+      "https://sszyqmgrlxpwonfidkcr.supabase.co",
+      "sb_publishable_DxGd6Yu_mXB1YqiUTxJdqA_CT17Rv27"
+    );
+
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const authMessage = document.getElementById("authMessage");
+
+    const goRegisterBtn = document.getElementById("goRegisterBtn");
+    const goLoginBtn = document.getElementById("goLoginBtn");
+
+    function showMessage(text, isError = false) {
+      authMessage.textContent = text;
+      authMessage.classList.toggle("error", isError);
+      authMessage.classList.toggle("success", !isError && text !== "");
+    }
+
+    function switchToLogin() {
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginForm.classList.remove("hidden");
+      registerForm.classList.add("hidden");
+      showMessage("");
+    }
+
+    function switchToRegister() {
+      registerTab.classList.add("active");
+      loginTab.classList.remove("active");
+      registerForm.classList.remove("hidden");
+      loginForm.classList.add("hidden");
+      showMessage("");
+    }
+
+    loginTab.addEventListener("click", switchToLogin);
+    registerTab.addEventListener("click", switchToRegister);
+    goRegisterBtn.addEventListener("click", switchToRegister);
+    goLoginBtn.addEventListener("click", switchToLogin);
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        showMessage("登入失敗：" + error.message, true);
+        return;
+      }
+
+      showMessage("登入成功，正在跳轉...", false);
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 800);
+    });
+
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const confirmPassword = document.getElementById("registerPasswordConfirm").value;
+      const agreeTerms = document.getElementById("agreeTerms").checked;
+
+      if (password !== confirmPassword) {
+        showMessage("兩次輸入的密碼不一致。", true);
+        return;
+      }
+
+      if (!agreeTerms) {
+        showMessage("請先勾選同意會員條款與隱私權聲明。", true);
+        return;
+      }
+
+      const { error } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (error) {
+        showMessage("註冊失敗：" + error.message, true);
+        return;
+      }
+
+      showMessage("註冊成功，請至 Email 完成驗證。", false);
+      switchToLogin();
+    });
+
+    const openTermsBtn = document.getElementById("openTermsBtn");
+    const openPrivacyBtn = document.getElementById("openPrivacyBtn");
+    const termsModal = document.getElementById("termsModal");
+    const privacyModal = document.getElementById("privacyModal");
+
+    openTermsBtn.addEventListener("click", () => {
+      termsModal.classList.remove("hidden");
+    });
+
+    openPrivacyBtn.addEventListener("click", () => {
+      privacyModal.classList.remove("hidden");
+    });
+
+    document.querySelectorAll(".policy-close").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-close");
+        document.getElementById(target).classList.add("hidden");
+      });
+    });
+
+    [termsModal, privacyModal].forEach((modal) => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.classList.add("hidden");
+        }
+      });
+    });
+
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileDrawer = document.getElementById("mobileDrawer");
+
+    if (mobileMenuBtn && mobileDrawer) {
+      mobileMenuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mobileDrawer.classList.toggle("show");
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+          mobileDrawer.classList.remove("show");
+        }
+      });
+
+      mobileDrawer.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => {
+          mobileDrawer.classList.remove("show");
+        });
+      });
+    }
+  </script>
 </body>
 </html>
