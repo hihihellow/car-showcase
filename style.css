@@ -1031,3 +1031,11 @@ html {
     text-align: center;
   }
 }
+
+.detail-top-banner {
+  height: 110px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12)),
+    url("images/logo.png") center center / cover no-repeat;
+  border-bottom: 1px solid #e5e5e5;
+}
