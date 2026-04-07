@@ -1559,3 +1559,31 @@ html {
     font-size: 16px;
   }
 }
+
+.password-field {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.password-field .auth-input {
+  margin-bottom: 0;
+  padding-right: 52px;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  color: #666;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #111;
+}

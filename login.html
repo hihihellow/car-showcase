@@ -74,7 +74,10 @@
           <input type="email" id="loginEmail" class="auth-input" placeholder="請輸入您的 Email" required />
 
           <label class="auth-label" for="loginPassword">密碼</label>
-          <input type="password" id="loginPassword" class="auth-input" placeholder="請輸入您的密碼" required />
+          <div class="password-field">
+            <input type="password" id="loginPassword" class="auth-input password-input" placeholder="請輸入您的密碼" required />
+            <button type="button" class="toggle-password" data-target="loginPassword">👁</button>
+          </div>
 
           <button type="submit" class="auth-submit-btn">登入</button>
 
@@ -91,11 +94,17 @@
           <input type="email" id="registerEmail" class="auth-input" placeholder="請輸入您的 Email" required />
 
           <label class="auth-label" for="registerPassword">密碼</label>
-          <input type="password" id="registerPassword" class="auth-input" placeholder="請輸入至少 6 碼密碼" required />
+          <div class="password-field">
+            <input type="password" id="registerPassword" class="auth-input password-input" placeholder="請輸入至少 6 碼密碼" required />
+            <button type="button" class="toggle-password" data-target="registerPassword">👁</button>
+          </div>
 
           <label class="auth-label" for="registerPasswordConfirm">確認密碼</label>
-          <input type="password" id="registerPasswordConfirm" class="auth-input" placeholder="請再次輸入密碼" required />
-
+          <div class="password-field">
+            <input type="password" id="registerPasswordConfirm" class="auth-input password-input" placeholder="請再次輸入密碼" required />
+            <button type="button" class="toggle-password" data-target="registerPasswordConfirm">👁</button>
+          </div>
+          
           <label class="auth-check-row">
             <input type="checkbox" id="agreeTerms" />
             <span>
