@@ -494,3 +494,25 @@ function renderPagination(totalCars) {
     renderCars(filteredCars);
   });
 }
+
+const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+const mobileDrawer = document.getElementById("mobileDrawer");
+
+if (mobileMenuBtn && mobileDrawer) {
+  mobileMenuBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    mobileDrawer.classList.toggle("show");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!mobileDrawer.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+      mobileDrawer.classList.remove("show");
+    }
+  });
+
+  mobileDrawer.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      mobileDrawer.classList.remove("show");
+    });
+  });
+}

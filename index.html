@@ -9,23 +9,42 @@
 <body>
   <header class="site-header">
   <div class="header-top">
-  <div class="header-top-inner">
-    <div class="brand-wrap"></div>
+    <div class="header-top-inner">
+      <div class="brand-wrap"></div>
 
-    <nav class="top-nav-menu">
-      <a href="#homeSection" class="nav-link active">首頁</a>
-      <a href="#carSection" class="nav-link">車輛</a>
-      <a href="#serviceSection" class="nav-link">服務</a>
-      <a href="#aboutSection" class="nav-link">關於我們</a>
-    </nav>
+      <nav class="top-nav-menu">
+        <a href="#homeSection" class="nav-link active">首頁</a>
+        <a href="#carSection" class="nav-link">車輛</a>
+        <a href="#serviceSection" class="nav-link">服務</a>
+        <a href="#aboutSection" class="nav-link">關於我們</a>
+      </nav>
 
-    <div class="header-actions">
-      <a href="login.html" class="header-btn btn-login">登入</a>
-      <a href="login.html" class="header-btn btn-register">註冊</a>
+      <div class="header-actions">
+        <a href="login.html" class="header-btn btn-login">登入</a>
+        <a href="login.html" class="header-btn btn-register">註冊</a>
+      </div>
+
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="開啟選單">
+        <span></span>
+        <span></span>
+        <span></span>
+        <strong>MENU</strong>
+      </button>
+    </div>
+
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="#homeSection" class="mobile-drawer-link">首頁</a>
+      <a href="#carSection" class="mobile-drawer-link">車輛</a>
+      <a href="#serviceSection" class="mobile-drawer-link">服務</a>
+      <a href="#aboutSection" class="mobile-drawer-link">關於我們</a>
+
+      <div class="mobile-drawer-actions">
+        <a href="login.html" class="header-btn btn-login">登入</a>
+        <a href="login.html" class="header-btn btn-register">註冊</a>
+      </div>
     </div>
   </div>
-</div>
-</header>
+  </header>
 
 <section class="hero" id="homeSection">
   <div class="hero-overlay"></div>
