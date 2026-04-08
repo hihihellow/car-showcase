@@ -10,12 +10,7 @@
   <header class="site-header">
     <div class="header-top">
       <div class="header-top-inner">
-
-        <div class="brand-wrap">
-          <a href="index.html">
-            <img src="images/logo.png" class="brand-logo">
-          </a>
-        </div>
+        <div class="brand-wrap"></div>
 
         <nav class="top-nav-menu">
           <a href="index.html#homeSection" class="nav-link">首頁</a>
@@ -24,11 +19,29 @@
           <a href="index.html#aboutSection" class="nav-link">關於我們</a>
         </nav>
 
-        <div class="header-actions">
-          <a href="member.html" id="memberCenterBtn" class="header-btn btn-login">會員中心</a>
-          <button id="logoutBtn" class="header-btn btn-register">登出</button>
+        <div class="header-actions" id="headerActions">
+          <a href="login.html" class="header-btn btn-login guest-only hidden">登入</a>
+          <a href="login.html" class="header-btn btn-register guest-only hidden">註冊</a>
+
+          <a href="member.html" class="header-btn btn-login user-only" id="memberCenterBtn">會員中心</a>
+          <button type="button" class="header-btn btn-register user-only" id="logoutBtn">登出</button>
         </div>
 
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="開啟選單">
+          <strong>MENU</strong>
+        </button>
+      </div>
+
+      <div class="mobile-drawer" id="mobileDrawer">
+        <a href="index.html#homeSection" class="mobile-drawer-link">首頁</a>
+        <a href="index.html#carSection" class="mobile-drawer-link">車輛</a>
+        <a href="index.html#serviceSection" class="mobile-drawer-link">服務</a>
+        <a href="index.html#aboutSection" class="mobile-drawer-link">關於我們</a>
+
+        <div class="mobile-drawer-actions">
+          <a href="member.html" class="header-btn btn-login">會員中心</a>
+          <button type="button" class="header-btn btn-register" id="logoutBtnMobile">登出</button>
+        </div>
       </div>
     </div>
   </header>
