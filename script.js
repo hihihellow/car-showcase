@@ -699,7 +699,7 @@ async function updateAuthUI() {
     userOnlyEls.forEach((el) => el.classList.remove("hidden"));
 
     memberCenterBtn.textContent = "會員中心";
-    memberCenterBtn.href = "login.html";
+    memberCenterBtn.href = "member.html";
   } else {
     guestOnlyEls.forEach((el) => el.classList.remove("hidden"));
     userOnlyEls.forEach((el) => el.classList.add("hidden"));
@@ -719,3 +719,13 @@ async function updateAuthUI() {
 }
 
 updateAuthUI();
+
+// 如果在 member.html，沒登入就踢回 login
+if (window.location.pathname.includes("member.html")) {
+  supabase.auth.getUser().then(({ data }) => {
+    if (!data.user) {
+      alert("請先登入");
+      window.location.href = "login.html";
+    }
+  });
+}
