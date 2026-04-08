@@ -19,9 +19,12 @@
           <a href="index.html#aboutSection" class="nav-link">關於我們</a>
         </nav>
 
-        <div class="header-actions">
-          <a href="login.html" class="header-btn btn-login">登入</a>
-          <a href="login.html" class="header-btn btn-register">註冊</a>
+        <div class="header-actions" id="headerActions">
+          <a href="login.html" class="header-btn btn-login guest-only">登入</a>
+          <a href="login.html" class="header-btn btn-register guest-only">註冊</a>
+
+          <a href="login.html" class="header-btn btn-login user-only hidden" id="memberCenterBtn">會員中心</a>
+          <button type="button" class="header-btn btn-register user-only hidden" id="logoutBtn">登出</button>
         </div>
 
         <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="開啟選單">
@@ -298,28 +301,15 @@
 
       const phone = normalizeTaiwanPhone(phoneInput);
 
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         phone,
         password
       });
- 
+
       if (error) {
         showMessage("註冊失敗：" + error.message, true);
         return;
-      }
-
-      if (data.user) {
-        const { error: profileError } = await supabase.from("profiles").upsert({
-          id: data.user.id,
-          email,
-          phone
-        });
-
-        if (profileError) {
-          showMessage("帳號建立成功，但會員資料寫入失敗。", true);
-          return;
-        }
       }
 
       showMessage("註冊成功，請直接登入。", false);

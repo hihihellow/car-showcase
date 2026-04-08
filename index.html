@@ -19,9 +19,12 @@
         <a href="#aboutSection" class="nav-link">關於我們</a>
       </nav>
 
-      <div class="header-actions">
-        <a href="login.html" class="header-btn btn-login">登入</a>
-        <a href="login.html" class="header-btn btn-register">註冊</a>
+      <div class="header-actions" id="headerActions">
+        <a href="login.html" class="header-btn btn-login guest-only">登入</a>
+        <a href="login.html" class="header-btn btn-register guest-only">註冊</a>
+
+        <a href="login.html" class="header-btn btn-login user-only hidden" id="memberCenterBtn">會員中心</a>
+        <button type="button" class="header-btn btn-register user-only hidden" id="logoutBtn">登出</button>
       </div>
 
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="開啟選單">

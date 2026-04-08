@@ -1587,3 +1587,86 @@ html {
 .toggle-password:hover {
   color: #111;
 }
+
+.hidden {
+  display: none !important;
+}
+
+/* =========================
+   收藏愛心按鈕
+========================= */
+.car-card {
+  position: relative;
+}
+
+.favorite-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.favorite-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.16);
+}
+
+.favorite-btn.active {
+  color: #e53935;
+}
+
+.favorite-btn.detail-favorite {
+  position: static;
+  width: auto;
+  height: auto;
+  border-radius: 999px;
+  padding: 12px 18px;
+  gap: 8px;
+  background: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.favorite-btn.detail-favorite.active {
+  background: #fff5f5;
+}
+
+.detail-action-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .favorite-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+    top: 10px;
+    right: 10px;
+  }
+
+  .detail-action-row {
+    flex-direction: column;
+  }
+
+  .favorite-btn.detail-favorite,
+  .contact-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

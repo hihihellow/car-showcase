@@ -41,6 +41,129 @@ function hidePageLoader() {
   }
 }
 
+async function getCurrentUser() {
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("取得登入使用者失敗:", error);
+    return null;
+  }
+
+  return user;
+}
+
+function normalizeCarId(carId) {
+  return String(carId);
+}
+
+async function getFavoriteCarIds() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("car_id")
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("讀取收藏失敗:", error);
+    return [];
+  }
+
+  return (data || []).map((item) => String(item.car_id));
+}
+
+function setFavoriteButtonState(btn, isActive) {
+  if (!btn) return;
+
+  btn.classList.toggle("active", isActive);
+
+  if (btn.classList.contains("detail-favorite")) {
+    btn.textContent = isActive ? "❤️ 已收藏" : "🤍 收藏";
+  } else {
+    btn.textContent = isActive ? "❤️" : "🤍";
+  }
+}
+
+async function toggleFavorite(carId, btn) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請先登入會員再使用收藏功能");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const normalizedCarId = normalizeCarId(carId);
+
+  const { data: existing, error: existingError } = await supabase
+    .from("favorites")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("car_id", normalizedCarId)
+    .maybeSingle();
+
+  if (existingError) {
+    console.error("檢查收藏狀態失敗:", existingError);
+    alert("收藏功能發生錯誤，請稍後再試");
+    return;
+  }
+
+  if (existing) {
+    const { error: deleteError } = await supabase
+      .from("favorites")
+      .delete()
+      .eq("id", existing.id);
+
+    if (deleteError) {
+      console.error("取消收藏失敗:", deleteError);
+      alert("取消收藏失敗，請稍後再試");
+      return;
+    }
+
+    setFavoriteButtonState(btn, false);
+  } else {
+    const { error: insertError } = await supabase
+      .from("favorites")
+      .insert({
+        user_id: user.id,
+        car_id: normalizedCarId
+      });
+
+    if (insertError) {
+      console.error("加入收藏失敗:", insertError);
+      alert("加入收藏失敗，請稍後再試");
+      return;
+    }
+
+    setFavoriteButtonState(btn, true);
+  }
+}
+
+async function setupFavoriteButtons() {
+  const buttons = document.querySelectorAll(".favorite-btn:not(.detail-favorite)");
+  if (buttons.length === 0) return;
+
+  const favoriteIds = await getFavoriteCarIds();
+
+  buttons.forEach((btn) => {
+    const carId = normalizeCarId(btn.dataset.id);
+    const isActive = favoriteIds.includes(carId);
+
+    setFavoriteButtonState(btn, isActive);
+
+    btn.onclick = null;
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(carId, btn);
+    });
+  });
+}
+
 async function loadCarsFromSupabase() {
   const { data, error } = await supabase
     .from("cars")
@@ -77,6 +200,8 @@ function renderCars(carArray) {
     card.className = "car-card";
 
     card.innerHTML = `
+      <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
+
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
         <div class="car-content">
@@ -90,6 +215,7 @@ function renderCars(carArray) {
     carList.appendChild(card);
   });
 
+  setupFavoriteButtons();
   renderPagination(carArray.length);
 }
 
@@ -373,7 +499,10 @@ if (carDetail) {
             <span class="car-price">${Number(car.price).toLocaleString()}</span>
           </div>
 
-          <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+          <div class="detail-action-row">
+            <button id="detailFavoriteBtn" class="favorite-btn detail-favorite" type="button" data-id="${car.id}">🤍 收藏</button>
+            <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+          </div>
 
           <div class="contact-info" id="contactInfo">
             <p>📞 0912-345-678</p>
@@ -435,6 +564,18 @@ if (carDetail) {
 
       const contactSellerBtn = document.getElementById("contactSellerBtn");
       const contactInfo = document.getElementById("contactInfo");
+
+      const detailFavoriteBtn = document.getElementById("detailFavoriteBtn");
+
+      if (detailFavoriteBtn) {
+        const favoriteIds = await getFavoriteCarIds();
+        const isActive = favoriteIds.includes(normalizeCarId(car.id));
+        setFavoriteButtonState(detailFavoriteBtn, isActive);
+
+        detailFavoriteBtn.addEventListener("click", () => {
+          toggleFavorite(car.id, detailFavoriteBtn);
+        });
+      }
 
       if (contactSellerBtn && contactInfo) {
         contactSellerBtn.addEventListener("click", () => {
@@ -533,3 +674,48 @@ if (mobileMenuBtn && mobileDrawer) {
     });
   });
 }
+
+async function updateAuthUI() {
+  const memberCenterBtn = document.getElementById("memberCenterBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  const guestOnlyEls = document.querySelectorAll(".guest-only");
+  const userOnlyEls = document.querySelectorAll(".user-only");
+
+  if (!memberCenterBtn || !logoutBtn) return;
+
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("取得登入狀態失敗：", error);
+    return;
+  }
+
+  if (user) {
+    guestOnlyEls.forEach((el) => el.classList.add("hidden"));
+    userOnlyEls.forEach((el) => el.classList.remove("hidden"));
+
+    memberCenterBtn.textContent = "會員中心";
+    memberCenterBtn.href = "login.html";
+  } else {
+    guestOnlyEls.forEach((el) => el.classList.remove("hidden"));
+    userOnlyEls.forEach((el) => el.classList.add("hidden"));
+  }
+
+  logoutBtn.addEventListener("click", async () => {
+    const { error: signOutError } = await supabase.auth.signOut();
+
+    if (signOutError) {
+      console.error("登出失敗：", signOutError);
+      alert("登出失敗，請稍後再試");
+      return;
+    }
+
+    window.location.href = "index.html";
+  });
+}
+
+updateAuthUI();
