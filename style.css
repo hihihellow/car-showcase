@@ -1670,3 +1670,48 @@ html {
     justify-content: center;
   }
 }
+
+.member-layout {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  gap: 30px;
+}
+
+.member-sidebar {
+  width: 220px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.member-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.member-sidebar li {
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.member-sidebar li.active {
+  background: #f5f5f5;
+  font-weight: bold;
+}
+
+.member-content {
+  flex: 1;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.tab {
+  display: none;
+}
+
+.tab.active {
+  display: block;
+}

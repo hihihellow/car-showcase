@@ -729,3 +729,20 @@ if (window.location.pathname.includes("member.html")) {
     }
   });
 }
+
+const tabs = document.querySelectorAll(".member-sidebar li");
+const tabContents = {
+  profile: document.getElementById("profileTab"),
+  favorites: document.getElementById("favoritesTab"),
+  chat: document.getElementById("chatTab")
+};
+
+tabs.forEach(tab => {
+  tab.addEventListener("click", () => {
+    tabs.forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    Object.values(tabContents).forEach(c => c.classList.remove("active"));
+    tabContents[tab.dataset.tab].classList.add("active");
+  });
+});
