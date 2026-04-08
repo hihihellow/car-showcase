@@ -70,8 +70,8 @@
         <form id="loginForm" class="auth-form">
           <div class="auth-form-title">歡迎回來</div>
 
-          <label class="auth-label" for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" class="auth-input" placeholder="請輸入您的 Email" required />
+          <label class="auth-label" for="loginIdentifier">Email / 手機號碼</label>
+          <input type="text" id="loginIdentifier" class="auth-input" placeholder="請輸入 Email 或手機號碼" required />
 
           <label class="auth-label" for="loginPassword">密碼</label>
           <div class="password-field">
@@ -92,6 +92,9 @@
 
           <label class="auth-label" for="registerEmail">Email</label>
           <input type="email" id="registerEmail" class="auth-input" placeholder="請輸入您的 Email" required />
+
+          <label class="auth-label" for="registerPhone">手機號碼</label>
+          <input type="tel" id="registerPhone" class="auth-input" placeholder="例如 0912345678" required />
 
           <label class="auth-label" for="registerPassword">密碼</label>
           <div class="password-field">
@@ -199,13 +202,26 @@
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const email = document.getElementById("loginEmail").value.trim();
+      const identifier = document.getElementById("loginIdentifier").value.trim();
       const password = document.getElementById("loginPassword").value;
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      let result;
+
+      if (identifier.includes("@")) {
+        result = await supabase.auth.signInWithPassword({
+          email: identifier,
+          password
+        });
+      } else {
+        const phone = normalizeTaiwanPhone(identifier);
+
+        result = await supabase.auth.signInWithPassword({
+          phone,
+          password
+        });
+      }
+
+      const { error } = result;
 
       if (error) {
         showMessage("登入失敗：" + error.message, true);
@@ -222,6 +238,7 @@
       e.preventDefault();
 
       const email = document.getElementById("registerEmail").value.trim();
+      const phoneInput = document.getElementById("registerPhone").value.trim();
       const password = document.getElementById("registerPassword").value;
       const confirmPassword = document.getElementById("registerPasswordConfirm").value;
       const agreeTerms = document.getElementById("agreeTerms").checked;
@@ -236,17 +253,33 @@
         return;
       }
 
-      const { error } = await supabase.auth.signUp({
+      const phone = normalizeTaiwanPhone(phoneInput);
+
+      const { data, error } = await supabase.auth.signUp({
         email,
+        phone,
         password
       });
-
+ 
       if (error) {
         showMessage("註冊失敗：" + error.message, true);
         return;
       }
 
-      showMessage("註冊成功，請至 Email 完成驗證。", false);
+      if (data.user) {
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: data.user.id,
+          email,
+          phone
+        });
+
+        if (profileError) {
+          showMessage("帳號建立成功，但會員資料寫入失敗。", true);
+          return;
+        }
+      }
+
+      showMessage("註冊成功，請直接登入。", false);
       switchToLogin();
     });
 
@@ -316,6 +349,16 @@
         }
       });
     });
+
+    function normalizeTaiwanPhone(input) {
+      const raw = input.replace(/[\s-]/g, "");
+
+      if (raw.startsWith("+886")) return raw;
+      if (raw.startsWith("09") && raw.length === 10) {
+        return "+886" + raw.slice(1);
+      }
+      return raw;
+    }
   </script>
 </body>
 </html>
