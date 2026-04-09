@@ -82,19 +82,11 @@
             <button type="button" class="toggle-password" data-target="loginPassword">👁</button>
           </div>
 
-          <button type="submit" class="auth-submit-btn">註冊</button>
-
-          <div id="phoneOtpBlock" class="hidden" style="margin-top: 16px;">
-            <label class="auth-label" for="phoneOtpCode">手機驗證碼</label>
-            <input type="text" id="phoneOtpCode" class="auth-input" placeholder="請輸入 6 碼驗證碼" maxlength="6" />
-            <button type="button" class="auth-submit-btn" id="verifyPhoneOtpBtn" style="margin-top: 12px;">
-              驗證手機
-            </button>
-          </div>
+          <button type="submit" class="auth-submit-btn">登入</button>
 
           <p class="auth-switch-text">
-            已經有帳號？
-            <button type="button" class="inline-switch-btn" id="goLoginBtn">返回登入</button>
+            還沒有帳號？
+            <button type="button" class="inline-switch-btn" id="goRegisterBtn">前往註冊</button>
           </p>
         </form>
 
@@ -133,6 +125,14 @@
           </label>
 
           <button type="submit" class="auth-submit-btn">註冊</button>
+
+          <div id="phoneOtpBlock" class="hidden" style="margin-top: 16px;">
+            <label class="auth-label" for="phoneOtpCode">手機驗證碼</label>
+            <input type="text" id="phoneOtpCode" class="auth-input" placeholder="請輸入 6 碼驗證碼" maxlength="6" />
+            <button type="button" class="auth-submit-btn" id="verifyPhoneOtpBtn" style="margin-top: 12px;">
+              驗證手機
+            </button>
+          </div>
 
           <p class="auth-switch-text">
             已經有帳號？
@@ -247,6 +247,12 @@
       registerTab.classList.remove("active");
       loginForm.classList.remove("hidden");
       registerForm.classList.add("hidden");
+
+      phoneOtpBlock.classList.add("hidden");
+      phoneOtpCode.value = "";
+      pendingPhoneNumber = "";
+      pendingProfileData = null;
+
       showMessage("");
     }
 
@@ -255,14 +261,23 @@
       loginTab.classList.remove("active");
       registerForm.classList.remove("hidden");
       loginForm.classList.add("hidden");
+
+      phoneOtpBlock.classList.add("hidden");
+      phoneOtpCode.value = "";
+
       showMessage("");
     }
 
     loginTab.addEventListener("click", switchToLogin);
     registerTab.addEventListener("click", switchToRegister);
-    goRegisterBtn.addEventListener("click", switchToRegister);
-    goLoginBtn.addEventListener("click", switchToLogin);
 
+    if (goRegisterBtn) {
+      goRegisterBtn.addEventListener("click", switchToRegister);
+    }
+
+    if (goLoginBtn) {
+      goLoginBtn.addEventListener("click", switchToLogin);
+    }
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
@@ -313,6 +328,16 @@
 
       const phone = normalizeTaiwanPhone(phoneInput);
 
+      if (!phone.startsWith("+886")) {
+        showMessage("請輸入正確的台灣手機號碼。", true);
+        return;
+      }
+
+      if (!phone.startsWith("+886")) {
+        showMessage("請輸入正確的台灣手機號碼。", true);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         phone,
         password,
@@ -336,6 +361,7 @@
         phone
       };
 
+      phoneOtpCode.value = "";
       phoneOtpBlock.classList.remove("hidden");
       showMessage("註冊成功，請輸入收到的 6 碼手機驗證碼。", false);
     });
@@ -385,6 +411,10 @@
           return;
         }
       }
+
+      pendingPhoneNumber = "";
+      pendingProfileData = null;
+      phoneOtpCode.value = "";
 
       showMessage("手機驗證成功，帳號建立完成，正在跳轉...", false);
 
