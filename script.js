@@ -746,3 +746,27 @@ tabs.forEach(tab => {
     tabContents[tab.dataset.tab].classList.add("active");
   });
 });
+
+const memberTabs = document.querySelectorAll(".member-sidebar li");
+
+if (memberTabs.length > 0) {
+  const tabContents = {
+    profile: document.getElementById("profileTab"),
+    favorites: document.getElementById("favoritesTab"),
+    chat: document.getElementById("chatTab")
+  };
+
+  memberTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      memberTabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      Object.values(tabContents).forEach((content) => {
+        if (content) content.classList.remove("active");
+      });
+
+      const target = tabContents[tab.dataset.tab];
+      if (target) target.classList.add("active");
+    });
+  });
+}
