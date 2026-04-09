@@ -746,3 +746,54 @@ tabs.forEach(tab => {
     tabContents[tab.dataset.tab].classList.add("active");
   });
 });
+
+async function loadMemberProfile() {
+  if (!window.location.pathname.includes("member.html")) return;
+
+  const nameEl = document.getElementById("userName");
+  const emailEl = document.getElementById("userEmail");
+  const phoneEl = document.getElementById("userPhone");
+
+  const {
+    data: { user },
+    error: userError
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    console.error("取得會員失敗:", userError);
+    return;
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("display_name, email, phone")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError) {
+    console.error("讀取 profiles 失敗:", profileError);
+
+    if (nameEl) {
+      nameEl.textContent = `姓名：${user.user_metadata?.display_name || "未設定"}`;
+    }
+    if (emailEl) {
+      emailEl.textContent = `Email：${user.email || "未設定"}`;
+    }
+    if (phoneEl) {
+      phoneEl.textContent = `手機：${user.phone || "未設定"}`;
+    }
+    return;
+  }
+
+  if (nameEl) {
+    nameEl.textContent = `姓名：${profile.display_name || "未設定"}`;
+  }
+  if (emailEl) {
+    emailEl.textContent = `Email：${profile.email || user.email || "未設定"}`;
+  }
+  if (phoneEl) {
+    phoneEl.textContent = `手機：${profile.phone || user.phone || "未設定"}`;
+  }
+}
+
+loadMemberProfile();
