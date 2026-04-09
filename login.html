@@ -285,6 +285,11 @@
       const password = document.getElementById("loginPassword").value;
       const phone = normalizeTaiwanPhone(phoneInput);
 
+      if (!phone.startsWith("+886")) {
+        showMessage("請輸入正確的台灣手機號碼。", true);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         phone,
         password
@@ -327,11 +332,6 @@
       }
 
       const phone = normalizeTaiwanPhone(phoneInput);
-
-      if (!phone.startsWith("+886")) {
-        showMessage("請輸入正確的台灣手機號碼。", true);
-        return;
-      }
 
       if (!phone.startsWith("+886")) {
         showMessage("請輸入正確的台灣手機號碼。", true);
