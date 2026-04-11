@@ -1836,3 +1836,11 @@ html {
     grid-template-columns: 1fr;
   }
 }
+
+.verify-card-narrow {
+  width: min(520px, 100%);
+}
+
+.verify-btn-row-single {
+  grid-template-columns: 1fr 1fr;
+}
