@@ -403,52 +403,22 @@
 
       const phone = normalizeTaiwanPhone(phoneInput);
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            display_name: name
-          }
-        }
-      });
-
       if (error) {
         showMessage("註冊失敗：" + error.message, true);
         return;
       }
 
-      const userId = data.user?.id;
-
-      if (userId) {
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            id: userId,
-            display_name: name,
-            email,
-            phone
-          });
-
-        if (profileError) {
-          showMessage("帳號建立成功，但會員資料寫入失敗：" + profileError.message, true);
-          return;
-        }
-      }
-
       pendingProfileData = {
-        id: userId,
-        display_name: name,
         email,
+        display_name: name,
         phone
       };
-
       resetVerifyState();
       verifyEmailDisplay.value = email;
 
       showMessage("");
       openVerifyModal();
-      showVerifyMessage("成功，請發送 Email 驗證碼。", false);
+      showVerifyMessage("註冊成功，如未收到驗證碼可按下方按鈕重新發送。", false);
     });
 
     sendEmailOtpBtn.addEventListener("click", async () => {
