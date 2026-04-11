@@ -126,14 +126,6 @@
 
           <button type="submit" class="auth-submit-btn">註冊</button>
 
-          <div id="phoneOtpBlock" class="hidden" style="margin-top: 16px;">
-            <label class="auth-label" for="phoneOtpCode">手機驗證碼</label>
-            <input type="text" id="phoneOtpCode" class="auth-input" placeholder="請輸入 6 碼驗證碼" maxlength="6" />
-            <button type="button" class="auth-submit-btn" id="verifyPhoneOtpBtn" style="margin-top: 12px;">
-              驗證手機
-            </button>
-          </div>
-
           <p class="auth-switch-text">
             已經有帳號？
             <button type="button" class="inline-switch-btn" id="goLoginBtn">返回登入</button>
@@ -144,6 +136,70 @@
       </div>
     </section>
   </main>
+
+  <div id="verifyModal" class="verify-modal hidden">
+    <div class="verify-card">
+      <button type="button" class="policy-close" id="closeVerifyModal">&times;</button>
+
+      <div class="verify-badge">帳號驗證</div>
+      <h3>完成手機與 Email 驗證</h3>
+      <p class="verify-desc">
+        請先發送手機驗證碼完成手機驗證，再進行 Email 驗證。
+      </p>
+  
+      <div class="verify-grid">
+        <div class="verify-section">
+          <div class="verify-section-head">
+            <span class="verify-step">1</span>
+            <strong>手機驗證</strong>
+          </div>
+
+          <p class="verify-tip" id="phoneVerifyHint">尚未發送手機驗證碼</p>
+
+          <label class="auth-label" for="verifyPhoneDisplay">手機號碼</label>
+          <input type="text" id="verifyPhoneDisplay" class="auth-input" readonly />
+
+          <label class="auth-label" for="phoneOtpCode">手機驗證碼</label>
+          <input type="text" id="phoneOtpCode" class="auth-input" placeholder="請輸入 6 碼驗證碼" maxlength="6" />
+  
+          <div class="verify-btn-row">
+            <button type="button" class="auth-submit-btn verify-half-btn" id="sendPhoneOtpBtn">
+              發送驗證碼
+            </button>
+            <button type="button" class="auth-submit-btn verify-half-btn" id="verifyPhoneOtpBtn">
+              驗證
+            </button>
+          </div>
+        </div>
+
+        <div class="verify-section">
+          <div class="verify-section-head">
+            <span class="verify-step">2</span>
+            <strong>Email 驗證</strong>
+          </div>
+
+          <p class="verify-tip" id="emailVerifyHint">請先完成手機驗證，再發送 Email 驗證碼</p>
+
+          <label class="auth-label" for="verifyEmailDisplay">Email</label>
+          <input type="email" id="verifyEmailDisplay" class="auth-input" readonly />
+
+          <label class="auth-label" for="emailOtpCode">Email 驗證碼</label>
+          <input type="text" id="emailOtpCode" class="auth-input" placeholder="請輸入 6 碼驗證碼" maxlength="6" />
+  
+          <div class="verify-btn-row">
+            <button type="button" class="auth-submit-btn verify-half-btn" id="sendEmailOtpBtn">
+              發送驗證碼
+            </button>
+            <button type="button" class="auth-submit-btn verify-half-btn" id="verifyEmailOtpBtn">
+              驗證
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p id="verifyModalMessage" class="auth-message"></p>
+    </div>
+  </div>
 
   <div id="termsModal" class="policy-modal hidden">
     <div class="policy-card">
@@ -226,12 +282,31 @@
     const registerForm = document.getElementById("registerForm");
     const authMessage = document.getElementById("authMessage");
 
-    const phoneOtpBlock = document.getElementById("phoneOtpBlock");
     const phoneOtpCode = document.getElementById("phoneOtpCode");
+    const emailOtpCode = document.getElementById("emailOtpCode");
+
+    const verifyModal = document.getElementById("verifyModal");
+    const closeVerifyModal = document.getElementById("closeVerifyModal");
+    const verifyModalMessage = document.getElementById("verifyModalMessage");
+
+    const verifyPhoneDisplay = document.getElementById("verifyPhoneDisplay");
+    const verifyEmailDisplay = document.getElementById("verifyEmailDisplay");
+
+    const sendPhoneOtpBtn = document.getElementById("sendPhoneOtpBtn");
     const verifyPhoneOtpBtn = document.getElementById("verifyPhoneOtpBtn");
+    const sendEmailOtpBtn = document.getElementById("sendEmailOtpBtn");
+    const verifyEmailOtpBtn = document.getElementById("verifyEmailOtpBtn");
+
+    const phoneVerifyHint = document.getElementById("phoneVerifyHint");
+    const emailVerifyHint = document.getElementById("emailVerifyHint");
 
     let pendingPhoneNumber = "";
     let pendingProfileData = null;
+    let registerDraft = null;
+    let signupCreated = false;
+    let phoneVerified = false;
+    let emailOtpSent = false;
+    let emailVerified = false;
 
     const goRegisterBtn = document.getElementById("goRegisterBtn");
     const goLoginBtn = document.getElementById("goLoginBtn");
@@ -242,16 +317,87 @@
       authMessage.classList.toggle("success", !isError && text !== "");
     }
 
+    function showVerifyMessage(text, isError = false) {
+      verifyModalMessage.textContent = text;
+      verifyModalMessage.classList.toggle("error", isError);
+      verifyModalMessage.classList.toggle("success", !isError && text !== "");
+    }
+
+    function openVerifyModal() {
+      verifyModal.classList.remove("hidden");
+    }
+
+    function closeVerifyModalFn() {
+      verifyModal.classList.add("hidden");
+    }
+
+    function resetVerifyState() {
+      phoneOtpCode.value = "";
+      emailOtpCode.value = "";
+      verifyPhoneDisplay.value = "";
+      verifyEmailDisplay.value = "";
+      signupCreated = false;
+      phoneVerified = false;
+      emailOtpSent = false;
+      emailVerified = false;
+      phoneVerifyHint.textContent = "尚未發送手機驗證碼";
+      emailVerifyHint.textContent = "請先完成手機驗證，再發送 Email 驗證碼";
+      showVerifyMessage("");
+    }
+
+    function resetPendingState() {
+      pendingPhoneNumber = "";
+      pendingProfileData = null;
+      registerDraft = null;
+    }
+
+    function validateRegisterFields() {
+      const name = document.getElementById("registerName").value.trim();
+      const email = document.getElementById("registerEmail").value.trim();
+      const phoneInput = document.getElementById("registerPhone").value.trim();
+      const password = document.getElementById("registerPassword").value;
+      const confirmPassword = document.getElementById("registerPasswordConfirm").value;
+      const agreeTerms = document.getElementById("agreeTerms").checked;
+
+      if (!name) {
+        showMessage("請輸入姓名。", true);
+        return null;
+      }
+
+      if (!email) {
+        showMessage("請輸入 Email。", true);
+        return null;
+      }
+
+      if (password !== confirmPassword) {
+        showMessage("兩次輸入的密碼不一致。", true);
+        return null;
+      }
+
+      if (!agreeTerms) {
+        showMessage("請先勾選同意會員條款與隱私權聲明。", true);
+        return null;
+      }
+
+      const phone = normalizeTaiwanPhone(phoneInput);
+
+      if (!phone.startsWith("+886")) {
+        showMessage("請輸入正確的台灣手機號碼。", true);
+        return null;
+      }
+
+      return { name, email, phone, password };
+    }
+
     function switchToLogin() {
       loginTab.classList.add("active");
       registerTab.classList.remove("active");
       loginForm.classList.remove("hidden");
       registerForm.classList.add("hidden");
 
-      phoneOtpBlock.classList.add("hidden");
-      phoneOtpCode.value = "";
-      pendingPhoneNumber = "";
-      pendingProfileData = null;
+      resetVerifyState();
+      resetPendingState();
+      closeVerifyModalFn();
 
       showMessage("");
     }
@@ -262,8 +408,9 @@
       registerForm.classList.remove("hidden");
       loginForm.classList.add("hidden");
 
-      phoneOtpBlock.classList.add("hidden");
-      phoneOtpCode.value = "";
+      resetVerifyState();
+      resetPendingState();
+      closeVerifyModalFn();
 
       showMessage("");
     }
@@ -309,36 +456,28 @@
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById("registerName").value.trim();
-      const email = document.getElementById("registerEmail").value.trim();
-      const phoneInput = document.getElementById("registerPhone").value.trim();
-      const password = document.getElementById("registerPassword").value;
-      const confirmPassword = document.getElementById("registerPasswordConfirm").value;
-      const agreeTerms = document.getElementById("agreeTerms").checked;
+      const formData = validateRegisterFields();
+     if (!formData) return;
 
-      if (!name) {
-        showMessage("請輸入姓名。", true);
+      registerDraft = formData;
+
+      resetVerifyState();
+      verifyPhoneDisplay.value = formData.phone;
+      verifyEmailDisplay.value = formData.email;
+
+      showMessage("");
+      openVerifyModal();
+    });
+
+    sendPhoneOtpBtn.addEventListener("click", async () => {
+      if (!registerDraft) {
+        showVerifyMessage("找不到註冊資料，請重新填寫後再試。", true);
         return;
       }
 
-      if (password !== confirmPassword) {
-        showMessage("兩次輸入的密碼不一致。", true);
-        return;
-      }
+      const { name, email, phone, password } = registerDraft;
 
-      if (!agreeTerms) {
-        showMessage("請先勾選同意會員條款與隱私權聲明。", true);
-        return;
-      }
-
-      const phone = normalizeTaiwanPhone(phoneInput);
-
-      if (!phone.startsWith("+886")) {
-        showMessage("請輸入正確的台灣手機號碼。", true);
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         phone,
         password,
         options: {
@@ -350,7 +489,7 @@
       });
 
       if (error) {
-        showMessage("註冊失敗：" + error.message, true);
+        showVerifyMessage("手機驗證碼發送失敗：" + error.message, true);
         return;
       }
 
@@ -361,21 +500,21 @@
         phone
       };
 
-      phoneOtpCode.value = "";
-      phoneOtpBlock.classList.remove("hidden");
-      showMessage("註冊成功，請輸入收到的 6 碼手機驗證碼。", false);
+      signupCreated = true;
+      phoneVerifyHint.textContent = "手機驗證碼已送出，請輸入 6 碼後按驗證。";
+      showVerifyMessage("手機驗證碼已發送。", false);
     });
 
     verifyPhoneOtpBtn.addEventListener("click", async () => {
       const token = phoneOtpCode.value.trim();
 
-      if (!pendingPhoneNumber) {
-        showMessage("找不到待驗證的手機號碼，請重新註冊。", true);
+      if (!signupCreated || !pendingPhoneNumber) {
+        showVerifyMessage("請先按手機的「發送驗證碼」。", true);
         return;
       }
 
       if (!token || token.length !== 6) {
-        showMessage("請輸入 6 碼驗證碼。", true);
+        showVerifyMessage("請輸入 6 碼手機驗證碼。", true);
         return;
       }
 
@@ -389,7 +528,7 @@
       });
 
       if (error) {
-        showMessage("手機驗證失敗：" + error.message, true);
+        showVerifyMessage("手機驗證失敗：" + error.message, true);
         return;
       }
 
@@ -407,21 +546,94 @@
 
         if (profileError) {
           console.error("profiles 寫入失敗：", profileError);
-          showMessage("手機驗證成功，但會員資料寫入失敗。", true);
+          showVerifyMessage("手機驗證成功，但會員資料寫入失敗。", true);
           return;
         }
       }
 
-      pendingPhoneNumber = "";
-      pendingProfileData = null;
-      phoneOtpCode.value = "";
+      phoneVerified = true;
+      phoneVerifyHint.textContent = "手機驗證完成。";
+      emailVerifyHint.textContent = "現在可以發送 Email 驗證碼。";
 
-      showMessage("手機驗證成功，帳號建立完成，正在跳轉...", false);
+      showVerifyMessage("手機驗證成功，請繼續完成 Email 驗證。", false);
+    });
+
+    sendEmailOtpBtn.addEventListener("click", async () => {
+      if (!phoneVerified) {
+        showVerifyMessage("請先完成手機驗證，再發送 Email 驗證碼。", true);
+        return;
+      }
+
+      if (!pendingProfileData?.email) {
+        showVerifyMessage("找不到 Email 資料，請重新註冊。", true);
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        email: pendingProfileData.email
+      });
+
+      if (error) {
+        showVerifyMessage("Email 驗證碼發送失敗：" + error.message, true);
+        return;
+      }
+
+      emailOtpSent = true;
+      emailVerifyHint.textContent = "Email 驗證碼已送出，請輸入 6 碼後按驗證。";
+      showVerifyMessage("Email 驗證碼已發送。", false);
+    });
+
+    verifyEmailOtpBtn.addEventListener("click", async () => {
+      const token = emailOtpCode.value.trim();
+
+      if (!phoneVerified) {
+        showVerifyMessage("請先完成手機驗證，再進行 Email 驗證。", true);
+        return;
+      }
+
+      if (!emailOtpSent) {
+        showVerifyMessage("請先按 Email 的「發送驗證碼」。", true);
+        return;
+      }
+
+      if (!token || token.length !== 6) {
+       showVerifyMessage("請輸入 6 碼 Email 驗證碼。", true);
+        return;
+      }
+
+      const { error } = await supabase.auth.verifyOtp({
+        email: pendingProfileData.email,
+        token,
+        type: "email_change"
+      });
+
+      if (error) {
+        showVerifyMessage("Email 驗證失敗：" + error.message, true);
+        return;
+      }
+
+      emailVerified = true;
+      emailVerifyHint.textContent = "Email 驗證完成。";
+      showVerifyMessage("手機與 Email 都驗證成功，正在跳轉...", false);
 
       setTimeout(() => {
         window.location.href = "index.html";
       }, 800);
     });
+
+    if (closeVerifyModal) {
+      closeVerifyModal.addEventListener("click", () => {
+        closeVerifyModalFn();
+      });
+    }
+
+    if (verifyModal) {
+      verifyModal.addEventListener("click", (e) => {
+        if (e.target === verifyModal) {
+          closeVerifyModalFn();
+        }
+      });
+    }
 
     const openTermsBtn = document.getElementById("openTermsBtn");
     const openPrivacyBtn = document.getElementById("openPrivacyBtn");
@@ -439,7 +651,11 @@
     document.querySelectorAll(".policy-close").forEach((btn) => {
       btn.addEventListener("click", () => {
         const target = btn.getAttribute("data-close");
-        document.getElementById(target).classList.add("hidden");
+        if (!target) return;
+        const modal = document.getElementById(target);
+        if (modal) {
+          modal.classList.add("hidden");
+        }
       });
     });
 
