@@ -403,6 +403,17 @@
 
       const phone = normalizeTaiwanPhone(phoneInput);
 
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: name,
+            phone: phone
+          }
+        }
+      });
+
       if (error) {
         showMessage("註冊失敗：" + error.message, true);
         return;
