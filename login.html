@@ -302,11 +302,11 @@
       showVerifyMessage("");
     }
 
-    function switchToRegister() {
-      registerTab.classList.add("active");
-      loginTab.classList.remove("active");
-      registerForm.classList.remove("hidden");
-      loginForm.classList.add("hidden");
+    function switchToLogin() {
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginForm.classList.remove("hidden");
+      registerForm.classList.add("hidden");
 
       resetVerifyState();
       pendingProfileData = null;
@@ -321,8 +321,8 @@
       registerForm.classList.remove("hidden");
       loginForm.classList.add("hidden");
 
-      resetVerifyState();
-      resetPendingState();
+     resetVerifyState();
+      pendingProfileData = null;
       closeVerifyModalFn();
 
       showMessage("");
