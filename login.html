@@ -414,6 +414,9 @@
         }
       });
 
+      console.log("signUp data:", data);
+      console.log("signUp error:", error);
+
       if (error) {
         showMessage("註冊失敗：" + error.message, true);
         return;
@@ -424,12 +427,17 @@
         display_name: name,
         phone
       };
+
       resetVerifyState();
       verifyEmailDisplay.value = email;
 
+      // signUp 成功時，Supabase 會先自動寄出第一封確認信
+      emailOtpSent = true;
+      emailVerifyHint.textContent = "驗證碼已自動寄出，如未收到可按下方按鈕重新發送。";
+
       showMessage("");
       openVerifyModal();
-      showVerifyMessage("註冊成功，如未收到驗證碼可按下方按鈕重新發送。", false);
+      showVerifyMessage("註冊成功，驗證碼已寄出，請到信箱查看。", false);
     });
 
     sendEmailOtpBtn.addEventListener("click", async () => {
@@ -438,10 +446,15 @@
         return;
       }
 
-      const { error } = await supabase.auth.resend({
+      console.log("準備重發 signup 驗證碼給：", pendingProfileData.email);
+
+      const { data, error } = await supabase.auth.resend({
         type: "signup",
         email: pendingProfileData.email
       });
+
+      console.log("resend data =", data);
+      console.log("resend error =", error);
 
       if (error) {
         showVerifyMessage("Email 驗證碼發送失敗：" + error.message, true);
@@ -450,9 +463,8 @@
 
       emailOtpSent = true;
       emailVerifyHint.textContent = "Email 驗證碼已送出，請輸入 6 碼後按驗證。";
-      showVerifyMessage("Email 驗證碼已發送。", false);
+      showVerifyMessage("Email 驗證碼已重新發送。", false);
     });
-
     verifyEmailOtpBtn.addEventListener("click", async () => {
       const token = emailOtpCode.value.trim();
 
@@ -474,7 +486,7 @@
       const { error } = await supabase.auth.verifyOtp({
         email: pendingProfileData.email,
         token,
-        type: "email"
+        type: "signup"
       });
 
       if (error) {
