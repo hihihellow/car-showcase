@@ -418,6 +418,7 @@
       console.log("signUp error:", error);
 
       if (error) {
+        console.error("signUp 完整錯誤 =", error);
         showMessage("註冊失敗：" + error.message, true);
         return;
       }
