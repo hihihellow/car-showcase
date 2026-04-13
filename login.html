@@ -419,7 +419,13 @@
 
       if (error) {
         console.error("signUp 完整錯誤 =", error);
-        showMessage("註冊失敗：" + error.message, true);
+
+        const detail =
+          error?.status
+            ? `（status: ${error.status}）`
+            : "";
+
+        showMessage("註冊失敗：" + error.message + detail, true);
         return;
       }
 
