@@ -141,6 +141,36 @@
     </section>
   </main>
 
+  <div id="forgotPasswordModal" class="verify-modal hidden">
+    <div class="verify-card verify-card-narrow">
+      <button type="button" class="policy-close" id="closeForgotPasswordModal">&times;</button>
+
+      <div class="verify-badge">忘記密碼</div>
+      <h3>重設密碼</h3>
+      <p class="verify-desc">
+        請輸入您註冊時使用的 Email，我們會寄送重設密碼連結給您。
+      </p>
+
+      <div class="verify-section">
+        <label class="auth-label" for="forgotPasswordEmail">Email</label>
+        <input
+          type="email"
+          id="forgotPasswordEmail"
+          class="auth-input"
+          placeholder="請輸入您的 Email"
+        />
+
+        <div class="verify-btn-row verify-btn-row-single">
+          <button type="button" class="auth-submit-btn" id="sendResetPasswordBtn">
+            寄送重設密碼信
+          </button>
+        </div>
+      </div>
+
+      <p id="forgotPasswordMessage" class="auth-message"></p>
+    </div>
+  </div>
+
   <div id="verifyModal" class="verify-modal hidden">
     <div class="verify-card verify-card-narrow">
       <button type="button" class="policy-close" id="closeVerifyModal">&times;</button>
@@ -264,6 +294,12 @@
     const closeVerifyModal = document.getElementById("closeVerifyModal");
     const verifyModalMessage = document.getElementById("verifyModalMessage");
 
+    const forgotPasswordModal = document.getElementById("forgotPasswordModal");
+    const closeForgotPasswordModal = document.getElementById("closeForgotPasswordModal");
+    const forgotPasswordEmail = document.getElementById("forgotPasswordEmail");
+    const forgotPasswordMessage = document.getElementById("forgotPasswordMessage");
+    const sendResetPasswordBtn = document.getElementById("sendResetPasswordBtn");
+
     const verifyEmailDisplay = document.getElementById("verifyEmailDisplay");
     const emailOtpCode = document.getElementById("emailOtpCode");
     const sendEmailOtpBtn = document.getElementById("sendEmailOtpBtn");
@@ -288,6 +324,25 @@
       verifyModalMessage.textContent = text;
       verifyModalMessage.classList.toggle("error", isError);
       verifyModalMessage.classList.toggle("success", !isError && text !== "");
+    }
+
+        function showForgotPasswordMessage(text, isError = false) {
+      forgotPasswordMessage.textContent = text;
+      forgotPasswordMessage.classList.toggle("error", isError);
+      forgotPasswordMessage.classList.toggle("success", !isError && text !== "");
+    }
+
+    function openForgotPasswordModal() {
+      forgotPasswordModal.classList.remove("hidden");
+    }
+
+    function closeForgotPasswordModalFn() {
+      forgotPasswordModal.classList.add("hidden");
+    }
+
+    function resetForgotPasswordState() {
+      forgotPasswordEmail.value = document.getElementById("loginIdentifier").value.trim();
+      showForgotPasswordMessage("");
     }
 
     function openVerifyModal() {
@@ -345,11 +400,18 @@
     }
 
     if (forgotPasswordBtn) {
-      forgotPasswordBtn.addEventListener("click", async () => {
-        const email = document.getElementById("loginIdentifier").value.trim();
+      forgotPasswordBtn.addEventListener("click", () => {
+        resetForgotPasswordState();
+        openForgotPasswordModal();
+      });
+    }
+
+    if (sendResetPasswordBtn) {
+      sendResetPasswordBtn.addEventListener("click", async () => {
+        const email = forgotPasswordEmail.value.trim();
 
         if (!email) {
-          showMessage("請先在登入欄位輸入 Email，再按忘記密碼。", true);
+          showForgotPasswordMessage("請輸入 Email。", true);
           return;
         }
 
@@ -358,11 +420,11 @@
         });
 
         if (error) {
-          showMessage("忘記密碼寄送失敗：" + error.message, true);
+          showForgotPasswordMessage("重設密碼信寄送失敗：" + error.message, true);
           return;
         }
 
-        showMessage("重設密碼信已寄出，請到您的 Email 收信。", false);
+        showForgotPasswordMessage("重設密碼信已寄出，請到您的 Email 收信。", false);
       });
     }
 
@@ -555,6 +617,20 @@
       verifyModal.addEventListener("click", (e) => {
         if (e.target === verifyModal) {
           closeVerifyModalFn();
+        }
+      });
+    }
+
+    if (closeForgotPasswordModal) {
+      closeForgotPasswordModal.addEventListener("click", () => {
+        closeForgotPasswordModalFn();
+      });
+    }
+
+    if (forgotPasswordModal) {
+      forgotPasswordModal.addEventListener("click", (e) => {
+        if (e.target === forgotPasswordModal) {
+          closeForgotPasswordModalFn();
         }
       });
     }
