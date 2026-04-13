@@ -141,6 +141,10 @@ async function toggleFavorite(carId, btn) {
 
     setFavoriteButtonState(btn, true);
   }
+
+  if (window.location.pathname.includes("member.html")) {
+    loadFavoriteCars();
+  }
 }
 
 async function setupFavoriteButtons() {
@@ -797,3 +801,86 @@ async function loadMemberProfile() {
 }
 
 loadMemberProfile();
+
+async function loadFavoriteCars() {
+  if (!window.location.pathname.includes("member.html")) return;
+
+  const favoriteList = document.getElementById("favoriteList");
+  if (!favoriteList) return;
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    favoriteList.innerHTML = `<p>請先登入會員。</p>`;
+    return;
+  }
+
+  const { data: favoriteRows, error: favoriteError } = await supabase
+    .from("favorites")
+    .select("car_id")
+    .eq("user_id", user.id);
+
+  if (favoriteError) {
+    console.error("讀取收藏資料失敗:", favoriteError);
+    favoriteList.innerHTML = `<p>讀取收藏失敗，請稍後再試。</p>`;
+    return;
+  }
+
+  if (!favoriteRows || favoriteRows.length === 0) {
+    favoriteList.innerHTML = `<p>目前還沒有收藏任何車輛。</p>`;
+    return;
+  }
+
+  const favoriteIds = favoriteRows.map(item => item.car_id);
+
+  const { data: carData, error: carError } = await supabase
+    .from("cars")
+    .select("*")
+    .in("id", favoriteIds)
+    .order("created_at", { ascending: false });
+
+  if (carError) {
+    console.error("讀取收藏車輛失敗:", carError);
+    favoriteList.innerHTML = `<p>讀取收藏車輛失敗，請稍後再試。</p>`;
+    return;
+  }
+
+  if (!carData || carData.length === 0) {
+    favoriteList.innerHTML = `<p>目前還沒有收藏任何車輛。</p>`;
+    return;
+  }
+
+  favoriteList.innerHTML = "";
+
+  carData.forEach(car => {
+    const card = document.createElement("div");
+    card.className = "car-card";
+
+    card.innerHTML = `
+      <button class="favorite-btn active" data-id="${car.id}" type="button">❤️</button>
+
+      <a href="detail.html?id=${car.id}" class="car-link">
+        <img src="${car.image}" alt="${car.title}">
+        <div class="car-content">
+          <h2 class="car-title">${car.title}</h2>
+          <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
+          <div class="car-meta">${car.category}｜${car.region}</div>
+        </div>
+      </a>
+    `;
+
+    favoriteList.appendChild(card);
+  });
+
+  const favoriteButtons = favoriteList.querySelectorAll(".favorite-btn");
+
+  favoriteButtons.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.id, btn);
+    });
+  });
+}
+
+loadFavoriteCars();
