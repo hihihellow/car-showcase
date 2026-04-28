@@ -855,9 +855,36 @@ body {
     font-size: 18px;
   }
 
-  .features,
-  .car-list {
+  .features {
     grid-template-columns: 1fr;
+  }
+
+  .car-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .car-card img {
+    height: 150px;
+  }
+
+  .car-content {
+    padding: 14px;
+  }
+
+  .car-title {
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  .card-price {
+    font-size: 20px;
+  }
+
+  .car-meta {
+    font-size: 13px;
   }
 
   .features {
