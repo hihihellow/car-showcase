@@ -33,6 +33,25 @@ const searchInput = document.getElementById("searchInput");
 const categoryFilter = document.getElementById("categoryFilter");
 const regionFilter = document.getElementById("regionFilter");
 const priceFilter = document.getElementById("priceFilter");
+const headerSearchInput = document.getElementById("headerSearchInput");
+const mobileSearchBtn = document.getElementById("mobileSearchBtn");
+const headerSearch = document.querySelector(".header-search");
+
+if (headerSearchInput && searchInput) {
+  headerSearchInput.addEventListener("input", () => {
+    searchInput.value = headerSearchInput.value;
+    filterCars();
+  });
+}
+
+if (mobileSearchBtn && headerSearch && headerSearchInput) {
+  mobileSearchBtn.addEventListener("click", () => {
+    headerSearch.classList.toggle("show");
+    if (headerSearch.classList.contains("show")) {
+      headerSearchInput.focus();
+    }
+  });
+}
 
 function hidePageLoader() {
   const loader = document.getElementById("pageLoader");

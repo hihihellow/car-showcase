@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>澄品汽車</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="/favicon.ico" />
 </head>
 <body>
   <header class="site-header">
@@ -18,6 +19,16 @@
         <a href="#serviceSection" class="nav-link">服務</a>
         <a href="#aboutSection" class="nav-link">關於我們</a>
       </nav>
+
+      <div class="header-search">
+        <button class="header-search-btn" id="mobileSearchBtn" type="button">🔍</button>
+
+        <input
+          type="text"
+          id="headerSearchInput"
+          placeholder="搜尋品牌或車名"
+        />
+      </div>
 
       <div class="header-actions" id="headerActions">
         <a href="login.html" class="header-btn btn-login guest-only">登入</a>
@@ -64,11 +75,7 @@
   </section>
   <section id="carSection">
     <section class="filters">
-      <input
-        type="text"
-        id="searchInput"
-        placeholder="搜尋品牌或車名，例如 Toyota、Altis"
-      />
+      <input type="hidden" id="searchInput" />
 
       <select id="categoryFilter">
         <option value="all">全部分類</option>
@@ -111,4 +118,3 @@
   <script type="module" src="script.js"></script>
 </body>
 </html>
-<link rel="icon" href="/favicon.ico" />

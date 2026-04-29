@@ -1922,3 +1922,90 @@ html {
     font-size: 18px;
   }
 }
+
+/* =========================
+   Header 搜尋欄
+========================= */
+.header-search {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-search input {
+  width: 220px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(244, 196, 48, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 0 16px;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.header-search input::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.header-search input:focus {
+  border-color: #f4c430;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.header-search-btn {
+  display: none;
+}
+
+/* header 欄位重新分配 */
+.header-top-inner {
+  grid-template-columns: 1fr auto auto auto;
+}
+
+/* 手機版：只顯示放大鏡 */
+@media (max-width: 900px) {
+  .header-search {
+    justify-self: end;
+  }
+
+  .header-search input {
+    display: none;
+  }
+
+  .header-search-btn {
+    display: flex;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .header-search.show input {
+    display: block;
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    top: calc(100% + 10px);
+    width: auto;
+    height: 48px;
+    background: #fff;
+    color: #111;
+    z-index: 1300;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  }
+
+  .header-search.show input::placeholder {
+    color: #777;
+  }
+
+  .header-top-inner {
+    grid-template-columns: 1fr auto auto;
+  }
+}
