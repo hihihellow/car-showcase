@@ -1,9 +1,7 @@
 body {
   font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
   margin: 0;
-  background:
-    linear-gradient(rgba(255,255,255,0.86), rgba(255,255,255,0.86)),
-    url("images/cover.avif") center center / cover no-repeat fixed;
+  background: #f5f5f5;
   color: #222;
 }
 
@@ -585,7 +583,9 @@ body {
 .hero {
   position: relative;
   min-height: 600px;
-  background: transparent;
+  background:
+    linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.52) 42%, rgba(0,0,0,0.18) 100%),
+    url("images/cover.avif") center/cover no-repeat;
   overflow: hidden;
   margin-top: 0;
 }
@@ -593,7 +593,7 @@ body {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(8, 12, 20, 0.2);
 }
 
 .hero-content {
