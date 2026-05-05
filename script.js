@@ -336,25 +336,24 @@ if (addCarBtn) {
       Array.from(imageFiles).map(fileToBase64)
     );
 
+    const { data: lastCar, error: adminNoError } = await supabase
+      .from("cars")
+      .select("admin_no")
+      .not("admin_no", "is", null)
+      .order("admin_no", { ascending: false })
+      .limit(1)
+     .maybeSingle();
+
+    if (adminNoError) {
+      console.error("取得車號失敗:", adminNoError);
+      alert("取得車號失敗，請看 Console");
+      return;
+    }
+
+    const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
+
     const { data: insertedCar, error: carError } = await supabase
       .from("cars")
-
-      const { data: lastCar, error: adminNoError } = await supabase
-        .from("cars")
-        .select("admin_no")
-        .not("admin_no", "is", null)
-        .order("admin_no", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (adminNoError) {
-        console.error("取得車號失敗:", adminNoError);
-        alert("取得車號失敗，請看 Console");
-        return;
-      }
-
-      const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
-
       .insert([
         {
           admin_no: nextAdminNo,
