@@ -2081,3 +2081,12 @@ html {
     width: 100%;
   }
 }
+
+.admin-search-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 12px 0 18px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 15px;
+}

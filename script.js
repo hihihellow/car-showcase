@@ -338,8 +338,26 @@ if (addCarBtn) {
 
     const { data: insertedCar, error: carError } = await supabase
       .from("cars")
+
+      const { data: lastCar, error: adminNoError } = await supabase
+        .from("cars")
+        .select("admin_no")
+        .not("admin_no", "is", null)
+        .order("admin_no", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (adminNoError) {
+        console.error("取得車號失敗:", adminNoError);
+        alert("取得車號失敗，請看 Console");
+        return;
+      }
+
+      const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
+
       .insert([
         {
+          admin_no: nextAdminNo,
           title,
           brand,
           model,
@@ -404,6 +422,9 @@ if (addCarBtn) {
 // ADMIN 車輛列表 + 刪除
 // =========================
 const adminCarList = document.getElementById("adminCarList");
+const adminSearchInput = document.getElementById("adminSearchInput");
+
+let adminCars = [];
 
 async function loadAdminCars() {
   if (!adminCarList) return;
@@ -413,7 +434,7 @@ async function loadAdminCars() {
   const { data, error } = await supabase
     .from("cars")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("admin_no", { ascending: true });
 
   if (error) {
     console.error("讀取後台車輛失敗:", error);
@@ -421,14 +442,21 @@ async function loadAdminCars() {
     return;
   }
 
-  if (!data || data.length === 0) {
-    adminCarList.innerHTML = "<p>目前沒有車輛。</p>";
+  adminCars = data || [];
+  renderAdminCars(adminCars);
+}
+
+function renderAdminCars(list) {
+  if (!adminCarList) return;
+
+  if (!list || list.length === 0) {
+    adminCarList.innerHTML = "<p>找不到符合的車輛。</p>";
     return;
   }
 
   adminCarList.innerHTML = "";
 
-  data.forEach((car) => {
+  list.forEach((car) => {
     const item = document.createElement("div");
     item.className = "admin-car-item";
 
@@ -436,9 +464,9 @@ async function loadAdminCars() {
       <img src="${car.image}" alt="${car.title}" class="admin-car-img">
 
       <div class="admin-car-info">
-        <h3>${car.title}</h3>
+        <h3>#${car.admin_no || "未編號"}｜${car.title}</h3>
         <p>NT$ ${Number(car.price).toLocaleString()}</p>
-        <p>${car.category || ""}｜${car.region || ""}</p>
+        <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
       </div>
 
       <button class="admin-delete-btn" data-id="${car.id}">
@@ -461,8 +489,26 @@ async function loadAdminCars() {
   });
 }
 
+if (adminSearchInput) {
+  adminSearchInput.addEventListener("input", () => {
+    const keyword = adminSearchInput.value.trim().toLowerCase();
+
+    const filtered = adminCars.filter((car) => {
+      return (
+        String(car.admin_no || "").includes(keyword) ||
+        String(car.title || "").toLowerCase().includes(keyword) ||
+        String(car.brand || "").toLowerCase().includes(keyword) ||
+        String(car.model || "").toLowerCase().includes(keyword) ||
+        String(car.region || "").toLowerCase().includes(keyword) ||
+        String(car.category || "").toLowerCase().includes(keyword)
+      );
+    });
+
+    renderAdminCars(filtered);
+  });
+}
+
 async function deleteCar(carId) {
-  // 先刪多圖
   const { error: imageError } = await supabase
     .from("car_images")
     .delete()
@@ -474,7 +520,6 @@ async function deleteCar(carId) {
     return;
   }
 
-  // 再刪收藏紀錄
   const { error: favoriteError } = await supabase
     .from("favorites")
     .delete()
@@ -486,7 +531,6 @@ async function deleteCar(carId) {
     return;
   }
 
-  // 最後刪 cars 主資料
   const { error: carError } = await supabase
     .from("cars")
     .delete()
