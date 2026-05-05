@@ -401,6 +401,110 @@ if (addCarBtn) {
 }
 
 // =========================
+// ADMIN 車輛列表 + 刪除
+// =========================
+const adminCarList = document.getElementById("adminCarList");
+
+async function loadAdminCars() {
+  if (!adminCarList) return;
+
+  adminCarList.innerHTML = "<p>車輛讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("cars")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("讀取後台車輛失敗:", error);
+    adminCarList.innerHTML = "<p>讀取車輛失敗，請看 Console。</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    adminCarList.innerHTML = "<p>目前沒有車輛。</p>";
+    return;
+  }
+
+  adminCarList.innerHTML = "";
+
+  data.forEach((car) => {
+    const item = document.createElement("div");
+    item.className = "admin-car-item";
+
+    item.innerHTML = `
+      <img src="${car.image}" alt="${car.title}" class="admin-car-img">
+
+      <div class="admin-car-info">
+        <h3>${car.title}</h3>
+        <p>NT$ ${Number(car.price).toLocaleString()}</p>
+        <p>${car.category || ""}｜${car.region || ""}</p>
+      </div>
+
+      <button class="admin-delete-btn" data-id="${car.id}">
+        刪除
+      </button>
+    `;
+
+    adminCarList.appendChild(item);
+  });
+
+  document.querySelectorAll(".admin-delete-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const carId = btn.dataset.id;
+
+      const confirmDelete = confirm("確定要刪除這台車嗎？刪除後無法復原。");
+      if (!confirmDelete) return;
+
+      await deleteCar(carId);
+    });
+  });
+}
+
+async function deleteCar(carId) {
+  // 先刪多圖
+  const { error: imageError } = await supabase
+    .from("car_images")
+    .delete()
+    .eq("car_id", carId);
+
+  if (imageError) {
+    console.error("刪除圖片失敗:", imageError);
+    alert("刪除圖片失敗，請看 Console");
+    return;
+  }
+
+  // 再刪收藏紀錄
+  const { error: favoriteError } = await supabase
+    .from("favorites")
+    .delete()
+    .eq("car_id", String(carId));
+
+  if (favoriteError) {
+    console.error("刪除收藏紀錄失敗:", favoriteError);
+    alert("刪除收藏紀錄失敗，請看 Console");
+    return;
+  }
+
+  // 最後刪 cars 主資料
+  const { error: carError } = await supabase
+    .from("cars")
+    .delete()
+    .eq("id", carId);
+
+  if (carError) {
+    console.error("刪除車輛失敗:", carError);
+    alert("刪除車輛失敗，請看 Console");
+    return;
+  }
+
+  alert("車輛已刪除");
+  loadAdminCars();
+}
+
+loadAdminCars();
+
+// =========================
 // 詳細頁功能
 // =========================
 const carDetail = document.getElementById("carDetail");
