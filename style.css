@@ -584,8 +584,9 @@ body {
   position: relative;
   min-height: 600px;
   background:
-    linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.52) 42%, rgba(0,0,0,0.18) 100%),
+    linear-gradient(90deg, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.68) 42%, rgba(0,0,0,0.42) 100%),
     url("images/cover.avif") center/cover no-repeat;
+  background-attachment: fixed;
   overflow: hidden;
   margin-top: 0;
 }
