@@ -230,7 +230,9 @@ function renderCars(carArray) {
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
           <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
-          <div class="car-meta">${car.category}｜${car.region}</div>
+          <div class="car-meta">
+            ${car.category || "-"}｜${car.region || "-"}｜${car.year ? car.year + " 年" : "-"}
+          </div>
         </div>
       </a>
     `;
@@ -1030,7 +1032,9 @@ async function loadFavoriteCars() {
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
           <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
-          <div class="car-meta">${car.category}｜${car.region}</div>
+          <div class="car-meta">
+            ${car.category || "-"}｜${car.region || "-"}｜${car.year ? car.year + " 年" : "-"}
+          </div>
         </div>
       </a>
     `;
