@@ -582,7 +582,7 @@ body {
 ========================= */
 .hero {
   position: relative;
-  min-height: 600px;
+  min-height: 640px;
   background:
     linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.52) 42%, rgba(0,0,0,0.18) 100%),
     url("images/cover.avif") center/cover no-repeat;
@@ -600,7 +600,7 @@ body {
   position: relative;
   z-index: 2;
   max-width: 1280px;
-  min-height: 600px;
+  min-height: 640px;
   margin: 0 auto;
   padding: 0 48px;
   display: flex;
@@ -609,16 +609,17 @@ body {
 }
 
 .hero-text {
-  max-width: 580px;
+  max-width: 900px;
   color: #fff;
 }
 
 .hero-text h1 {
   margin: 0 0 22px;
-  font-size: 76px;
-  line-height: 1.05;
+  font-size: 64px;
+  line-height: 1.15;
   font-weight: 900;
   letter-spacing: 1px;
+  white-space: nowrap;
 }
 
 .hero-text p {
@@ -861,6 +862,7 @@ body {
 
   .hero-text h1 {
     font-size: 42px;
+    white-space: normal;
   }
 
   .hero-text p {
