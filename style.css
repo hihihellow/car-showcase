@@ -2104,3 +2104,221 @@ html {
   border-radius: 10px;
   font-size: 15px;
 }
+
+/* =========================
+   首頁黑色系版面優化
+========================= */
+
+/* Hero 大圖區 */
+.hero {
+  min-height: 680px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,0.25) 0%,
+      rgba(0,0,0,0.62) 62%,
+      #050505 100%
+    ),
+    url("images/cover.avif") center center / cover no-repeat fixed;
+}
+
+.hero-overlay {
+  background: rgba(0,0,0,0.15);
+}
+
+.hero-content {
+  min-height: 680px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: 40px;
+}
+
+.hero-text {
+  max-width: 1100px;
+}
+
+.hero-text h1 {
+  font-size: 68px;
+  line-height: 1.1;
+  white-space: nowrap;
+  letter-spacing: 3px;
+  text-shadow: 0 12px 34px rgba(0,0,0,0.75);
+}
+
+.hero-text p {
+  font-size: 22px;
+  color: rgba(255,255,255,0.82);
+}
+
+/* 車輛區 */
+.car-area {
+  background:
+    linear-gradient(
+      180deg,
+      #050505 0%,
+      #101010 180px,
+      #0b0b0b 100%
+    );
+  padding-bottom: 90px;
+}
+
+/* 全部車輛標題 */
+.section-title {
+  margin: 0 auto;
+  padding: 80px 48px 28px;
+  text-align: center;
+}
+
+.section-title h2 {
+  color: #f4c430;
+  font-size: 48px;
+  letter-spacing: 4px;
+}
+
+.section-title p {
+  color: rgba(255,255,255,0.65);
+}
+
+/* 篩選列 */
+.filters {
+  padding: 8px 48px 46px;
+}
+
+.filters select {
+  background: rgba(255,255,255,0.08);
+  color: #f5f5f5;
+  border: 1px solid rgba(244,196,48,0.4);
+  border-radius: 999px;
+  padding: 14px 24px;
+}
+
+.filters select option {
+  background: #111;
+  color: #fff;
+}
+
+/* 車卡區 */
+.car-list {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 34px;
+  margin-bottom: 80px;
+}
+
+.car-card {
+  background: #151515;
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: 0 24px 50px rgba(0,0,0,0.48);
+}
+
+.car-card:hover {
+  transform: translateY(-10px);
+  border-color: rgba(244,196,48,0.65);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.75);
+}
+
+.car-card img {
+  height: 250px;
+}
+
+.car-content {
+  background: linear-gradient(180deg, #1a1a1a, #101010);
+  padding: 24px 26px 28px;
+}
+
+.car-title {
+  color: #fff;
+  font-size: 22px;
+  letter-spacing: 0.5px;
+}
+
+.card-price {
+  color: #f4c430;
+  font-size: 30px;
+}
+
+.car-meta {
+  color: rgba(255,255,255,0.65);
+}
+
+/* 愛心 */
+.favorite-btn {
+  background: rgba(0,0,0,0.72);
+  color: #f4c430;
+  border: 1px solid rgba(244,196,48,0.4);
+}
+
+/* 分頁 */
+#pagination {
+  color: #fff;
+}
+
+#pagination button {
+  background: #f4c430;
+  color: #111;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+#pagination button:disabled {
+  background: #333;
+  color: #888;
+}
+
+/* 服務 / 關於我們 */
+#serviceSection,
+#aboutSection {
+  max-width: none;
+  margin: 0;
+  padding: 90px 48px;
+  background: #080808;
+  border-top: 1px solid rgba(244,196,48,0.16);
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 560px;
+    background-attachment: scroll;
+  }
+
+  .hero-content {
+    min-height: 560px;
+    text-align: left;
+    justify-content: flex-start;
+  }
+
+  .hero-text h1 {
+    font-size: 42px;
+    white-space: normal;
+  }
+
+  .hero-text p {
+    font-size: 17px;
+  }
+
+  .section-title {
+    text-align: left;
+    padding: 64px 24px 20px;
+  }
+
+  .section-title h2 {
+    font-size: 36px;
+  }
+
+  .filters {
+    padding: 10px 24px 32px;
+  }
+
+  .filters select {
+    width: 100%;
+  }
+
+  .car-list {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
