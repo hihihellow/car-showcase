@@ -2572,3 +2572,23 @@ body {
     width: auto;
   }
 }
+
+/* detail 車輛配備字體亮一點 */
+.equipment-section {
+  color: #f5f1e6;
+}
+
+.equipment-section h2 {
+  color: #ffffff;
+}
+
+.equipment-list,
+.equipment-list li,
+.equipment-section p,
+.equipment-section span {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.equipment-list li::marker {
+  color: #f4c430;
+}
