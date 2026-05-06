@@ -2573,22 +2573,16 @@ body {
   }
 }
 
-/* detail 車輛配備字體亮一點 */
-.equipment-section {
-  color: #f5f1e6;
+/* detail 車輛配備文字亮色 */
+.equipment-section .equipment-label,
+.equipment-section .equipment-item {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
-.equipment-section h2 {
-  color: #ffffff;
+.equipment-section .equipment-header h3 {
+  color: #ffffff !important;
 }
 
-.equipment-list,
-.equipment-list li,
-.equipment-section p,
-.equipment-section span {
-  color: rgba(255, 255, 255, 0.86) !important;
-}
-
-.equipment-list li::marker {
-  color: #f4c430;
+.equipment-section .equipment-label {
+  color: #f4c430 !important;
 }
