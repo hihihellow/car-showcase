@@ -2432,3 +2432,28 @@ body {
 .equipment-section .equipment-label {
   color: #f4c430 !important;
 }
+
+.admin-action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-edit-btn {
+  padding: 10px 16px;
+  background: #f4c430;
+  color: #111;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.admin-delete-btn {
+  background: #b00020;
+}
+
+.edit-mode-text {
+  margin-top: 10px;
+  color: #f4c430;
+  font-weight: 800;
+}

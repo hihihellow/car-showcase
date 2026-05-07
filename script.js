@@ -294,6 +294,11 @@ if (searchInput && categoryFilter && regionFilter && priceFilter) {
 // 發文頁功能
 // =========================
 const addCarBtn = document.getElementById("addCarBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+const editModeText = document.getElementById("editModeText");
+
+let editingCarId = null;
+let oldImages = [];
 
 if (addCarBtn) {
   addCarBtn.addEventListener("click", async () => {
@@ -329,36 +334,33 @@ if (addCarBtn) {
       return;
     }
 
-    if (imageFiles.length === 0) {
+    if (!editingCarId && imageFiles.length === 0) {
       alert("請至少上傳一張照片");
       return;
     }
 
-    const images = await Promise.all(
-      Array.from(imageFiles).map(fileToBase64)
-    );
+    let images = [];
 
-    const { data: lastCar, error: adminNoError } = await supabase
-      .from("cars")
-      .select("admin_no")
-      .not("admin_no", "is", null)
-      .order("admin_no", { ascending: false })
-      .limit(1)
-     .maybeSingle();
+    if (imageFiles.length > 0) {
+      const filesArray = Array.from(imageFiles);
 
-    if (adminNoError) {
-      console.error("取得車號失敗:", adminNoError);
-      alert("取得車號失敗，請看 Console");
-      return;
+      for (let i = 0; i < filesArray.length; i++) {
+        const base64 = await fileToBase64(filesArray[i]);
+        images.push(base64);
+      }
+    } else {
+      images = oldImages;
     }
 
-    const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
+    if (!images || images.length === 0) {
+      images = oldImages;
+    }
+    let savedCar = null;
 
-    const { data: insertedCar, error: carError } = await supabase
-      .from("cars")
-      .insert([
-        {
-          admin_no: nextAdminNo,
+    if (editingCarId) {
+      const { data: updatedCar, error: updateError } = await supabase
+        .from("cars")
+        .update({
           title,
           brand,
           model,
@@ -371,35 +373,110 @@ if (addCarBtn) {
           color: color || null,
           description,
           equipment: equipment || null,
-          image: images[0]
+          image: images && images.length > 0 ? images[0] : oldImages[0]
+        })
+        .eq("id", editingCarId)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("更新車輛失敗:", updateError);
+        alert("更新車輛失敗，請看 Console");
+        return;
+      }
+
+      savedCar = updatedCar;
+
+      if (imageFiles.length > 0) {
+        await supabase
+          .from("car_images")
+          .delete()
+          .eq("car_id", editingCarId);
+
+        const imageRows = images.map((img, index) => ({
+          car_id: editingCarId,
+          image_url: img,
+          sort_order: index
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("car_images")
+          .insert(imageRows);
+
+        if (imagesError) {
+          console.error("更新圖片失敗:", imagesError);
+          alert("車輛已更新，但圖片更新失敗，請看 Console");
+          return;
         }
-      ])
-      .select()
-      .single();
+      }
 
-    if (carError) {
-      console.error("新增車輛失敗:", carError);
-      alert("新增車輛失敗，請看 Console");
-      return;
+      alert("車輛更新成功！");
+    } else {
+      const { data: lastCar, error: adminNoError } = await supabase
+        .from("cars")
+        .select("admin_no")
+        .not("admin_no", "is", null)
+        .order("admin_no", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (adminNoError) {
+        console.error("取得車號失敗:", adminNoError);
+        alert("取得車號失敗，請看 Console");
+        return;
+      }
+
+      const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
+
+      const { data: insertedCar, error: carError } = await supabase
+        .from("cars")
+        .insert([
+          {
+            admin_no: nextAdminNo,
+            title,
+            brand,
+            model,
+            year,
+            cc,
+            price,
+            region,
+            category,
+            mileage: Number.isNaN(mileage) ? null : mileage,
+            color: color || null,
+            description,
+            equipment: equipment || null,
+            image: images && images.length > 0 ? images[0] : null
+          }
+        ])
+        .select()
+        .single();
+
+      if (carError) {
+        console.error("新增車輛失敗:", carError);
+        alert("新增車輛失敗，請看 Console");
+        return;
+      }
+
+      savedCar = insertedCar;
+
+      const imageRows = images.map((img, index) => ({
+       car_id: insertedCar.id,
+        image_url: img,
+        sort_order: index
+      }));
+
+      const { error: imagesError } = await supabase
+        .from("car_images")
+        .insert(imageRows);
+
+      if (imagesError) {
+        console.error("新增圖片失敗:", imagesError);
+        alert("車輛已新增，但圖片新增失敗，請看 Console");
+        return;
+      }
+
+      alert("刊登成功！回首頁就能看到新車。");
     }
-
-    const imageRows = images.map((img, index) => ({
-      car_id: insertedCar.id,
-      image_url: img,
-      sort_order: index
-    }));
-
-    const { error: imagesError } = await supabase
-      .from("car_images")
-      .insert(imageRows);
-
-    if (imagesError) {
-      console.error("新增圖片失敗:", imagesError);
-      alert("車輛已新增，但圖片新增失敗，請看 Console");
-      return;
-    }
-
-    alert("刊登成功！回首頁就能看到新車。");
 
     document.getElementById("titleInput").value = "";
     document.getElementById("brandInput").value = "";
@@ -415,7 +492,16 @@ if (addCarBtn) {
     document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
 
-    window.location.href = "index.html";
+    //window.location.href = "index.html";
+
+    editingCarId = null;
+    oldImages = [];
+
+    addCarBtn.textContent = "送出";
+    cancelEditBtn.classList.add("hidden");
+    editModeText.classList.add("hidden");
+
+    loadAdminCars();
   });
 }
 
@@ -470,12 +556,25 @@ function renderAdminCars(list) {
         <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
       </div>
 
-      <button class="admin-delete-btn" data-id="${car.id}">
-        刪除
-      </button>
+      <div class="admin-action-row">
+        <button class="admin-edit-btn" data-id="${car.id}">
+          編輯
+        </button>
+
+        <button class="admin-delete-btn" data-id="${car.id}">
+          刪除
+        </button>
+      </div>
     `;
 
     adminCarList.appendChild(item);
+  });
+
+  document.querySelectorAll(".admin-edit-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const carId = Number(btn.dataset.id);
+      await startEditCar(carId);
+    });
   });
 
   document.querySelectorAll(".admin-delete-btn").forEach((btn) => {
@@ -506,6 +605,58 @@ if (adminSearchInput) {
     });
 
     renderAdminCars(filtered);
+  });
+}
+
+async function startEditCar(carId) {
+  const car = adminCars.find(item => Number(item.id) === Number(carId));
+
+  if (!car) {
+    alert("找不到這台車");
+    return;
+  }
+
+  const { data: imageData, error: imageError } = await supabase
+    .from("car_images")
+    .select("*")
+    .eq("car_id", car.id)
+    .order("sort_order", { ascending: true });
+
+  if (imageError) {
+    console.error("讀取圖片失敗:", imageError);
+    alert("讀取圖片失敗，請看 Console");
+    return;
+  }
+
+  oldImages =
+    imageData && imageData.length > 0
+      ? imageData.map(item => item.image_url)
+      : [car.image];
+
+  editingCarId = car.id;
+
+  document.getElementById("titleInput").value = car.title || "";
+  document.getElementById("brandInput").value = car.brand || "";
+  document.getElementById("modelInput").value = car.model || "";
+  document.getElementById("yearInput").value = car.year || "";
+  document.getElementById("ccInput").value = car.cc || "";
+  document.getElementById("priceInput").value = car.price || "";
+  document.getElementById("regionInput").value = car.region || "";
+  document.getElementById("categoryInput").value = car.category || "";
+  document.getElementById("mileageInput").value = car.mileage || "";
+  document.getElementById("colorInput").value = car.color || "";
+  document.getElementById("equipmentInput").value = car.equipment || "";
+  document.getElementById("descInput").value = car.description || "";
+  document.getElementById("imageInput").value = "";
+
+  addCarBtn.textContent = "儲存修改";
+  cancelEditBtn.classList.remove("hidden");
+  editModeText.classList.remove("hidden");
+  editModeText.textContent = `目前正在編輯：#${car.admin_no || "未編號"}｜${car.title}`;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
   });
 }
 
@@ -545,6 +696,31 @@ async function deleteCar(carId) {
 
   alert("車輛已刪除");
   loadAdminCars();
+}
+
+if (cancelEditBtn) {
+  cancelEditBtn.addEventListener("click", () => {
+    editingCarId = null;
+    oldImages = [];
+
+    document.getElementById("titleInput").value = "";
+    document.getElementById("brandInput").value = "";
+    document.getElementById("modelInput").value = "";
+    document.getElementById("yearInput").value = "";
+    document.getElementById("ccInput").value = "";
+    document.getElementById("priceInput").value = "";
+    document.getElementById("regionInput").value = "";
+    document.getElementById("categoryInput").value = "";
+    document.getElementById("mileageInput").value = "";
+    document.getElementById("colorInput").value = "";
+    document.getElementById("imageInput").value = "";
+    document.getElementById("equipmentInput").value = "";
+    document.getElementById("descInput").value = "";
+
+    addCarBtn.textContent = "送出";
+    cancelEditBtn.classList.add("hidden");
+    editModeText.classList.add("hidden");
+  });
 }
 
 loadAdminCars();
