@@ -2505,3 +2505,220 @@ body {
   color: #f4c430;
   font-size: 13px;
 }
+
+/* =========================
+   Admin 後台黑金美編
+========================= */
+
+body:has(.post-form) {
+  background:
+    radial-gradient(circle at top, rgba(244,196,48,0.1), transparent 34%),
+    linear-gradient(180deg, #050505 0%, #101010 45%, #060606 100%);
+  color: #f5f1e6;
+}
+
+.header {
+  background:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.85)),
+    url("images/cover.avif") center center / cover no-repeat;
+  color: #fff;
+  padding: 70px 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.header h1 {
+  color: #f4c430;
+  font-size: 44px;
+  margin: 0 0 10px;
+}
+
+.header p {
+  color: rgba(255,255,255,0.72);
+}
+
+.post-form,
+.admin-car-section {
+  max-width: 1180px;
+  margin: 34px auto;
+  padding: 34px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 28px;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.45);
+}
+
+.post-form h2,
+.admin-car-section h2 {
+  color: #f4c430;
+  font-size: 30px;
+  margin: 0 0 22px;
+}
+
+.post-form input,
+.post-form textarea,
+.admin-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(244,196,48,0.25);
+  border-radius: 14px;
+  outline: none;
+}
+
+.post-form input::placeholder,
+.post-form textarea::placeholder,
+.admin-search-input::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+.post-form input:focus,
+.post-form textarea:focus,
+.admin-search-input:focus {
+  border-color: #f4c430;
+  box-shadow: 0 0 0 3px rgba(244,196,48,0.13);
+}
+
+.post-form label {
+  color: #f4c430;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.post-form input[type="file"] {
+  padding: 14px;
+  cursor: pointer;
+}
+
+.post-form button,
+.post-link-btn {
+  background: #f4c430;
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-weight: 900;
+  padding: 13px 22px;
+}
+
+#cancelEditBtn {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(244,196,48,0.25);
+}
+
+.edit-mode-text,
+.image-order-tip {
+  color: #f4c430;
+}
+
+/* 圖片預覽 */
+.image-preview-list {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+}
+
+.image-preview-item {
+  background: #111;
+  border: 1px solid rgba(244,196,48,0.25);
+  border-radius: 18px;
+  padding: 10px;
+}
+
+.image-preview-item img {
+  height: 130px;
+  border-radius: 12px;
+}
+
+.preview-cover-badge {
+  color: #f4c430;
+}
+
+.preview-actions button {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.preview-actions button:hover {
+  background: #f4c430;
+  color: #111;
+}
+
+/* 後台車輛列表 */
+.admin-car-list {
+  gap: 16px;
+}
+
+.admin-car-item {
+  background: rgba(0,0,0,0.32);
+  border: 1px solid rgba(244,196,48,0.15);
+  border-radius: 22px;
+  padding: 16px;
+}
+
+.admin-car-img {
+  width: 150px;
+  height: 100px;
+  border-radius: 16px;
+}
+
+.admin-car-info h3 {
+  color: #fff;
+}
+
+.admin-car-info p {
+  color: rgba(255,255,255,0.65);
+}
+
+.admin-action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-edit-btn {
+  background: #f4c430;
+  color: #111;
+  border-radius: 999px;
+}
+
+.admin-delete-btn {
+  background: #b00020;
+  color: #fff;
+  border-radius: 999px;
+}
+
+.post-entry {
+  margin: 40px 0 70px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 46px 18px;
+  }
+
+  .header h1 {
+    font-size: 34px;
+  }
+
+  .post-form,
+  .admin-car-section {
+    margin: 20px 14px;
+    padding: 22px;
+  }
+
+  .admin-car-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .admin-car-img {
+    width: 100%;
+    height: 190px;
+  }
+
+  .admin-action-row,
+  .admin-edit-btn,
+  .admin-delete-btn {
+    width: 100%;
+  }
+}
