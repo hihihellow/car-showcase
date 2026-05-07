@@ -299,6 +299,76 @@ const editModeText = document.getElementById("editModeText");
 
 let editingCarId = null;
 let oldImages = [];
+let selectedImageFiles = [];
+
+const imageInput = document.getElementById("imageInput");
+const imagePreviewList = document.getElementById("imagePreviewList");
+
+function renderImagePreview() {
+  if (!imagePreviewList) return;
+
+  imagePreviewList.innerHTML = "";
+
+  selectedImageFiles.forEach((file, index) => {
+    const imageUrl = URL.createObjectURL(file);
+
+    const item = document.createElement("div");
+    item.className = "image-preview-item";
+
+    item.innerHTML = `
+      <div class="preview-cover-badge">${index === 0 ? "封面" : `第 ${index + 1} 張`}</div>
+      <img src="${imageUrl}" alt="preview">
+      <div class="preview-actions">
+        <button type="button" class="preview-up-btn" data-index="${index}">上移</button>
+        <button type="button" class="preview-down-btn" data-index="${index}">下移</button>
+        <button type="button" class="preview-remove-btn" data-index="${index}">刪除</button>
+      </div>
+    `;
+
+    imagePreviewList.appendChild(item);
+  });
+
+  document.querySelectorAll(".preview-up-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const index = Number(btn.dataset.index);
+      if (index <= 0) return;
+
+      const temp = selectedImageFiles[index - 1];
+      selectedImageFiles[index - 1] = selectedImageFiles[index];
+      selectedImageFiles[index] = temp;
+
+      renderImagePreview();
+    });
+  });
+
+  document.querySelectorAll(".preview-down-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const index = Number(btn.dataset.index);
+      if (index >= selectedImageFiles.length - 1) return;
+
+      const temp = selectedImageFiles[index + 1];
+      selectedImageFiles[index + 1] = selectedImageFiles[index];
+      selectedImageFiles[index] = temp;
+
+      renderImagePreview();
+    });
+  });
+
+  document.querySelectorAll(".preview-remove-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const index = Number(btn.dataset.index);
+      selectedImageFiles.splice(index, 1);
+      renderImagePreview();
+    });
+  });
+}
+
+if (imageInput) {
+  imageInput.addEventListener("change", () => {
+    selectedImageFiles = Array.from(imageInput.files);
+    renderImagePreview();
+  });
+}
 
 if (addCarBtn) {
   addCarBtn.addEventListener("click", async () => {
@@ -315,7 +385,6 @@ if (addCarBtn) {
     const mileage = Number(document.getElementById("mileageInput").value);
     const color = document.getElementById("colorInput").value.trim();
 
-    const imageFiles = document.getElementById("imageInput").files;
     const equipment = document.getElementById("equipmentInput").value.trim();
     const description = document.getElementById("descInput").value.trim();
 
@@ -334,18 +403,16 @@ if (addCarBtn) {
       return;
     }
 
-    if (!editingCarId && imageFiles.length === 0) {
+    if (!editingCarId && selectedImageFiles.length === 0) {
       alert("請至少上傳一張照片");
       return;
     }
 
     let images = [];
 
-    if (imageFiles.length > 0) {
-      const filesArray = Array.from(imageFiles);
-
-      for (let i = 0; i < filesArray.length; i++) {
-        const base64 = await fileToBase64(filesArray[i]);
+    if (selectedImageFiles.length > 0) {
+      for (let i = 0; i < selectedImageFiles.length; i++) {
+        const base64 = await fileToBase64(selectedImageFiles[i]);
         images.push(base64);
       }
     } else {
@@ -392,7 +459,7 @@ if (addCarBtn) {
 
       savedCar = updatedCar;
 
-      if (imageFiles.length > 0) {
+      if (selectedImageFiles.length > 0) {
         await supabase
           .from("car_images")
           .delete()
@@ -494,6 +561,8 @@ if (addCarBtn) {
     document.getElementById("mileageInput").value = "";
     document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
+    selectedImageFiles = [];
+    renderImagePreview();
     document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
 
@@ -653,6 +722,8 @@ async function startEditCar(carId) {
   document.getElementById("equipmentInput").value = car.equipment || "";
   document.getElementById("descInput").value = car.description || "";
   document.getElementById("imageInput").value = "";
+  selectedImageFiles = [];
+  renderImagePreview();
 
   addCarBtn.textContent = "儲存修改";
   cancelEditBtn.classList.remove("hidden");
@@ -719,6 +790,8 @@ if (cancelEditBtn) {
     document.getElementById("mileageInput").value = "";
     document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
+    selectedImageFiles = [];
+    renderImagePreview();
     document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
 
