@@ -375,13 +375,18 @@ if (addCarBtn) {
           equipment: equipment || null,
           image: images && images.length > 0 ? images[0] : oldImages[0]
         })
-        .eq("id", editingCarId)
+        .eq("id", Number(editingCarId))
         .select()
-        .single();
+        .maybeSingle();
 
       if (updateError) {
         console.error("更新車輛失敗:", updateError);
         alert("更新車輛失敗，請看 Console");
+        return;
+      }
+
+      if (!updatedCar) {
+        alert("更新失敗：找不到這台車，可能已經被刪除。");
         return;
       }
 
