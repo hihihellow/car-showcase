@@ -463,7 +463,7 @@ if (addCarBtn) {
         await supabase
           .from("car_images")
           .delete()
-          .eq("car_id", editingCarId);
+          .eq("car_id", Number(editingCarId));
 
         const imageRows = images.map((img, index) => ({
           car_id: editingCarId,

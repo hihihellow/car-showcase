@@ -2114,14 +2114,129 @@ html {
   color: #888;
 }
 
-/* 服務 / 關於我們 */
-#serviceSection,
-#aboutSection {
-  max-width: none;
-  margin: 0;
-  padding: 90px 48px;
-  background: #080808;
+/* 服務 / 關於我們 升級版 */
+.service-section,
+.about-section {
+  position: relative;
+  padding: 110px 8%;
+  background:
+    radial-gradient(circle at top right, rgba(244,196,48,0.08), transparent 35%),
+    #050505;
   border-top: 1px solid rgba(244,196,48,0.16);
+  overflow: hidden;
+}
+
+.about-section {
+  background:
+    radial-gradient(circle at bottom right, rgba(244,196,48,0.08), transparent 35%),
+    #070707;
+}
+
+.section-title-wrap {
+  text-align: center;
+  margin-bottom: 65px;
+}
+
+.section-title-wrap span {
+  color: #f4c430;
+  letter-spacing: 4px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.section-title-wrap h2 {
+  color: #f4c430;
+  font-size: 56px;
+  font-weight: 900;
+  margin: 10px 0 18px;
+}
+
+.section-title-wrap p {
+  color: #d6d6d6;
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+.service-grid,
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+}
+
+.service-card,
+.stats-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01));
+  border: 1px solid rgba(244,196,48,0.28);
+  border-radius: 22px;
+  padding: 42px 28px;
+  text-align: center;
+  transition: 0.35s ease;
+  backdrop-filter: blur(10px);
+}
+
+.service-card:hover,
+.stats-card:hover {
+  transform: translateY(-10px);
+  border-color: #f4c430;
+  box-shadow: 0 18px 45px rgba(244,196,48,0.15);
+}
+
+.service-card img,
+.stats-card img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 0 10px rgba(244,196,48,0.35));
+}
+
+.service-card h3 {
+  color: #fff;
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+.service-card p,
+.stats-card p {
+  color: #cfcfcf;
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.stats-card h3 {
+  color: #fff;
+  font-size: 42px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 992px) {
+  .service-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .service-section,
+  .about-section {
+    padding: 80px 24px;
+  }
+
+  .service-grid,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title-wrap h2 {
+    font-size: 42px;
+  }
+
+  .section-title-wrap p {
+    font-size: 16px;
+  }
 }
 
 /* 手機版 */
@@ -2722,3 +2837,4 @@ body:has(.post-form) {
     width: 100%;
   }
 }
+
