@@ -2972,112 +2972,73 @@ body:has(.post-form) {
 }
 
 /* =========================
-   ABOUT 長方形精品金框
+   關於我們｜長方形金框圖片
 ========================= */
 
 .about-banner-grid {
-  max-width: 1400px;
-  margin: 70px auto 0;
+  max-width: 1320px;
+  margin: 65px auto 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 28px;
+  gap: 30px;
 }
 
 .about-banner-card {
   position: relative;
-  overflow: hidden;
-  border-radius: 26px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,255,255,0.06),
-      rgba(255,255,255,0.015)
-    );
-
-  border: 1px solid rgba(244,196,48,0.45);
-
+  padding: 10px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+  border: 1.5px solid rgba(244,196,48,0.65);
   box-shadow:
-    0 20px 60px rgba(0,0,0,0.55),
-    0 0 35px rgba(244,196,48,0.08);
-
-  padding: 14px;
-
-  transition: all 0.4s ease;
+    0 18px 45px rgba(0,0,0,0.55),
+    0 0 22px rgba(244,196,48,0.10),
+    inset 0 0 0 1px rgba(255,255,255,0.05);
+  overflow: hidden;
+  transition: 0.35s ease;
 }
 
-.about-banner-card::before {
+.about-banner-card::after {
   content: "";
   position: absolute;
-  inset: 0;
-
-  background:
-    linear-gradient(
-      120deg,
-      transparent 20%,
-      rgba(244,196,48,0.08),
-      transparent 80%
-    );
-
-  opacity: 0;
-  transition: 0.5s;
-}
-
-.about-banner-card:hover {
-  transform: translateY(-8px);
-
-  border-color: #f4c430;
-
-  box-shadow:
-    0 25px 70px rgba(0,0,0,0.65),
-    0 0 45px rgba(244,196,48,0.16);
-}
-
-.about-banner-card:hover::before {
-  opacity: 1;
+  inset: 10px;
+  border-radius: 16px;
+  border: 1px solid rgba(244,196,48,0.18);
+  pointer-events: none;
 }
 
 .about-banner-card img {
   width: 100%;
-  height: 220px;
-
-  object-fit: cover;
-
-  border-radius: 18px;
-
+  aspect-ratio: 2.7 / 1;
+  object-fit: contain;
   display: block;
-
-  background: #0a0a0a;
+  border-radius: 15px;
+  background: #050505;
 }
 
-/* 平板 */
-@media (max-width: 992px) {
-
-  .about-banner-grid {
-    gap: 20px;
-  }
-
-  .about-banner-card img {
-    height: 180px;
-  }
+.about-banner-card:hover {
+  transform: translateY(-6px);
+  border-color: #f4c430;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.65),
+    0 0 36px rgba(244,196,48,0.18);
 }
 
 /* 手機版 */
 @media (max-width: 768px) {
-
   .about-banner-grid {
     grid-template-columns: 1fr;
     gap: 18px;
+    margin-top: 42px;
   }
 
   .about-banner-card {
-    border-radius: 22px;
-    padding: 10px;
+    padding: 8px;
+    border-radius: 18px;
   }
 
   .about-banner-card img {
-    height: 160px;
-    border-radius: 14px;
+    aspect-ratio: 2.4 / 1;
+    border-radius: 12px;
   }
 }
 
