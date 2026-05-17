@@ -2271,11 +2271,12 @@ html {
 @media (max-width: 768px) {
   .service-section,
   .about-section {
-    padding: 75px 22px;
+    padding: 75px 16px;
   }
 
   .service-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 
   .section-title-wrap h2 {
@@ -2287,7 +2288,27 @@ html {
   }
 
   .service-card {
-    min-height: auto;
+    min-height: 210px;
+    padding: 22px 10px 24px;
+    border-radius: 18px;
+  }
+
+  .service-card img {
+    width: 54px;
+    height: 54px;
+    margin: 10px auto 18px;
+  }
+
+  .service-card h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .service-card p {
+    font-size: 13px;
+    line-height: 1.7;
+    padding-left: 6px;
+    padding-right: 6px;
   }
 }
 
