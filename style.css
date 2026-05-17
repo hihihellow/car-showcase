@@ -2161,8 +2161,7 @@ html {
   line-height: 1.9;
 }
 
-.service-grid,
-.stats-grid {
+.service-grid {
   max-width: 1320px;
   margin: 0 auto;
   display: grid;
@@ -2170,8 +2169,7 @@ html {
   gap: 26px;
 }
 
-.service-card,
-.stats-card {
+.service-card {
   position: relative;
   min-height: 330px;
   padding: 0 0 42px;
@@ -2188,8 +2186,7 @@ html {
   overflow: hidden;
 }
 
-.service-card::before,
-.stats-card::before {
+.service-card::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2203,13 +2200,11 @@ html {
   transition: 0.7s ease;
 }
 
-.service-card:hover::before,
-.stats-card:hover::before {
+.service-card:hover::before {
   transform: translateX(120%);
 }
 
-.service-card:hover,
-.stats-card:hover {
+.service-card:hover {
   transform: translateY(-10px) scale(1.02);
   border-color: #f4c430;
   box-shadow:
@@ -2227,17 +2222,6 @@ html {
   border-radius: 0;
   background: transparent;
   filter: drop-shadow(0 0 12px rgba(244,196,48,0.45));
-}
-
-.stats-card img {
-  width: 58px;
-  height: 58px;
-  object-fit: contain;
-  margin: 0 auto 14px;
-  display: block;
-  background: transparent;
-  padding: 0;
-  filter: drop-shadow(0 0 10px rgba(244,196,48,0.35));
 }
 
 .service-card h3,
@@ -2258,8 +2242,7 @@ html {
   letter-spacing: 1px;
 }
 
-.service-card p,
-.stats-card p {
+.service-card p {
   color: #d6d6d6;
   line-height: 1.9;
   font-size: 16px;
@@ -2280,8 +2263,7 @@ html {
 
 /* RWD */
 @media (max-width: 992px) {
-  .service-grid,
-  .stats-grid {
+ .service-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -2292,8 +2274,7 @@ html {
     padding: 75px 22px;
   }
 
-  .service-grid,
-  .stats-grid {
+  .service-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2906,68 +2887,6 @@ body:has(.post-form) {
   .admin-edit-btn,
   .admin-delete-btn {
     width: 100%;
-  }
-}
-
-/* 關於我們圖片金框版 */
-.about-photo-grid {
-  max-width: 1320px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 26px;
-}
-
-.about-photo-card {
-  position: relative;
-  border-radius: 24px;
-  padding: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015));
-  border: 1px solid rgba(244,196,48,0.45);
-  box-shadow:
-    0 18px 45px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(255,255,255,0.08);
-  overflow: hidden;
-  transition: 0.35s ease;
-}
-
-.about-photo-card img {
-  width: 100%;
-  height: 100%;
-  min-height: 210px;
-  object-fit: contain;
-  display: block;
-  border-radius: 18px;
-  background: #080808;
-  filter: none;
-}
-
-.about-photo-card:hover {
-  transform: translateY(-8px);
-  border-color: #f4c430;
-  box-shadow: 0 22px 55px rgba(244,196,48,0.14);
-}
-
-/* 手機版 */
-@media (max-width: 992px) {
-  .about-photo-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .about-photo-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .about-photo-card {
-    padding: 12px;
-    border-radius: 20px;
-  }
-
-  .about-photo-card img {
-    min-height: 160px;
   }
 }
 
