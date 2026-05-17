@@ -2979,7 +2979,7 @@ body:has(.post-form) {
   max-width: 1320px;
   margin: 65px auto 0;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 30px;
 }
 
@@ -3026,7 +3026,7 @@ body:has(.post-form) {
 /* 手機版 */
 @media (max-width: 768px) {
   .about-banner-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 18px;
     margin-top: 42px;
   }
