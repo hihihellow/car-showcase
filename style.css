@@ -3157,3 +3157,8 @@ body:has(.post-form) {
   text-decoration: none;
 }
 
+#registerRole option {
+  color: #111;
+  background: #fff;
+}
+
