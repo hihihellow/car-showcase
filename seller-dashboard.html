@@ -11,6 +11,25 @@
   <h1>賣家車輛管理後台</h1>
   <p>在這裡管理你車行自己的車輛</p>
   </header>
+
+  <section class="seller-store-panel">
+    <h2>店面資料設定</h2>
+    <p>設定你的車行名稱、介紹與店面形象。</p>
+
+    <label>車行名稱</label>
+    <input id="storeNameEdit" placeholder="例如：進家中古車" />
+
+    <label>店面介紹</label>
+    <textarea id="storeDescEdit" rows="4" placeholder="輸入車行介紹"></textarea>
+
+    <label>Banner 圖片網址</label>
+    <input id="storeBannerEdit" placeholder="https://..." />
+
+    <label>Logo 圖片網址</label>
+    <input id="storeLogoEdit" placeholder="https://..." />
+
+    <button id="saveStoreBtn" type="button">儲存店面資料</button>
+  </section>
  
   <section class="post-form">
     <h2>新增車輛</h2>
@@ -65,6 +84,6 @@
     <a href="index.html" class="post-link-btn">返回前台首頁</a>
   </section>
 
-  <script type="module" src="script.js"></script>
+  <script type="module" src="seller-dashboard.script.js"></script>
 </body>
 </html>

@@ -1,7 +1,8 @@
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
 console.log("script.js 有執行");
 console.log("目前網址:", window.location.href);
 console.log("Supabase client ready");
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabaseUrl = "https://sszyqmgrlxpwonfidkcr.supabase.co";
 const supabaseKey = "sb_publishable_DxGd6Yu_mXB1YqiUTxJdqA_CT17Rv27";
@@ -885,6 +886,17 @@ if (carDetail) {
 
       const car = cars.find(item => item.id === carId);
 
+      if (!car) {
+        carDetail.innerHTML = `
+          <div class="detail-content">
+            <h2 class="detail-title">找不到這台車</h2>
+            <div class="detail-desc">可能已被刪除，或連結有誤。</div>
+          </div>
+        `;
+        hidePageLoader();
+        return;
+      }
+
       let store = null;
 
       if (car.store_id) {
@@ -899,17 +911,6 @@ if (carDetail) {
         } else {
           store = storeData;
         }
-      }
-
-      if (!car) {
-        carDetail.innerHTML = `
-          <div class="detail-content">
-            <h2 class="detail-title">找不到這台車</h2>
-            <div class="detail-desc">可能已被刪除，或連結有誤。</div>
-          </div>
-        `;
-        hidePageLoader();
-        return;
       }
 
       const { data: imageData, error: imageError } = await supabase

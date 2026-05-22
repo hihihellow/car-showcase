@@ -3200,3 +3200,50 @@ body:has(.post-form) {
   background: #fff;
 }
 
+.seller-store-panel {
+  background: #111;
+  color: #fff;
+  margin: 24px;
+  padding: 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(212,175,55,0.35);
+}
+
+.seller-store-panel h2 {
+  margin-top: 0;
+  color: #f3c638;
+}
+
+.seller-store-panel p {
+  color: #bbb;
+}
+
+.seller-store-panel label {
+  display: block;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  color: #ddd;
+  font-weight: 700;
+}
+
+.seller-store-panel input,
+.seller-store-panel textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(212,175,55,0.35);
+  background: #1b1b1b;
+  color: #fff;
+}
+
+.seller-store-panel button {
+  margin-top: 18px;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f3c638, #9b761f);
+  color: #111;
+  font-weight: 800;
+  cursor: pointer;
+}
