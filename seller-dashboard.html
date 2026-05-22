@@ -22,11 +22,15 @@
     <label>店面介紹</label>
     <textarea id="storeDescEdit" rows="4" placeholder="輸入車行介紹"></textarea>
 
-    <label>Banner 圖片網址</label>
-    <input id="storeBannerEdit" placeholder="https://..." />
+    <label>Banner 圖片</label>
+    <input id="storeBannerFile" type="file" accept="image/*" />
+    <input id="storeBannerEdit" type="hidden" />
+    <img id="bannerPreview" class="store-preview-img" alt="Banner 預覽" />
 
-    <label>Logo 圖片網址</label>
-    <input id="storeLogoEdit" placeholder="https://..." />
+    <label>Logo 圖片</label>
+    <input id="storeLogoFile" type="file" accept="image/*" />
+    <input id="storeLogoEdit" type="hidden" />
+    <img id="logoPreview" class="store-preview-img logo-preview" alt="Logo 預覽" />
 
     <button id="saveStoreBtn" type="button">儲存店面資料</button>
   </section>

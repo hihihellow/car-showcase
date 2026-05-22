@@ -608,6 +608,43 @@ async function getMyStore() {
   return data;
 }
 
+const bannerFileInput = document.getElementById("storeBannerFile");
+const logoFileInput = document.getElementById("storeLogoFile");
+const bannerPreview = document.getElementById("bannerPreview");
+const logoPreview = document.getElementById("logoPreview");
+
+if (bannerFileInput) {
+  bannerFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const base64 = await fileToBase64(file);
+
+    document.getElementById("storeBannerEdit").value = base64;
+
+    if (bannerPreview) {
+      bannerPreview.src = base64;
+      bannerPreview.style.display = "block";
+    }
+  });
+}
+
+if (logoFileInput) {
+  logoFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const base64 = await fileToBase64(file);
+
+    document.getElementById("storeLogoEdit").value = base64;
+
+    if (logoPreview) {
+      logoPreview.src = base64;
+      logoPreview.style.display = "block";
+    }
+  });
+}
+
 async function loadSellerStoreSettings() {
   if (!isSellerDashboard) return;
 
