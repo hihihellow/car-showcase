@@ -425,7 +425,7 @@ if (addCarBtn) {
     let savedCar = null;
 
     if (editingCarId) {
-      const { data: updatedCar, error: updateError } = await supabase
+      let updateQuery = supabase
         .from("cars")
         .update({
           title,
@@ -442,7 +442,13 @@ if (addCarBtn) {
           equipment: equipment || null,
           image: images && images.length > 0 ? images[0] : oldImages[0]
         })
-        .eq("id", Number(editingCarId))
+        .eq("id", Number(editingCarId));
+
+      if (isSellerDashboard && currentSellerStore) {
+        updateQuery = updateQuery.eq("store_id", currentSellerStore.id);
+      }
+
+      const { data: updatedCar, error: updateError } = await updateQuery
         .select()
         .maybeSingle();
 
@@ -453,7 +459,7 @@ if (addCarBtn) {
       }
 
       if (!updatedCar) {
-        alert("更新失敗：找不到這台車，可能已經被刪除。");
+        alert("更新失敗：找不到這台車，可能已經被刪除，或不是你的車。");
         return;
       }
 
@@ -466,7 +472,7 @@ if (addCarBtn) {
           .eq("car_id", Number(editingCarId));
 
         const imageRows = images.map((img, index) => ({
-          car_id: editingCarId,
+          car_id: Number(editingCarId),
           image_url: img,
           sort_order: index
         }));
@@ -477,7 +483,7 @@ if (addCarBtn) {
 
         if (imagesError) {
           console.error("更新圖片失敗:", imagesError);
-          alert("車輛已更新，但圖片更新失敗，請看 Console");
+      alert("車輛已更新，但圖片更新失敗，請看 Console");
           return;
         }
       }
@@ -500,10 +506,26 @@ if (addCarBtn) {
 
       const nextAdminNo = lastCar?.admin_no ? Number(lastCar.admin_no) + 1 : 1;
 
+      let storeId = null;
+
+      if (isSellerDashboard) {
+        if (!currentSellerStore) {
+          currentSellerStore = await getMyStore();
+        }
+
+        if (!currentSellerStore) {
+           alert("找不到你的車行資料，無法新增車輛。");
+          return;
+        }
+
+        storeId = currentSellerStore.id;
+      }
+
       const { data: insertedCar, error: carError } = await supabase
         .from("cars")
         .insert([
           {
+            store_id: storeId,
             admin_no: nextAdminNo,
             title,
             brand,
@@ -587,15 +609,31 @@ const adminSearchInput = document.getElementById("adminSearchInput");
 
 let adminCars = [];
 
+const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
+let currentSellerStore = null;
+
 async function loadAdminCars() {
   if (!adminCarList) return;
 
   adminCarList.innerHTML = "<p>車輛讀取中...</p>";
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("cars")
     .select("*")
     .order("admin_no", { ascending: true });
+
+  if (isSellerDashboard) {
+    currentSellerStore = await getMyStore();
+
+    if (!currentSellerStore) {
+      adminCarList.innerHTML = "<p>找不到你的車行資料，請確認你是車行帳號。</p>";
+      return;
+    }
+
+    query = query.eq("store_id", currentSellerStore.id);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error("讀取後台車輛失敗:", error);
@@ -759,10 +797,16 @@ async function deleteCar(carId) {
     return;
   }
 
-  const { error: carError } = await supabase
+  let deleteQuery = supabase
     .from("cars")
     .delete()
     .eq("id", carId);
+
+  if (isSellerDashboard && currentSellerStore) {
+    deleteQuery = deleteQuery.eq("store_id", currentSellerStore.id);
+  }
+
+  const { error: carError } = await deleteQuery;
 
   if (carError) {
     console.error("刪除車輛失敗:", carError);
@@ -801,6 +845,29 @@ if (cancelEditBtn) {
   });
 }
 
+async function getMyStore() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請先登入");
+    window.location.href = "login.html";
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("stores")
+    .select("*")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error("讀取車行資料失敗:", error);
+    return null;
+  }
+
+  return data;
+}
+
 loadAdminCars();
 
 // =========================
@@ -817,6 +884,22 @@ if (carDetail) {
       cars = data;
 
       const car = cars.find(item => item.id === carId);
+
+      let store = null;
+
+      if (car.store_id) {
+        const { data: storeData, error: storeError } = await supabase
+          .from("stores")
+          .select("*")
+          .eq("id", car.store_id)
+          .maybeSingle();
+
+        if (storeError) {
+          console.error("讀取車行資料失敗:", storeError);
+        } else {
+          store = storeData;
+        }
+      }
 
       if (!car) {
         carDetail.innerHTML = `
@@ -924,6 +1007,27 @@ if (carDetail) {
             <span class="price-title">售價</span>
             <span class="car-price">${Number(car.price).toLocaleString()}</span>
           </div>
+
+          ${store ? `
+            <div class="detail-store-box">
+              <div class="detail-store-label">販售車行</div>
+
+              <div class="detail-store-name">
+                ${store.name}
+              </div>
+
+              <p class="detail-store-desc">
+                ${store.description || "優質車行，嚴選好車。"}
+              </p>
+
+              <a 
+                href="store.html?slug=${store.slug}" 
+                class="detail-store-link"
+              >
+                查看車行店面
+              </a>
+            </div>
+          ` : ""}
 
           <div class="detail-action-row">
             <button id="detailFavoriteBtn" class="favorite-btn detail-favorite" type="button" data-id="${car.id}">🤍 收藏</button>

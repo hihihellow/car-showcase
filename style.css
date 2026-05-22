@@ -3119,3 +3119,41 @@ body:has(.post-form) {
   }
 }
 
+.detail-store-box {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 16px;
+  background: rgba(20, 20, 20, 0.88);
+}
+
+.detail-store-label {
+  font-size: 13px;
+  color: #c9a646;
+  margin-bottom: 6px;
+}
+
+.detail-store-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.detail-store-desc {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.detail-store-link {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d6b45b, #8f6b22);
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
+

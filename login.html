@@ -106,6 +106,24 @@
           <label class="auth-label" for="registerPhone">手機號碼</label>
           <input type="tel" id="registerPhone" class="auth-input" placeholder="例如 0912345678" required />
 
+          <label class="auth-label" for="registerRole">帳號類型</label>
+
+          <select id="registerRole" class="auth-input">
+            <option value="buyer">一般會員</option>
+            <option value="seller">車行賣家</option>
+          </select>
+
+          <div id="storeNameWrap" class="hidden">
+            <label class="auth-label" for="storeNameInput">車行名稱</label>
+
+            <input
+              type="text"
+              id="storeNameInput"
+              class="auth-input"
+              placeholder="例如：亮光車行"
+            />
+          </div>
+
           <label class="auth-label" for="registerPassword">密碼</label>
           <div class="password-field">
             <input type="password" id="registerPassword" class="auth-input password-input" placeholder="請輸入至少 6 碼密碼" required />
@@ -313,6 +331,9 @@
     const goRegisterBtn = document.getElementById("goRegisterBtn");
     const goLoginBtn = document.getElementById("goLoginBtn");
     const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+    const registerRole = document.getElementById("registerRole");
+    const storeNameWrap = document.getElementById("storeNameWrap");
+    const storeNameInput = document.getElementById("storeNameInput");
 
     function showMessage(text, isError = false) {
       authMessage.textContent = text;
@@ -391,6 +412,16 @@
     loginTab.addEventListener("click", switchToLogin);
     registerTab.addEventListener("click", switchToRegister);
 
+    if (registerRole) {
+      registerRole.addEventListener("change", () => {
+        if (registerRole.value === "seller") {
+          storeNameWrap.classList.remove("hidden");
+        } else {
+          storeNameWrap.classList.add("hidden");
+        }
+      });
+    }
+
     if (goRegisterBtn) {
       goRegisterBtn.addEventListener("click", switchToRegister);
     }
@@ -450,8 +481,31 @@
       }
 
       showMessage("登入成功，正在跳轉...", false);
+
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error("讀取會員角色失敗:", profileError);
+        showMessage("登入成功，但讀取角色失敗。", true);
+        return;
+      }
+
       setTimeout(() => {
-        window.location.href = "index.html";
+        if (profile?.role === "seller") {
+          window.location.href = "seller-dashboard.html";
+        } else if (profile?.role === "admin") {
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "member.html";
+        }
       }, 800);
     });
 
@@ -461,6 +515,8 @@
       const name = document.getElementById("registerName").value.trim();
       const email = document.getElementById("registerEmail").value.trim();
       const phoneInput = document.getElementById("registerPhone").value.trim();
+      const role = registerRole.value;
+      const storeName = storeNameInput.value.trim();
       const password = document.getElementById("registerPassword").value;
       const confirmPassword = document.getElementById("registerPasswordConfirm").value;
       const agreeTerms = document.getElementById("agreeTerms").checked;
@@ -477,6 +533,11 @@
 
       if (!phoneInput) {
         showMessage("請輸入手機號碼。", true);
+        return;
+      }
+
+      if (role === "seller" && !storeName) {
+        showMessage("請輸入車行名稱。", true);
         return;
       }
 
@@ -498,7 +559,9 @@
         options: {
           data: {
             display_name: name,
-            phone: phone
+            phone: phone,
+            role: role,
+            store_name: storeName
           }
         }
       });
@@ -529,7 +592,9 @@
       pendingProfileData = {
         email,
         display_name: name,
-        phone
+        phone,
+        role,
+        store_name: storeName
       };
 
       resetVerifyState();
@@ -570,12 +635,14 @@
       showVerifyMessage("Email 驗證碼已重新發送。", false);
     });
     verifyEmailOtpBtn.addEventListener("click", async () => {
-      const token = emailOtpCode.value.trim();
-
       if (!pendingProfileData?.email) {
         showVerifyMessage("找不到 Email 資料，請重新註冊。", true);
         return;
       }
+
+      const role = pendingProfileData.role;
+      const storeName = pendingProfileData.store_name;
+      const token = emailOtpCode.value.trim();
 
       if (!emailOtpSent) {
         showVerifyMessage("請先按「發送驗證碼」。", true);
@@ -599,11 +666,68 @@
       }
 
       emailVerified = true;
+
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+
+      if (user && pendingProfileData) {
+
+        // 建立 profile
+        await supabase
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            email: pendingProfileData.email,
+            display_name: pendingProfileData.display_name,
+            phone: pendingProfileData.phone,
+            role: role
+          });
+
+        // 如果是 seller 建立車行
+        if (role === "seller") {
+
+          const slug = storeName
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+
+          const { data: storeData, error: storeError } = await supabase
+            .from("stores")
+            .insert([
+              {
+                owner_id: user.id,
+                name: storeName,
+                slug: slug
+              }
+            ])
+            .select()
+            .single();
+
+          if (storeError) {
+            showVerifyMessage("車行資料建立失敗：" + storeError.message, true);
+            return;
+          }
+
+          if (storeData) {
+            await supabase
+              .from("profiles")
+              .update({
+                store_id: storeData.id
+              })
+              .eq("id", user.id);
+          }
+        }
+      }
+
       emailVerifyHint.textContent = "Email 驗證完成。";
       showVerifyMessage("Email 驗證成功，正在跳轉...", false);
 
       setTimeout(() => {
-        window.location.href = "index.html";
+        if (role === "seller") {
+          window.location.href = "seller-dashboard.html";
+        } else {
+          window.location.href = "member.html";
+        }
       }, 800);
     });
 
