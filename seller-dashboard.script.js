@@ -409,6 +409,9 @@ function renderAdminCars(list) {
         <p class="car-status-text">
           狀態：${car.status === "active" ? "上架中" : "已下架"}
         </p>
+        <p class="car-status-text">
+          精選：${car.is_featured ? "是" : "否"}
+        </p>
       </div>
 
       <div class="admin-action-row">
@@ -418,6 +421,10 @@ function renderAdminCars(list) {
 
         <button class="toggle-status-btn" data-id="${car.id}">
           ${car.status === "active" ? "下架" : "重新上架"}
+        </button>
+
+        <button class="toggle-featured-btn" data-id="${car.id}">
+          ${car.is_featured ? "取消精選" : "設為精選"}
         </button>
 
         <button class="admin-delete-btn" data-id="${car.id}">
@@ -440,6 +447,13 @@ function renderAdminCars(list) {
     btn.addEventListener("click", async () => {
       const carId = btn.dataset.id;
       await toggleCarStatus(carId);
+    });
+  });
+
+  document.querySelectorAll(".toggle-featured-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const carId = btn.dataset.id;
+      await toggleFeaturedCar(carId);
     });
   });
 
@@ -613,6 +627,39 @@ async function deleteCar(carId) {
   }
 
   alert("車輛已刪除");
+  loadAdminCars();
+}
+
+async function toggleFeaturedCar(carId) {
+  const targetCar = adminCars.find((car) => String(car.id) === String(carId));
+
+  if (!targetCar) {
+    alert("找不到這台車");
+    return;
+  }
+
+  const nextFeatured = !targetCar.is_featured;
+
+  let updateQuery = supabase
+    .from("cars")
+    .update({
+      is_featured: nextFeatured
+    })
+    .eq("id", carId);
+
+  if (currentSellerStore) {
+    updateQuery = updateQuery.eq("store_id", currentSellerStore.id);
+  }
+
+  const { error } = await updateQuery;
+
+  if (error) {
+    console.error("更新精選狀態失敗:", error);
+    alert("更新精選狀態失敗，請看 Console");
+    return;
+  }
+
+  alert(nextFeatured ? "已設為精選車" : "已取消精選");
   loadAdminCars();
 }
 
