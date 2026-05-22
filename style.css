@@ -1343,7 +1343,10 @@ html {
 }
 
 .auth-submit-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 34px rgba(212,175,55,0.28);
 }
 
 .auth-switch-text {
@@ -1641,12 +1644,28 @@ html {
 
 .verify-card {
   width: min(760px, 100%);
-  background: #fff;
-  border-radius: 24px;
-  padding: 28px 24px 24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,20,20,0.96),
+      rgba(8,8,8,0.98)
+    );
+
+  border: 1px solid rgba(212,175,55,0.22);
+
+  border-radius: 28px;
+
+  padding: 34px 30px 30px;
+
   box-sizing: border-box;
+
   position: relative;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.55),
+    0 0 30px rgba(212,175,55,0.08);
+
+  backdrop-filter: blur(16px);
 }
 
 .verify-badge {
@@ -1656,8 +1675,9 @@ html {
   min-height: 34px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(244, 196, 48, 0.14);
-  color: #b28704;
+  background: rgba(212,175,55,0.12);
+  color: #d6b45b;
+  border: 1px solid rgba(212,175,55,0.25);
   font-size: 13px;
   font-weight: 800;
   margin-bottom: 12px;
@@ -1684,18 +1704,26 @@ html {
 }
 
 .verify-section {
-  border: 1px solid #eee;
-  border-radius: 18px;
-  padding: 18px;
-  background: #fafafa;
+  border: 1px solid rgba(212,175,55,0.18);
+
+  border-radius: 22px;
+
+  padding: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,0.04),
+      rgba(255,255,255,0.02)
+    );
 }
 
 .verify-section-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  color: #111;
+  gap: 12px;
+  margin-bottom: 18px;
+  color: #fff;
   font-size: 18px;
 }
 
@@ -1713,7 +1741,7 @@ html {
 
 .verify-tip {
   margin: 0 0 14px;
-  color: #666;
+  color: rgba(255,255,255,0.58);
   font-size: 14px;
   line-height: 1.7;
   min-height: 44px;
@@ -2482,13 +2510,23 @@ body {
 .auth-form-title,
 .policy-card h3,
 .verify-card h3 {
+  font-size: 44px;
+  font-weight: 900;
   color: #fff;
+  margin: 10px 0 14px;
+  letter-spacing: -1px;
 }
 
 .auth-label,
 .auth-check-row,
 .auth-switch-text,
-.verify-desc,
+
+.verify-desc {
+  color: rgba(255,255,255,0.72);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
 .verify-tip,
 .policy-content {
   color: rgba(255,255,255,0.72);
