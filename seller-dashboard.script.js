@@ -406,6 +406,9 @@ function renderAdminCars(list) {
         <h3>#${car.admin_no || "未編號"}｜${car.title}</h3>
         <p>NT$ ${Number(car.price).toLocaleString()}</p>
         <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
+        <p class="car-status-text">
+          狀態：${car.status === "active" ? "上架中" : "已下架"}
+        </p>
       </div>
 
       <div class="admin-action-row">
@@ -413,10 +416,14 @@ function renderAdminCars(list) {
           編輯
         </button>
 
+        <button class="toggle-status-btn" data-id="${car.id}">
+          ${car.status === "active" ? "下架" : "重新上架"}
+        </button>
+
         <button class="admin-delete-btn" data-id="${car.id}">
           刪除
         </button>
-      </div>
+    </div>
     `;
 
     adminCarList.appendChild(item);
@@ -426,6 +433,13 @@ function renderAdminCars(list) {
     btn.addEventListener("click", async () => {
       const carId = Number(btn.dataset.id);
       await startEditCar(carId);
+    });
+  });
+
+  document.querySelectorAll(".toggle-status-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const carId = btn.dataset.id;
+      await toggleCarStatus(carId);
     });
   });
 
@@ -512,6 +526,50 @@ async function startEditCar(carId) {
     top: 0,
     behavior: "smooth"
   });
+}
+
+async function toggleCarStatus(carId) {
+  const targetCar = adminCars.find((car) => String(car.id) === String(carId));
+
+  if (!targetCar) {
+    alert("找不到這台車");
+    return;
+  }
+
+  const nextStatus = targetCar.status === "active" ? "inactive" : "active";
+
+  // 之後付費功能會接在這裡
+  // 如果 nextStatus === "active"，就檢查是否有有效方案
+  if (nextStatus === "active") {
+    const canActivate = true;
+
+    if (!canActivate) {
+      alert("請先完成付款或續約後，才能上架車輛。");
+      return;
+    }
+  }
+
+  let updateQuery = supabase
+    .from("cars")
+    .update({
+      status: nextStatus
+    })
+    .eq("id", carId);
+
+  if (currentSellerStore) {
+    updateQuery = updateQuery.eq("store_id", currentSellerStore.id);
+  }
+
+  const { error } = await updateQuery;
+
+  if (error) {
+    console.error("更新上下架狀態失敗:", error);
+    alert("更新上下架狀態失敗，請看 Console");
+    return;
+  }
+
+  alert(nextStatus === "active" ? "車輛已重新上架" : "車輛已下架");
+  loadAdminCars();
 }
 
 async function deleteCar(carId) {
@@ -665,6 +723,16 @@ async function loadSellerStoreSettings() {
   descInput.value = currentSellerStore.description || "";
   bannerInput.value = currentSellerStore.banner_url || "";
   logoInput.value = currentSellerStore.logo_url || "";
+
+  if (bannerPreview && currentSellerStore.banner_url) {
+    bannerPreview.src = currentSellerStore.banner_url;
+    bannerPreview.style.display = "block";
+  }
+
+  if (logoPreview && currentSellerStore.logo_url) {
+    logoPreview.src = currentSellerStore.logo_url;
+    logoPreview.style.display = "block";
+  }
 }
 
 const saveStoreBtn = document.getElementById("saveStoreBtn");
