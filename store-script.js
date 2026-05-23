@@ -19,23 +19,55 @@ async function loadStorePage() {
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("store") || params.get("slug");
 
-  if (!slug) {
-    storeTitle.textContent = "找不到車行";
-    storeDesc.textContent = "網址缺少車行代號。";
-    return;
-  }
+  let store = null;
 
-  const { data: store, error: storeError } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
+  if (slug) {
+    const { data, error } = await supabase
+      .from("stores")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
 
-  if (storeError) {
-    console.error("讀取車行失敗:", storeError);
-    storeTitle.textContent = "讀取車行失敗";
-    storeDesc.textContent = "請稍後再試。";
-    return;
+    if (error) {
+      console.error("讀取車行失敗:", error);
+      storeTitle.textContent = "讀取車行失敗";
+      storeDesc.textContent = "請稍後再試。";
+      return;
+    }
+
+    store = data;
+  } else {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
+
+    if (!user) {
+      storeTitle.textContent = "找不到車行";
+      storeDesc.textContent = "網址缺少車行代號。";
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("stores")
+      .select("*")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("讀取自己的車行失敗:", error);
+      storeTitle.textContent = "讀取車行失敗";
+      storeDesc.textContent = "請稍後再試。";
+      return;
+    }
+
+    store = data;
+
+    if (store?.slug) {
+      window.history.replaceState(
+        null,
+        "",
+        `store.html?store=${encodeURIComponent(store.slug)}`
+      );
+    }
   }
 
   if (!store) {
