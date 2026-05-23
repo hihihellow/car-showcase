@@ -7,70 +7,139 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-  <h1>賣家車輛管理後台</h1>
-  <p>在這裡管理你車行自己的車輛</p>
+  <header class="seller-topbar">
+    <div>
+      <h1>賣家後台</h1>
+      <p>管理店面資料、上架車輛與方案續約</p>
+    </div>
+
+    <a href="index.html" class="seller-home-link">返回前台首頁</a>
   </header>
 
-  <section class="seller-store-panel">
-    <h2>店面資料設定</h2>
-    <p>設定你的車行名稱、介紹與店面形象。</p>
+  <div class="seller-layout">
+    <aside class="seller-sidebar">
+      <button class="seller-nav-btn active" data-page="overview">店面首頁</button>
+      <button class="seller-nav-btn" data-page="cars">上架車輛</button>
+      <button class="seller-nav-btn" data-page="addCar">新增車輛</button>
+      <button class="seller-nav-btn" data-page="storeEdit">店面資料</button>
+      <button class="seller-nav-btn" data-page="plan">方案 / 續約</button>
+    </aside>
 
-    <label>車行名稱</label>
-    <input id="storeNameEdit" placeholder="例如：進家中古車" />
+    <main class="seller-main">
+      <section id="overviewPage" class="seller-page">
+        <h2>店面首頁</h2>
 
-    <label>店面介紹</label>
-    <textarea id="storeDescEdit" rows="4" placeholder="輸入車行介紹"></textarea>
+        <div class="seller-overview-grid">
+          <div class="seller-stat-card">
+            <p>車行名稱</p>
+            <strong id="overviewStoreName">讀取中...</strong>
+          </div>
+  
+          <div class="seller-stat-card">
+            <p>目前上架車輛</p>
+            <strong id="overviewActiveCars">0 台</strong>
+          </div>
+  
+          <div class="seller-stat-card">
+            <p>目前方案</p>
+            <strong>尚未開通</strong>
+          </div>
+  
+          <div class="seller-stat-card">
+            <p>到期日</p>
+            <strong>尚未設定</strong>
+          </div>
+        </div>
 
-    <label>Banner 圖片</label>
-    <input id="storeBannerFile" type="file" accept="image/*" />
-    <input id="storeBannerEdit" type="hidden" />
-    <img id="bannerPreview" class="store-preview-img" alt="Banner 預覽" />
+        <p id="overviewStoreDesc" class="seller-overview-desc"></p>
+        <a id="publicStoreLink" href="store.html" class="seller-primary-btn">查看公開店面</a>
+      </section>
+  
+      <section id="carsPage" class="seller-page hidden">
+        <h2>上架車輛</h2>
 
-    <label>Logo 圖片</label>
-    <input id="storeLogoFile" type="file" accept="image/*" />
-    <input id="storeLogoEdit" type="hidden" />
-    <img id="logoPreview" class="store-preview-img logo-preview" alt="Logo 預覽" />
-
-    <button id="saveStoreBtn" type="button">儲存店面資料</button>
-  </section>
+        <input 
+          id="adminSearchInput" 
+          class="admin-search-input" 
+          placeholder="搜尋車號、車名、廠牌、車型、地區"
+        />
+  
+        <div id="adminCarList" class="admin-car-list"></div>
+      </section>
+  
+      <section id="addCarPage" class="seller-page hidden">
+        <h2>新增車輛</h2>
+  
+        <input id="titleInput" placeholder="車名，例如 Toyota Corolla Cross" />
+        <input id="brandInput" placeholder="廠牌，例如 Toyota" />
+        <input id="modelInput" placeholder="車型，例如 Corolla Cross" />
+        <input id="yearInput" type="number" placeholder="年份，例如 2022" />
+        <input id="ccInput" type="number" placeholder="排氣量，例如 1800" />
+  
+        <input id="priceInput" type="number" placeholder="價格，例如 569000" />
+        <input id="regionInput" placeholder="地區，例如 桃園市" />
+        <input id="categoryInput" placeholder="分類，例如 休旅車" />
+  
+        <input id="mileageInput" type="number" placeholder="里程，例如 38871" />
+        <input id="colorInput" placeholder="顏色，例如 白色" />
+  
+        <label for="imageInput">上傳照片（可選多張）</label>
+        <input id="imageInput" type="file" accept="image/*" multiple />
  
-  <section class="post-form">
-    <h2>新增車輛</h2>
+        <div id="imagePreviewList" class="image-preview-list"></div>
+        <p class="image-order-tip">提示：第一張會作為封面，可用「上移 / 下移」調整順序。</p>
+  
+        <label for="equipmentInput">車輛配備（每行一項）</label>
+        <textarea id="equipmentInput" rows="8" placeholder="例如：
+  M-Sport運動套件
+  Apple CarPlay
+  雙前座電動椅
+  HUD抬頭顯示器
+  360環景系統"></textarea>
 
-    <input id="titleInput" placeholder="車名，例如 Toyota Corolla Cross" />
-    <input id="brandInput" placeholder="廠牌，例如 Toyota" />
-    <input id="modelInput" placeholder="車型，例如 Corolla Cross" />
-    <input id="yearInput" type="number" placeholder="年份，例如 2022" />
-    <input id="ccInput" type="number" placeholder="排氣量，例如 1800" />
+        <input id="descInput" placeholder="簡介，例如 車況良好、原鈑件" />
 
-    <input id="priceInput" type="number" placeholder="價格，例如 569000" />
-    <input id="regionInput" placeholder="地區，例如 桃園市" />
-    <input id="categoryInput" placeholder="分類，例如 休旅車" />
+        <button id="addCarBtn">送出</button>
+        <button id="cancelEditBtn" type="button" class="hidden">取消編輯</button>
+        <p id="editModeText" class="edit-mode-text hidden">目前正在編輯車輛</p>
+      </section>
 
-    <input id="mileageInput" type="number" placeholder="里程，例如 38871" />
-    <input id="colorInput" placeholder="顏色，例如 白色" />
+      <section id="storeEditPage" class="seller-page hidden">
+        <h2>店面資料設定</h2>
+        <p>設定你的車行名稱、介紹與店面形象。</p>
 
-    <label for="imageInput">上傳照片（可選多張）</label>
-    <input id="imageInput" type="file" accept="image/*" multiple />
+        <label>車行名稱</label>
+        <input id="storeNameEdit" placeholder="例如：進家中古車" />
 
-    <div id="imagePreviewList" class="image-preview-list"></div>
-    <p class="image-order-tip">提示：第一張會作為封面，可用「上移 / 下移」調整順序。</p>
+        <label>店面介紹</label>
+        <textarea id="storeDescEdit" rows="4" placeholder="輸入車行介紹"></textarea>
 
-    <label for="equipmentInput">車輛配備（每行一項）</label>
-    <textarea id="equipmentInput" rows="8" placeholder="例如：
-    M-Sport運動套件
-    Apple CarPlay
-    雙前座電動椅
-    HUD抬頭顯示器
-    360環景系統"></textarea>
+        <label>Banner 圖片</label>
+        <input id="storeBannerFile" type="file" accept="image/*" />
+        <input id="storeBannerEdit" type="hidden" />
+        <img id="bannerPreview" class="store-preview-img" alt="Banner 預覽" />
 
-    <input id="descInput" placeholder="簡介，例如 車況良好、原鈑件" />
+        <label>Logo 圖片</label>
+        <input id="storeLogoFile" type="file" accept="image/*" />
+        <input id="storeLogoEdit" type="hidden" />
+        <img id="logoPreview" class="store-preview-img logo-preview" alt="Logo 預覽" />
 
-    <button id="addCarBtn">送出</button>
-    <button id="cancelEditBtn" type="button" class="hidden">取消編輯</button>
-    <p id="editModeText" class="edit-mode-text hidden">目前正在編輯車輛</p>
-  </section>
+        <button id="saveStoreBtn" type="button">儲存店面資料</button>
+      </section>
+
+      <section id="planPage" class="seller-page hidden">
+        <h2>方案 / 續約</h2>
+
+        <div class="seller-plan-card">
+          <p>目前方案：尚未開通</p>
+          <p>可上架數量：0 台</p>
+          <p>已使用數量：0 台</p>
+          <p>到期日：尚未設定</p>
+          <button type="button">選擇方案</button>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <section class="admin-car-section">
     <h2>車輛列表</h2>

@@ -352,6 +352,31 @@ let adminCars = [];
 const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
 let currentSellerStore = null;
 
+const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
+const sellerPages = document.querySelectorAll(".seller-page");
+
+function showSellerPage(pageName) {
+  sellerPages.forEach((page) => {
+    page.classList.add("hidden");
+  });
+
+  const targetPage = document.getElementById(`${pageName}Page`);
+
+  if (targetPage) {
+    targetPage.classList.remove("hidden");
+  }
+
+  sellerNavBtns.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.page === pageName);
+  });
+}
+
+sellerNavBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    showSellerPage(btn.dataset.page);
+  });
+});
+
 async function loadAdminCars() {
   if (!adminCarList) return;
 
@@ -383,6 +408,7 @@ async function loadAdminCars() {
 
   adminCars = data || [];
   renderAdminCars(adminCars);
+  updateOverviewCarCount();
 }
 
 function renderAdminCars(list) {
@@ -469,6 +495,14 @@ function renderAdminCars(list) {
   });
 }
 
+function updateOverviewCarCount() {
+  const overviewActiveCars = document.getElementById("overviewActiveCars");
+  if (!overviewActiveCars) return;
+
+  const activeCount = adminCars.filter((car) => car.status === "active").length;
+  overviewActiveCars.textContent = `${activeCount} 台`;
+}
+
 if (adminSearchInput) {
   adminSearchInput.addEventListener("input", () => {
     const keyword = adminSearchInput.value.trim().toLowerCase();
@@ -535,6 +569,8 @@ async function startEditCar(carId) {
   cancelEditBtn.classList.remove("hidden");
   editModeText.classList.remove("hidden");
   editModeText.textContent = `目前正在編輯：#${car.admin_no || "未編號"}｜${car.title}`;
+
+  showSellerPage("addCar");
 
   window.scrollTo({
     top: 0,
@@ -765,6 +801,22 @@ async function loadSellerStoreSettings() {
   }
 
   if (!currentSellerStore) return;
+
+  const overviewStoreName = document.getElementById("overviewStoreName");
+  const overviewStoreDesc = document.getElementById("overviewStoreDesc");
+  const publicStoreLink = document.getElementById("publicStoreLink");
+
+  if (overviewStoreName) {
+    overviewStoreName.textContent = currentSellerStore.name || "尚未設定";
+  }
+
+  if (overviewStoreDesc) {
+    overviewStoreDesc.textContent = currentSellerStore.description || "尚未填寫店面介紹";
+  }
+
+  if (publicStoreLink) {
+    publicStoreLink.href = `store.html?store=${currentSellerStore.slug || currentSellerStore.id}`;
+  }
 
   nameInput.value = currentSellerStore.name || "";
   descInput.value = currentSellerStore.description || "";

@@ -193,6 +193,7 @@ async function loadCarsFromSupabase() {
     .from("cars")
     .select("*")
     .eq("status", "active")
+    .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
   console.log("cars data:", data);
@@ -229,6 +230,7 @@ function renderCars(carArray) {
 
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
+        ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
           <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
@@ -1389,6 +1391,7 @@ async function loadFavoriteCars() {
 
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
+        ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
           <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>

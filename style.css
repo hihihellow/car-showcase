@@ -3299,3 +3299,234 @@ body:has(.post-form) {
   background: #ffd75a;
   color: #111;
 }
+
+.car-card {
+  position: relative;
+}
+
+.featured-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ffd75a, #9b761f);
+  color: #111;
+  font-weight: 800;
+  font-size: 13px;
+  z-index: 2;
+}
+
+/* =========================
+   Seller Dashboard 分頁後台
+========================= */
+
+body:has(.seller-layout) {
+  background:
+    radial-gradient(circle at top, rgba(244,196,48,0.12), transparent 35%),
+    linear-gradient(180deg, #050505 0%, #101010 45%, #060606 100%);
+  color: #f5f1e6;
+}
+
+.seller-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: 34px 42px;
+  background: rgba(0,0,0,0.72);
+  border-bottom: 1px solid rgba(244,196,48,0.22);
+}
+
+.seller-topbar h1 {
+  margin: 0 0 6px;
+  color: #f4c430;
+  font-size: 34px;
+}
+
+.seller-topbar p {
+  margin: 0;
+  color: rgba(255,255,255,0.66);
+}
+
+.seller-home-link,
+.seller-primary-btn {
+  display: inline-block;
+  text-decoration: none;
+  background: #f4c430;
+  color: #111;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 900;
+}
+
+.seller-layout {
+  max-width: 1280px;
+  margin: 34px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 24px;
+}
+
+.seller-sidebar {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.42);
+}
+
+.seller-nav-btn {
+  width: 100%;
+  display: block;
+  margin-bottom: 10px;
+  padding: 13px 14px;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255,255,255,0.72);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.seller-nav-btn:hover,
+.seller-nav-btn.active {
+  background: rgba(244,196,48,0.14);
+  color: #f4c430;
+  border-color: rgba(244,196,48,0.28);
+}
+
+.seller-main {
+  min-width: 0;
+}
+
+.seller-page {
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 28px;
+  padding: 34px;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.45);
+}
+
+.seller-page h2 {
+  color: #f4c430;
+  font-size: 30px;
+  margin: 0 0 22px;
+}
+
+.seller-page input,
+.seller-page textarea,
+.admin-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(244,196,48,0.25);
+  border-radius: 14px;
+  outline: none;
+}
+
+.seller-page input::placeholder,
+.seller-page textarea::placeholder,
+.admin-search-input::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+.seller-page input:focus,
+.seller-page textarea:focus,
+.admin-search-input:focus {
+  border-color: #f4c430;
+  box-shadow: 0 0 0 3px rgba(244,196,48,0.13);
+}
+
+.seller-page label {
+  display: block;
+  color: #f4c430;
+  font-weight: 800;
+  margin: 10px 0 8px;
+}
+
+.seller-page button {
+  background: #f4c430;
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-weight: 900;
+  padding: 13px 22px;
+  cursor: pointer;
+}
+
+.seller-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.seller-stat-card,
+.seller-plan-card {
+  background: rgba(0,0,0,0.32);
+  border: 1px solid rgba(244,196,48,0.15);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.seller-stat-card p {
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.58);
+}
+
+.seller-stat-card strong {
+  color: #fff;
+  font-size: 22px;
+}
+
+.seller-overview-desc {
+  color: rgba(255,255,255,0.72);
+  line-height: 1.8;
+  margin-bottom: 22px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .seller-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 20px;
+  }
+
+  .seller-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-sidebar {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .seller-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .seller-sidebar,
+  .seller-overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-page {
+    padding: 22px;
+  }
+}
