@@ -1212,6 +1212,7 @@ if (mobileMenuBtn && mobileDrawer) {
 async function updateAuthUI() {
   const memberCenterBtn = document.getElementById("memberCenterBtn");
   const logoutBtn = document.getElementById("logoutBtn");
+  const mobileMemberCenterBtn = document.getElementById("mobileMemberCenterBtn");
 
   const guestOnlyEls = document.querySelectorAll(".guest-only");
   const userOnlyEls = document.querySelectorAll(".user-only");
@@ -1232,8 +1233,41 @@ async function updateAuthUI() {
     guestOnlyEls.forEach((el) => el.classList.add("hidden"));
     userOnlyEls.forEach((el) => el.classList.remove("hidden"));
 
-    memberCenterBtn.textContent = "會員中心";
-    memberCenterBtn.href = "member.html";
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("讀取會員角色失敗：", profileError);
+    }
+
+    if (profile?.role === "seller") {
+      memberCenterBtn.textContent = "車行後台";
+      memberCenterBtn.href = "seller-dashboard.html";
+
+      if (mobileMemberCenterBtn) {
+        mobileMemberCenterBtn.textContent = "車行後台";
+        mobileMemberCenterBtn.href = "seller-dashboard.html";
+      }
+    } else if (profile?.role === "admin") {
+      memberCenterBtn.textContent = "管理後台";
+      memberCenterBtn.href = "admin.html";
+
+      if (mobileMemberCenterBtn) {
+        mobileMemberCenterBtn.textContent = "管理後台";
+        mobileMemberCenterBtn.href = "admin.html";
+      }
+    } else {
+      memberCenterBtn.textContent = "會員中心";
+      memberCenterBtn.href = "member.html";
+
+      if (mobileMemberCenterBtn) {
+        mobileMemberCenterBtn.textContent = "會員中心";
+        mobileMemberCenterBtn.href = "member.html";
+      }
+    }
   } else {
     guestOnlyEls.forEach((el) => el.classList.remove("hidden"));
     userOnlyEls.forEach((el) => el.classList.add("hidden"));
