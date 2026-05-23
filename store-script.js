@@ -17,7 +17,7 @@ async function loadStorePage() {
   if (!storeInfo || !storeCarList) return;
 
   const params = new URLSearchParams(window.location.search);
-  const slug = params.get("slug");
+  const slug = params.get("store") || params.get("slug");
 
   if (!slug) {
     storeTitle.textContent = "找不到車行";

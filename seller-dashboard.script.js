@@ -815,7 +815,8 @@ async function loadSellerStoreSettings() {
   }
 
   if (publicStoreLink) {
-    publicStoreLink.href = `store.html?store=${currentSellerStore.slug || currentSellerStore.id}`;
+    const storeSlug = currentSellerStore.slug || currentSellerStore.id;
+    publicStoreLink.href = `store.html?store=${encodeURIComponent(storeSlug)}`;
   }
 
   nameInput.value = currentSellerStore.name || "";
@@ -870,6 +871,7 @@ if (saveStoreBtn) {
 
     alert("店面資料已更新！");
     currentSellerStore = await getMyStore();
+    loadSellerStoreSettings();
   });
 }
 
