@@ -79,7 +79,7 @@ async function loadStorePage() {
   document.title = `${store.name}｜澄品汽車`;
   storeTitle.textContent = store.name;
   storeDesc.textContent = store.description || "優質車行，嚴選好車。";
-  
+
   const heroImage =
     window.innerWidth <= 600
       ? store.banner_mobile_url || store.banner_desktop_url || store.banner_url
@@ -93,16 +93,24 @@ async function loadStorePage() {
   }
 
   storeInfo.innerHTML = `
-    <div class="clean-store-card">
-      <div class="store-card-body">
+    <div class="store-profile-card">
+      <div class="store-profile-logo-wrap">
         ${
           store.logo_url
             ? `<img src="${store.logo_url}" class="store-logo-img" alt="${store.name} Logo">`
-            : ""
+            : `<div class="store-logo-placeholder">${store.name?.slice(0, 1) || "車"}</div>`
         }
+      </div>
 
+      <div class="store-profile-content">
+        <p class="store-label">SELLER SHOWROOM</p>
         <h2>${store.name}</h2>
         <p>${store.description || "這間車行尚未填寫介紹。"}</p>
+      </div>
+
+      <div class="store-profile-actions">
+        <a href="index.html" class="store-outline-btn">返回首頁</a>
+        <a href="#storeCars" class="store-primary-btn">查看車輛</a>
       </div>
     </div>
   `;
