@@ -30,8 +30,8 @@ async function loadStorePage() {
 
     if (error) {
       console.error("讀取車行失敗:", error);
-      storeTitle.textContent = "讀取車行失敗";
-      storeDesc.textContent = "請稍後再試。";
+      if (storeTitle) storeTitle.textContent = "讀取車行失敗";
+      if (storeDesc) storeDesc.textContent = "請稍後再試。";
       return;
     }
 
@@ -41,8 +41,8 @@ async function loadStorePage() {
     const user = userData?.user;
 
     if (!user) {
-      storeTitle.textContent = "找不到車行";
-      storeDesc.textContent = "網址缺少車行代號。";
+      if (storeTitle) storeTitle.textContent = "找不到車行";
+      if (storeDesc) storeDesc.textContent = "網址缺少車行代號。";
       return;
     }
 
@@ -54,8 +54,8 @@ async function loadStorePage() {
 
     if (error) {
       console.error("讀取自己的車行失敗:", error);
-      storeTitle.textContent = "讀取車行失敗";
-      storeDesc.textContent = "請稍後再試。";
+      if (storeTitle) storeTitle.textContent = "讀取車行失敗";
+      if (storeDesc) storeDesc.textContent = "請稍後再試。";
       return;
     }
 
@@ -71,14 +71,14 @@ async function loadStorePage() {
   }
 
   if (!store) {
-    storeTitle.textContent = "找不到這間車行";
-    storeDesc.textContent = "請確認網址是否正確。";
+    if (storeTitle) storeTitle.textContent = "找不到這間車行";
+    if (storeDesc) storeDesc.textContent = "請確認網址是否正確。";
     return;
   }
 
   document.title = `${store.name}｜澄品汽車`;
-  storeTitle.textContent = store.name;
-  storeDesc.textContent = store.description || "優質車行，嚴選好車。";
+  if (storeTitle) storeTitle.textContent = store.name;
+  if (storeDesc) storeDesc.textContent = store.description || "優質車行，嚴選好車。";
 
   const heroImage =
     window.innerWidth <= 600
