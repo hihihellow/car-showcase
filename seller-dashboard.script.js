@@ -749,11 +749,6 @@ async function getMyStore() {
   return data;
 }
 
-const bannerFileInput = document.getElementById("storeBannerFile");
-const logoFileInput = document.getElementById("storeLogoFile");
-const bannerPreview = document.getElementById("bannerPreview");
-const logoPreview = document.getElementById("logoPreview");
-
 const logoFileInput = document.getElementById("storeLogoFile");
 const bannerDesktopFileInput = document.getElementById("storeBannerDesktopFile");
 const bannerMobileFileInput = document.getElementById("storeBannerMobileFile");
