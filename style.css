@@ -3861,11 +3861,6 @@ body:has(.store-page) {
 .cropper-view-box {
   outline: 3px dashed #f4c430 !important;
   outline-offset: -3px;
-}
-
-.cropper-view-box {
-  outline: 3px dashed #f4c430 !important;
-  outline-offset: -3px;
   border-radius: 14px;
   box-shadow: 0 0 0 9999px rgba(0,0,0,0.58);
 }
