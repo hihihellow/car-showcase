@@ -3530,3 +3530,196 @@ body:has(.seller-layout) {
     padding: 22px;
   }
 }
+
+.store-hero {
+  min-height: 360px;
+  max-height: 420px;
+  overflow: hidden;
+}
+
+.store-hero h1 {
+  font-size: clamp(36px, 5vw, 64px);
+}
+
+.store-hero p {
+  font-size: 20px;
+}
+
+.clean-store-card {
+  max-width: 1180px;
+  margin: 40px auto;
+  padding: 32px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+
+.store-card-body {
+  text-align: center;
+}
+
+.store-logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 24px;
+  margin-bottom: 18px;
+}
+
+.store-card-body h2 {
+  color: #f4c430;
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.store-card-body p {
+  color: rgba(255,255,255,0.75);
+  line-height: 1.8;
+}
+
+.store-car-section {
+  max-width: 1180px;
+  margin: 50px auto;
+  padding: 0 20px 70px;
+}
+
+.store-car-section h2 {
+  text-align: center;
+  color: #fff;
+  font-size: 30px;
+  margin-bottom: 28px;
+}
+
+/* =========================
+   Store Public Page 公開車行頁
+========================= */
+
+body:has(.store-page) {
+  background:
+    radial-gradient(circle at top, rgba(244,196,48,0.12), transparent 32%),
+    linear-gradient(180deg, #050505 0%, #101010 45%, #050505 100%);
+  color: #f5f1e6;
+  overflow-x: hidden;
+}
+
+.store-hero {
+  min-height: 360px;
+  max-height: 420px;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.82)),
+    url("images/hero-bg.jpg") center / cover no-repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 60px 20px;
+  box-sizing: border-box;
+}
+
+.store-hero-overlay h1 {
+  color: #f4c430;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 900;
+  margin: 0 0 14px;
+}
+
+.store-hero-overlay p {
+  color: rgba(255,255,255,0.82);
+  font-size: 20px;
+  margin: 0;
+}
+
+.store-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 46px 20px 80px;
+}
+
+.store-info {
+  width: 100%;
+}
+
+.clean-store-card {
+  margin: 0 auto 48px;
+  padding: 34px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+}
+
+.store-card-body {
+  text-align: center;
+}
+
+.store-logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 24px;
+  margin-bottom: 18px;
+}
+
+.store-card-body h2 {
+  color: #f4c430;
+  font-size: 36px;
+  margin: 0 0 10px;
+}
+
+.store-card-body p {
+  color: rgba(255,255,255,0.75);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.store-car-section {
+  margin-top: 20px;
+}
+
+.store-car-section h2 {
+  text-align: center;
+  color: #fff;
+  font-size: 32px;
+  margin-bottom: 28px;
+}
+
+.store-car-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.store-car-list .car-card {
+  margin: 0;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(244,196,48,0.16);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 16px 38px rgba(0,0,0,0.35);
+}
+
+@media (max-width: 900px) {
+  .store-car-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .store-hero {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 560px) {
+  .store-car-list {
+    grid-template-columns: 1fr;
+  }
+
+  .store-page {
+    padding: 30px 16px 60px;
+  }
+
+  .clean-store-card {
+    padding: 24px;
+  }
+}

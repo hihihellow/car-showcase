@@ -81,13 +81,7 @@ async function loadStorePage() {
   storeDesc.textContent = store.description || "優質車行，嚴選好車。";
 
   storeInfo.innerHTML = `
-    <div class="store-card">
-      ${
-        store.banner_url
-          ? `<img src="${store.banner_url}" class="store-banner-img" alt="${store.name}">`
-          : `<div class="store-banner-placeholder">${store.name}</div>`
-      }
-
+    <div class="clean-store-card">
       <div class="store-card-body">
         ${
           store.logo_url
