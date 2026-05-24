@@ -3566,24 +3566,33 @@ body:has(.store-page) {
   background: linear-gradient(transparent, #050505);
 }
 
-.store-hero-overlay {
-  position: relative;
-  z-index: 1;
+.store-hero-badge {
+  position: absolute;
+  left: 42px;
+  bottom: 130px;
+  z-index: 2;
+  padding: 14px 22px;
+  border: 1px solid rgba(244, 196, 48, 0.45);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  text-align: left;
 }
 
-.store-hero-overlay h1 {
+.store-hero-badge span {
+  display: block;
   color: #f4c430;
-  font-size: clamp(46px, 7vw, 88px);
-  font-weight: 950;
-  letter-spacing: 3px;
-  margin: 0 0 16px;
-  text-shadow: 0 8px 26px rgba(0,0,0,0.72);
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
 }
 
-.store-hero-overlay p {
-  color: rgba(255,255,255,0.86);
-  font-size: 22px;
-  margin: 0;
+.store-hero-badge small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,0.78);
+  font-size: 13px;
 }
 
 .store-page {
@@ -3778,6 +3787,21 @@ body:has(.store-page) {
 
   .store-car-list {
     grid-template-columns: 1fr;
+  }
+
+  .store-hero-badge {
+    left: 18px;
+    right: 18px;
+    bottom: 105px;
+    padding: 12px 18px;
+  }
+
+  .store-hero-badge span {
+    font-size: 18px;
+  }
+
+  .store-hero-badge small {
+    font-size: 12px;
   }
 }
 
