@@ -230,6 +230,23 @@ if (addCarBtn) {
 
       alert("車輛更新成功！");
     } else {
+      
+      if (isSellerDashboard) {
+        await loadSellerSubscription();
+
+        if (!isSubscriptionValid()) {
+          alert("你的方案尚未開通或已到期，無法新增車輛。");
+          return;
+        }
+
+        const activeCars = adminCars.filter((car) => car.status === "active").length;
+
+        if (activeCars >= currentPlan.max_cars) {
+          alert(`已達方案上架上限：${currentPlan.max_cars} 台`);
+          return;
+        }
+      }
+
       const { data: lastCar, error: adminNoError } = await supabase
         .from("cars")
         .select("admin_no")
@@ -351,6 +368,8 @@ let adminCars = [];
 
 const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
 let currentSellerStore = null;
+let currentSubscription = null;
+let currentPlan = null;
 
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
@@ -372,8 +391,12 @@ function showSellerPage(pageName) {
 }
 
 sellerNavBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", async () => {
     showSellerPage(btn.dataset.page);
+
+    if (btn.dataset.page === "plan") {
+      await renderPlanPage();
+    }
   });
 });
 
@@ -591,10 +614,17 @@ async function toggleCarStatus(carId) {
   // 之後付費功能會接在這裡
   // 如果 nextStatus === "active"，就檢查是否有有效方案
   if (nextStatus === "active") {
-    const canActivate = true;
+    await loadSellerSubscription();
 
-    if (!canActivate) {
-      alert("請先完成付款或續約後，才能上架車輛。");
+    if (!isSubscriptionValid()) {
+      alert("你的方案尚未開通或已到期，無法上架車輛。");
+      return;
+    }
+
+    const activeCars = adminCars.filter((car) => car.status === "active").length;
+
+    if (activeCars >= currentPlan.max_cars) {
+      alert(`已達方案上架上限：${currentPlan.max_cars} 台`);
       return;
     }
   }
@@ -676,6 +706,22 @@ async function toggleFeaturedCar(carId) {
 
   const nextFeatured = !targetCar.is_featured;
 
+  if (nextFeatured) {
+    await loadSellerSubscription();
+
+    if (!isSubscriptionValid()) {
+      alert("你的方案尚未開通或已到期，無法設定精選車。");
+      return;
+    }
+
+    const featuredCars = adminCars.filter((car) => car.is_featured).length;
+
+    if (featuredCars >= currentPlan.featured_limit) {
+      alert(`已達精選車上限：${currentPlan.featured_limit} 台`);
+      return;
+    }
+  }
+
   let updateQuery = supabase
     .from("cars")
     .update({
@@ -747,6 +793,158 @@ async function getMyStore() {
   }
 
   return data;
+}
+
+async function loadSellerSubscription() {
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  if (!currentSellerStore) return null;
+
+  const { data, error } = await supabase
+    .from("seller_subscriptions")
+    .select(`
+      *,
+      plans (*)
+    `)
+    .eq("store_id", currentSellerStore.id)
+    .eq("status", "active")
+    .order("expires_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("讀取方案失敗:", error);
+    return null;
+  }
+
+  currentSubscription = data;
+  currentPlan = data?.plans || null;
+
+  return data;
+}
+
+function isSubscriptionValid() {
+  if (!currentSubscription || !currentPlan) return false;
+
+  if (!currentSubscription.expires_at) return false;
+
+  const expiresAt = new Date(currentSubscription.expires_at);
+  const now = new Date();
+
+  return currentSubscription.status === "active" && expiresAt > now;
+}
+
+async function renderPlanPage() {
+  await loadSellerSubscription();
+
+  const activeCars = adminCars.filter((car) => car.status === "active").length;
+  const featuredCars = adminCars.filter((car) => car.is_featured).length;
+
+  document.getElementById("currentPlanName").textContent =
+    currentPlan?.name || "尚未開通";
+
+  document.getElementById("currentPlanMaxCars").textContent =
+    currentPlan?.max_cars || 0;
+
+  document.getElementById("currentPlanUsedCars").textContent =
+    activeCars;
+
+  document.getElementById("currentPlanFeatured").textContent =
+    `${featuredCars} / ${currentPlan?.featured_limit || 0}`;
+
+  document.getElementById("currentPlanExpires").textContent =
+    currentSubscription?.expires_at
+      ? new Date(currentSubscription.expires_at).toLocaleDateString("zh-TW")
+      : "尚未設定";
+
+  await loadPlanList();
+}
+
+async function loadPlanList() {
+  const planList = document.getElementById("planList");
+  if (!planList) return;
+
+  planList.innerHTML = "<p>方案讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("price", { ascending: true });
+
+  if (error) {
+    console.error("讀取方案列表失敗:", error);
+    planList.innerHTML = "<p>方案讀取失敗。</p>";
+    return;
+  }
+
+  planList.innerHTML = "";
+
+  data.forEach((plan) => {
+    const item = document.createElement("div");
+    item.className = "seller-plan-card";
+
+    item.innerHTML = `
+      <h3>${plan.name}</h3>
+      <p>月費：NT$ ${Number(plan.price).toLocaleString()}</p>
+      <p>可上架：${plan.max_cars} 台</p>
+      <p>精選車：${plan.featured_limit} 台</p>
+      <p>置頂車：${plan.allow_top ? "可使用" : "不可使用"}</p>
+      <button type="button" class="select-plan-btn" data-id="${plan.id}">
+        測試開通此方案
+      </button>
+    `;
+
+    planList.appendChild(item);
+  });
+
+  document.querySelectorAll(".select-plan-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await activateTestPlan(btn.dataset.id);
+    });
+  });
+}
+
+async function activateTestPlan(planId) {
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  if (!currentSellerStore) {
+    alert("找不到車行資料");
+    return;
+  }
+
+  const expiresAt = new Date();
+  expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+  await supabase
+    .from("seller_subscriptions")
+    .update({ status: "inactive" })
+    .eq("store_id", currentSellerStore.id)
+    .eq("status", "active");
+
+  const { error } = await supabase
+    .from("seller_subscriptions")
+    .insert([
+      {
+        store_id: currentSellerStore.id,
+        plan_id: Number(planId),
+        expires_at: expiresAt.toISOString(),
+        status: "active"
+      }
+    ]);
+
+  if (error) {
+    console.error("開通方案失敗:", error);
+    alert("開通方案失敗，請看 Console");
+    return;
+  }
+
+  alert("測試方案已開通 1 個月");
+  await renderPlanPage();
 }
 
 const logoFileInput = document.getElementById("storeLogoFile");
