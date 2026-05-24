@@ -754,45 +754,190 @@ const logoFileInput = document.getElementById("storeLogoFile");
 const bannerPreview = document.getElementById("bannerPreview");
 const logoPreview = document.getElementById("logoPreview");
 
-if (bannerFileInput) {
-  bannerFileInput.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+const logoFileInput = document.getElementById("storeLogoFile");
+const bannerDesktopFileInput = document.getElementById("storeBannerDesktopFile");
+const bannerMobileFileInput = document.getElementById("storeBannerMobileFile");
 
-    const base64 = await fileToBase64(file);
+const logoPreview = document.getElementById("logoPreview");
+const bannerDesktopPreview = document.getElementById("bannerDesktopPreview");
+const bannerMobilePreview = document.getElementById("bannerMobilePreview");
 
-    document.getElementById("storeBannerEdit").value = base64;
+const cropModal = document.getElementById("cropModal");
+const cropImage = document.getElementById("cropImage");
+const cropTitle = document.getElementById("cropTitle");
+const cropHint = document.getElementById("cropHint");
+const cancelCropBtn = document.getElementById("cancelCropBtn");
+const confirmCropBtn = document.getElementById("confirmCropBtn");
 
-    if (bannerPreview) {
-      bannerPreview.src = base64;
-      bannerPreview.style.display = "block";
-    }
-  });
+let cropper = null;
+let currentCropTarget = null;
+
+const cropSettings = {
+  logo: {
+    title: "Logo 圓形裁切",
+    hint: "虛線框內就是圓形 Logo 會保留的範圍。",
+    aspectRatio: 1,
+    width: 400,
+    height: 400,
+    inputId: "storeLogoEdit",
+    preview: logoPreview
+  },
+  desktopBanner: {
+    title: "電腦版 Banner 裁切",
+    hint: "請把重要文字和人物放在虛線框內，電腦版會照這個比例顯示。",
+    aspectRatio: 1920 / 520,
+    width: 1920,
+    height: 520,
+    inputId: "storeBannerDesktopEdit",
+    preview: bannerDesktopPreview
+  },
+  mobileBanner: {
+    title: "手機版 Banner 裁切",
+    hint: "手機版比較窄，請把重要內容放中間。",
+    aspectRatio: 900 / 1200,
+    width: 900,
+    height: 1200,
+    inputId: "storeBannerMobileEdit",
+    preview: bannerMobilePreview
+  }
+};
+
+function openCropper(file, target) {
+  if (!file || !cropModal || !cropImage) return;
+
+  currentCropTarget = target;
+  const setting = cropSettings[target];
+
+  cropTitle.textContent = setting.title;
+  cropHint.textContent = setting.hint;
+
+  const imageUrl = URL.createObjectURL(file);
+  cropImage.src = imageUrl;
+  cropModal.classList.remove("hidden");
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropImage.onload = () => {
+    cropper = new Cropper(cropImage, {
+      aspectRatio: setting.aspectRatio,
+      viewMode: 1,
+      dragMode: "move",
+      autoCropArea: 0.9,
+      background: false,
+      guides: true,
+      center: true,
+      movable: true,
+      zoomable: true,
+      scalable: false,
+      rotatable: false,
+      cropBoxMovable: true,
+      cropBoxResizable: false
+    });
+  };
+}
+
+function closeCropper() {
+  cropModal.classList.add("hidden");
+
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+
+  cropImage.src = "";
+  currentCropTarget = null;
 }
 
 if (logoFileInput) {
-  logoFileInput.addEventListener("change", async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const base64 = await fileToBase64(file);
-
-    document.getElementById("storeLogoEdit").value = base64;
-
-    if (logoPreview) {
-      logoPreview.src = base64;
-      logoPreview.style.display = "block";
-    }
+  logoFileInput.addEventListener("change", (e) => {
+    openCropper(e.target.files[0], "logo");
   });
 }
+
+if (bannerDesktopFileInput) {
+  bannerDesktopFileInput.addEventListener("change", (e) => {
+    openCropper(e.target.files[0], "desktopBanner");
+  });
+}
+
+if (bannerMobileFileInput) {
+  bannerMobileFileInput.addEventListener("change", (e) => {
+    openCropper(e.target.files[0], "mobileBanner");
+  });
+}
+
+if (cancelCropBtn) {
+  cancelCropBtn.addEventListener("click", closeCropper);
+}
+
+if (confirmCropBtn) {
+  confirmCropBtn.addEventListener("click", () => {
+    if (!cropper || !currentCropTarget) return;
+
+    const setting = cropSettings[currentCropTarget];
+
+    const canvas = cropper.getCroppedCanvas({
+      width: setting.width,
+      height: setting.height,
+      imageSmoothingQuality: "high"
+    });
+
+    const base64 = canvas.toDataURL("image/jpeg", 0.9);
+
+    document.getElementById(setting.inputId).value = base64;
+
+    if (setting.preview) {
+      setting.preview.src = base64;
+      setting.preview.style.display = "block";
+    }
+
+    closeCropper();
+  });
+}
+
+//if (bannerFileInput) {
+//  bannerFileInput.addEventListener("change", async (e) => {
+//    const file = e.target.files[0];
+//    if (!file) return;
+//
+//    const base64 = await fileToBase64(file);
+//
+//    document.getElementById("storeBannerEdit").value = base64;
+//
+//    if (bannerPreview) {
+//      bannerPreview.src = base64;
+//      bannerPreview.style.display = "block";
+//    }
+//  });
+//}
+
+//if (logoFileInput) {
+//  logoFileInput.addEventListener("change", async (e) => {
+//    const file = e.target.files[0];
+//    if (!file) return;
+//
+//    const base64 = await fileToBase64(file);
+//
+//    document.getElementById("storeLogoEdit").value = base64;
+//
+//    if (logoPreview) {
+//      logoPreview.src = base64;
+//      logoPreview.style.display = "block";
+//    }
+//  });
+//}
 
 async function loadSellerStoreSettings() {
   if (!isSellerDashboard) return;
 
   const nameInput = document.getElementById("storeNameEdit");
   const descInput = document.getElementById("storeDescEdit");
-  const bannerInput = document.getElementById("storeBannerEdit");
   const logoInput = document.getElementById("storeLogoEdit");
+  const bannerDesktopInput = document.getElementById("storeBannerDesktopEdit");
+  const bannerMobileInput = document.getElementById("storeBannerMobileEdit");
 
   if (!nameInput) return;
 
@@ -821,12 +966,18 @@ async function loadSellerStoreSettings() {
 
   nameInput.value = currentSellerStore.name || "";
   descInput.value = currentSellerStore.description || "";
-  bannerInput.value = currentSellerStore.banner_url || "";
   logoInput.value = currentSellerStore.logo_url || "";
+  bannerDesktopInput.value = currentSellerStore.banner_desktop_url || currentSellerStore.banner_url || "";
+  bannerMobileInput.value = currentSellerStore.banner_mobile_url || "";
 
-  if (bannerPreview && currentSellerStore.banner_url) {
-    bannerPreview.src = currentSellerStore.banner_url;
-    bannerPreview.style.display = "block";
+  if (bannerDesktopPreview && (currentSellerStore.banner_desktop_url || currentSellerStore.banner_url)) {
+    bannerDesktopPreview.src = currentSellerStore.banner_desktop_url || currentSellerStore.banner_url;
+    bannerDesktopPreview.style.display = "block";
+  }
+
+  if (bannerMobilePreview && currentSellerStore.banner_mobile_url) {
+    bannerMobilePreview.src = currentSellerStore.banner_mobile_url;
+    bannerMobilePreview.style.display = "block";
   }
 
   if (logoPreview && currentSellerStore.logo_url) {
@@ -850,16 +1001,19 @@ if (saveStoreBtn) {
 
     const name = document.getElementById("storeNameEdit").value.trim();
     const description = document.getElementById("storeDescEdit").value.trim();
-    const banner_url = document.getElementById("storeBannerEdit").value.trim();
     const logo_url = document.getElementById("storeLogoEdit").value.trim();
+    const banner_desktop_url = document.getElementById("storeBannerDesktopEdit").value.trim();
+    const banner_mobile_url = document.getElementById("storeBannerMobileEdit").value.trim();
 
     const { error } = await supabase
       .from("stores")
       .update({
         name,
         description,
-        banner_url: banner_url || null,
-        logo_url: logo_url || null
+        logo_url: logo_url || null,
+        banner_url: banner_desktop_url || null,
+        banner_desktop_url: banner_desktop_url || null,
+        banner_mobile_url: banner_mobile_url || null
       })
       .eq("id", currentSellerStore.id);
 

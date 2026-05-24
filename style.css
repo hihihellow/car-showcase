@@ -3723,3 +3723,87 @@ body:has(.store-page) {
     padding: 24px;
   }
 }
+
+.crop-tip {
+  color: rgba(255,255,255,0.58);
+  margin: -4px 0 10px;
+  font-size: 14px;
+}
+
+.banner-preview {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.mobile-banner-preview {
+  width: 220px;
+  height: 300px;
+  object-fit: cover;
+}
+
+.logo-preview,
+.store-logo-img {
+  border-radius: 50%;
+}
+
+.crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.crop-modal-card {
+  width: min(960px, 96vw);
+  background: #111;
+  border: 1px solid rgba(244,196,48,0.3);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.7);
+}
+
+.crop-modal-card h3 {
+  color: #f4c430;
+  margin: 0 0 8px;
+}
+
+.crop-modal-card p {
+  color: rgba(255,255,255,0.7);
+  margin: 0 0 16px;
+}
+
+.crop-workspace {
+  height: min(62vh, 560px);
+  background:
+    linear-gradient(45deg, rgba(255,255,255,0.06) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255,255,255,0.06) 25%, transparent 25%);
+  border: 2px dashed rgba(244,196,48,0.55);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.crop-workspace img {
+  display: block;
+  max-width: 100%;
+}
+
+.crop-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cropper-view-box {
+  outline: 3px dashed #f4c430 !important;
+  outline-offset: -3px;
+}
+
+.cropper-face {
+  background: transparent !important;
+}

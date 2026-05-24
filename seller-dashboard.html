@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>賣家後台｜澄品汽車</title>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 </head>
 <body>
   <header class="seller-topbar">
@@ -114,15 +116,39 @@
         <label>店面介紹</label>
         <textarea id="storeDescEdit" rows="4" placeholder="輸入車行介紹"></textarea>
 
-        <label>Banner 圖片</label>
-        <input id="storeBannerFile" type="file" accept="image/*" />
-        <input id="storeBannerEdit" type="hidden" />
-        <img id="bannerPreview" class="store-preview-img" alt="Banner 預覽" />
-
         <label>Logo 圖片</label>
+        <p class="crop-tip">圓形區域就是公開頁會顯示的範圍。</p>
         <input id="storeLogoFile" type="file" accept="image/*" />
-        <input id="storeLogoEdit" type="hidden" />
+       <input id="storeLogoEdit" type="hidden" />
         <img id="logoPreview" class="store-preview-img logo-preview" alt="Logo 預覽" />
+
+        <label>電腦版 Banner 圖片</label>
+        <p class="crop-tip">建議比例 1920 × 520，虛線框內會完整顯示。</p>
+        <input id="storeBannerDesktopFile" type="file" accept="image/*" />
+        <input id="storeBannerDesktopEdit" type="hidden" />
+        <img id="bannerDesktopPreview" class="store-preview-img banner-preview" alt="電腦版 Banner 預覽" />
+
+        <label>手機版 Banner 圖片</label>
+        <p class="crop-tip">建議比例 900 × 1200，手機版會使用這張。</p>
+        <input id="storeBannerMobileFile" type="file" accept="image/*" />
+        <input id="storeBannerMobileEdit" type="hidden" />
+        <img id="bannerMobilePreview" class="store-preview-img mobile-banner-preview" alt="手機版 Banner 預覽" />
+
+        <div id="cropModal" class="crop-modal hidden">
+          <div class="crop-modal-card">
+            <h3 id="cropTitle">調整圖片</h3>
+            <p id="cropHint">拖曳圖片或縮放，虛線框就是實際顯示範圍。</p>
+
+            <div class="crop-workspace">
+              <img id="cropImage" alt="裁切圖片">
+            </div>
+
+            <div class="crop-actions">
+              <button type="button" id="cancelCropBtn">取消</button>
+              <button type="button" id="confirmCropBtn">確認裁切</button>
+            </div>
+          </div>
+        </div>
 
         <button id="saveStoreBtn" type="button">儲存店面資料</button>
       </section>
@@ -140,18 +166,6 @@
       </section>
     </main>
   </div>
-
-  <section class="admin-car-section">
-    <h2>車輛列表</h2>
-
-   <input 
-      id="adminSearchInput" 
-      class="admin-search-input" 
-      placeholder="搜尋車號、車名、廠牌、車型、地區"
-    />
-
-    <div id="adminCarList" class="admin-car-list"></div>
-  </section>
   
   <section class="post-entry">
     <a href="index.html" class="post-link-btn">返回前台首頁</a>
