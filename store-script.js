@@ -77,6 +77,9 @@ async function loadStorePage() {
   }
 
   document.title = `${store.name}｜澄品汽車`;
+  storeTitle.textContent = store.name;
+  storeDesc.textContent = store.description || "優質車行，嚴選好車。";
+  
   const heroImage =
     window.innerWidth <= 600
       ? store.banner_mobile_url || store.banner_desktop_url || store.banner_url
