@@ -58,6 +58,14 @@
       placeholder="搜尋車號、車名、廠牌、車型、地區"
     />
 
+    <div class="admin-status-tabs">
+      <button class="admin-status-tab active" data-status="all">全部車輛</button>
+      <button class="admin-status-tab" data-status="pending_review">待審核</button>
+      <button class="admin-status-tab" data-status="active">已上架</button>
+      <button class="admin-status-tab" data-status="rejected">審核未通過</button>
+      <button class="admin-status-tab" data-status="inactive">已下架</button>
+    </div>
+
     <div id="adminCarList" class="admin-car-list"></div>
   </section>
   
@@ -65,6 +73,6 @@
     <a href="index.html" class="post-link-btn">返回前台首頁</a>
   </section>
 
-  <script type="module" src="script.js"></script>
+  <script type="module" src="admin.script.js"></script>
 </body>
 </html>

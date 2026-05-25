@@ -234,15 +234,17 @@ if (addCarBtn) {
       if (isSellerDashboard) {
         await loadSellerSubscription();
 
-        if (!isSubscriptionValid()) {
-          alert("你的方案尚未開通或已到期，無法新增車輛。");
+        if (!currentSubscription || !currentPlan) {
+          alert("請先選擇方案，才能送出車輛審核。");
           return;
         }
 
-        const activeCars = adminCars.filter((car) => car.status === "active").length;
+        const usedCars = adminCars.filter((car) =>
+          ["active", "pending_review"].includes(car.status)
+        ).length;
 
-        if (activeCars >= currentPlan.max_cars) {
-          alert(`已達方案上架上限：${currentPlan.max_cars} 台`);
+        if (usedCars >= currentPlan.max_cars) {
+          alert(`已達方案可刊登上限：${currentPlan.max_cars} 台，待審核車輛也會佔用額度。`);
           return;
         }
       }
@@ -296,7 +298,9 @@ if (addCarBtn) {
             color: color || null,
             description,
             equipment: equipment || null,
-            image: images && images.length > 0 ? images[0] : null
+            image: images && images.length > 0 ? images[0] : null,
+            status: "pending_review",
+            review_note: null
           }
         ])
         .select()
@@ -326,7 +330,7 @@ if (addCarBtn) {
         return;
       }
 
-      alert("刊登成功！回首頁就能看到新車。");
+      alert("車輛已送出審核，通過後才會公開上架。");
     }
 
     document.getElementById("titleInput").value = "";
@@ -456,7 +460,15 @@ function renderAdminCars(list) {
         <p>NT$ ${Number(car.price).toLocaleString()}</p>
         <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
         <p class="car-status-text">
-          狀態：${car.status === "active" ? "上架中" : "已下架"}
+          狀態：${
+            car.status === "active"
+              ? "上架中"
+              : car.status === "pending_review"
+                ? "等待審核"
+                : car.status === "rejected"
+                  ? "審核未通過"
+                  : "已下架"
+          }
         </p>
         <p class="car-status-text">
           精選：${car.is_featured ? "是" : "否"}
@@ -611,6 +623,16 @@ async function toggleCarStatus(carId) {
 
   const nextStatus = targetCar.status === "active" ? "inactive" : "active";
 
+  if (targetCar.status === "pending_review") {
+    alert("這台車正在審核中，不能手動上架。");
+    return;
+  }
+
+  if (targetCar.status === "rejected") {
+    alert("這台車審核未通過，請編輯後重新送審。");
+    return;
+  }
+
   // 之後付費功能會接在這裡
   // 如果 nextStatus === "active"，就檢查是否有有效方案
   if (nextStatus === "active") {
@@ -621,10 +643,12 @@ async function toggleCarStatus(carId) {
       return;
     }
 
-    const activeCars = adminCars.filter((car) => car.status === "active").length;
+    const usedCars = adminCars.filter((car) =>
+      ["active", "pending_review"].includes(car.status)
+    ).length;
 
-    if (activeCars >= currentPlan.max_cars) {
-      alert(`已達方案上架上限：${currentPlan.max_cars} 台`);
+    if (usedCars >= currentPlan.max_cars) {
+      alert(`已達方案可刊登上限：${currentPlan.max_cars} 台`);
       return;
     }
   }
@@ -809,7 +833,7 @@ async function loadSellerSubscription() {
       plans (*)
     `)
     .eq("store_id", currentSellerStore.id)
-    .eq("status", "active")
+    .in("status", ["active", "pending_activation"])
     .order("expires_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -839,7 +863,10 @@ function isSubscriptionValid() {
 async function renderPlanPage() {
   await loadSellerSubscription();
 
-  const activeCars = adminCars.filter((car) => car.status === "active").length;
+  const usedCars = adminCars.filter((car) =>
+    ["active", "pending_review"].includes(car.status)
+  ).length;
+
   const featuredCars = adminCars.filter((car) => car.is_featured).length;
 
   document.getElementById("currentPlanName").textContent =
@@ -849,7 +876,7 @@ async function renderPlanPage() {
     currentPlan?.max_cars || 0;
 
   document.getElementById("currentPlanUsedCars").textContent =
-    activeCars;
+    usedCars;
 
   document.getElementById("currentPlanFeatured").textContent =
     `${featuredCars} / ${currentPlan?.featured_limit || 0}`;
@@ -865,7 +892,9 @@ async function renderPlanPage() {
     noticeEl.textContent = "";
     noticeEl.classList.remove("danger");
 
-    if (!currentSubscription?.expires_at) {
+    if (currentSubscription?.status === "pending_activation") {
+      noticeEl.textContent = "方案已選擇，等待第一台車審核通過後開始計算時間。";
+    } else if (!currentSubscription?.expires_at) {
       noticeEl.textContent = "尚未開通方案，請先選擇方案。";
     } else {
       const expiresAt = new Date(currentSubscription.expires_at);
@@ -959,24 +988,11 @@ async function activateTestPlan(planId) {
     return;
   }
 
-  let expiresAt = new Date();
-
-  if (currentSubscription?.expires_at) {
-    const oldExpiresAt = new Date(currentSubscription.expires_at);
-    const now = new Date();
-
-    if (oldExpiresAt > now) {
-      expiresAt = oldExpiresAt;
-    }
-  }
-
-  expiresAt.setMonth(expiresAt.getMonth() + 1);
-
   await supabase
     .from("seller_subscriptions")
     .update({ status: "inactive" })
     .eq("store_id", currentSellerStore.id)
-    .eq("status", "active");
+    .in("status", ["active", "pending_activation"])
 
   const { error } = await supabase
     .from("seller_subscriptions")
@@ -984,8 +1000,8 @@ async function activateTestPlan(planId) {
       {
         store_id: currentSellerStore.id,
         plan_id: Number(planId),
-        expires_at: expiresAt.toISOString(),
-        status: "active"
+        expires_at: null,
+        status: "pending_activation"
       }
     ]);
 
@@ -995,7 +1011,7 @@ async function activateTestPlan(planId) {
     return;
   }
 
-  alert("方案已更新，有效期限 1 個月。");
+  alert("方案已選擇，將在第一台車審核通過後開始計算 1 個月。");
   await renderPlanPage();
 }
 
