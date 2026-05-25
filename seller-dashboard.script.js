@@ -926,7 +926,7 @@ async function loadPlanList() {
       </ul>
 
       <button type="button" class="select-plan-btn" data-id="${plan.id}">
-        測試開通此方案
+        ${currentPlan?.id === plan.id ? "續約此方案" : "選擇此方案"}
       </button>
     `;
 
@@ -935,7 +935,16 @@ async function loadPlanList() {
 
   document.querySelectorAll(".select-plan-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      await activateTestPlan(btn.dataset.id);
+      const planId = Number(btn.dataset.id);
+      const plan = data.find((item) => item.id === planId);
+
+      const ok = confirm(
+        `確定要${currentPlan?.id === planId ? "續約" : "選擇"}「${plan.name}」嗎？`
+      );
+
+      if (!ok) return;
+
+      await activateTestPlan(planId);
     });
   });
 }
@@ -976,7 +985,7 @@ async function activateTestPlan(planId) {
     return;
   }
 
-  alert("測試方案已開通 1 個月");
+  alert("方案已更新，有效期限 1 個月。");
   await renderPlanPage();
 }
 
