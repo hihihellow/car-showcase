@@ -3730,15 +3730,6 @@ body:has(.store-page) {
   .store-car-list {
     grid-template-columns: repeat(2, 1fr);
   }
-
-  .seller-plan-list {
-    grid-template-columns: 1fr;
-  }
-
-  .seller-current-plan-card,
-  .seller-plan-option-card {
-    padding: 20px;
-  }
 }
 
 @media (max-width: 560px) {
@@ -3974,4 +3965,15 @@ body:has(.store-page) {
   color: #f4c430;
   margin-right: 10px;
   font-weight: 900;
+}
+
+@media (max-width: 900px) {
+  .seller-plan-list {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-current-plan-card,
+  .seller-plan-option-card {
+    padding: 20px;
+  }
 }
