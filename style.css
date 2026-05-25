@@ -3730,6 +3730,15 @@ body:has(.store-page) {
   .store-car-list {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .seller-plan-list {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-current-plan-card,
+  .seller-plan-option-card {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 560px) {
@@ -3870,4 +3879,99 @@ body:has(.store-page) {
 #confirmCropBtn {
   background: linear-gradient(135deg, #f4c430, #ffdc52);
   color: #111;
+}
+
+.seller-current-plan-card {
+  background:
+    radial-gradient(circle at top left, rgba(244,196,48,0.13), transparent 36%),
+    rgba(0,0,0,0.36);
+  border: 1px solid rgba(244,196,48,0.22);
+  border-radius: 24px;
+  padding: 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+}
+
+.seller-current-plan-card p {
+  margin: 0 0 14px;
+  color: rgba(255,255,255,0.88);
+  font-weight: 700;
+}
+
+.seller-current-plan-card span {
+  color: #fff;
+  font-weight: 900;
+}
+
+.plan-expire-notice {
+  margin-top: 18px !important;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: rgba(244,196,48,0.1);
+  color: #f4c430 !important;
+  border: 1px solid rgba(244,196,48,0.22);
+}
+
+.plan-expire-notice.danger {
+  background: rgba(255,80,80,0.12);
+  color: #ff8b8b !important;
+  border-color: rgba(255,80,80,0.35);
+}
+
+.seller-plan-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 16px;
+}
+
+.seller-plan-option-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(0,0,0,0.28));
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.26);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.seller-plan-option-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(244,196,48,0.52);
+}
+
+.plan-card-head h3 {
+  margin: 0 0 14px;
+  color: #fff;
+  font-size: 24px;
+}
+
+.plan-card-head strong {
+  color: #f4c430;
+  font-size: 30px;
+  font-weight: 950;
+}
+
+.plan-card-head span {
+  color: rgba(255,255,255,0.55);
+  margin-left: 4px;
+}
+
+.plan-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0;
+}
+
+.plan-feature-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.82);
+  font-weight: 700;
+}
+
+.plan-feature-list li::before {
+  content: "✓";
+  color: #f4c430;
+  margin-right: 10px;
+  font-weight: 900;
 }

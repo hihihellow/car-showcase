@@ -858,6 +858,31 @@ async function renderPlanPage() {
     currentSubscription?.expires_at
       ? new Date(currentSubscription.expires_at).toLocaleDateString("zh-TW")
       : "尚未設定";
+  
+  const noticeEl = document.getElementById("planExpireNotice");
+
+  if (noticeEl) {
+    noticeEl.textContent = "";
+    noticeEl.classList.remove("danger");
+
+    if (!currentSubscription?.expires_at) {
+      noticeEl.textContent = "尚未開通方案，請先選擇方案。";
+    } else {
+      const expiresAt = new Date(currentSubscription.expires_at);
+      const now = new Date();
+      const diffDays = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        noticeEl.textContent = "方案已到期，請續約後再上架車輛。";
+        noticeEl.classList.add("danger");
+      } else if (diffDays <= 7) {
+        noticeEl.textContent = `方案將於 ${diffDays} 天後到期，建議盡快續約。`;
+        noticeEl.classList.add("danger");
+      } else {
+        noticeEl.textContent = `方案仍有效，剩餘 ${diffDays} 天。`;
+      }
+    }
+  }
 
   await loadPlanList();
 }
@@ -884,14 +909,22 @@ async function loadPlanList() {
 
   data.forEach((plan) => {
     const item = document.createElement("div");
-    item.className = "seller-plan-card";
+    item.className = "seller-plan-option-card";
 
     item.innerHTML = `
-      <h3>${plan.name}</h3>
-      <p>月費：NT$ ${Number(plan.price).toLocaleString()}</p>
-      <p>可上架：${plan.max_cars} 台</p>
-      <p>精選車：${plan.featured_limit} 台</p>
-      <p>置頂車：${plan.allow_top ? "可使用" : "不可使用"}</p>
+      <div class="plan-card-head">
+        <h3>${plan.name}</h3>
+        <strong>NT$ ${Number(plan.price).toLocaleString()}</strong>
+        <span>/ 月</span>
+      </div>
+
+      <ul class="plan-feature-list">
+        <li>可上架 ${plan.max_cars} 台車</li>
+        <li>精選車 ${plan.featured_limit} 台</li>
+        <li>${plan.allow_top ? "可使用置頂車" : "不可使用置頂車"}</li>
+        <li>${plan.allow_premium_template ? "可使用高級模板" : "一般店面模板"}</li>
+      </ul>
+
       <button type="button" class="select-plan-btn" data-id="${plan.id}">
         測試開通此方案
       </button>
