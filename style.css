@@ -4000,3 +4000,13 @@ body:has(.store-page) {
   color: #f4c430;
   border-color: #f4c430;
 }
+
+.car-review-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  color: #ff8b8b;
+  font-weight: 800;
+}

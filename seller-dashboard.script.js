@@ -165,23 +165,50 @@ if (addCarBtn) {
     let savedCar = null;
 
     if (editingCarId) {
+      const editingCar = adminCars.find((car) => Number(car.id) === Number(editingCarId));
+
+      const updateData = {
+        title,
+        brand,
+        model,
+        year,
+        cc,
+        price,
+        region,
+        category,
+        mileage: Number.isNaN(mileage) ? null : mileage,
+        color: color || null,
+        description,
+        equipment: equipment || null,
+        image: images && images.length > 0 ? images[0] : oldImages[0]
+      };
+
+      if (isSellerDashboard && editingCar?.status === "rejected") {
+        updateData.status = "pending_review";
+       updateData.review_note = null;
+      }
+
+      if (isSellerDashboard && editingCar?.status === "rejected") {
+        await loadSellerSubscription();
+
+        if (!currentSubscription || !currentPlan) {
+          alert("請先選擇方案，才能重新送審。");
+          return;
+        }
+
+        const usedCars = adminCars.filter((car) =>
+          ["active", "pending_review"].includes(car.status)
+        ).length;
+
+        if (usedCars >= currentPlan.max_cars) {
+          alert(`已達方案可刊登上限：${currentPlan.max_cars} 台，請先下架其他車輛後再重新送審。`);
+          return;
+        }
+      }
+
       let updateQuery = supabase
         .from("cars")
-        .update({
-          title,
-          brand,
-          model,
-          year,
-          cc,
-          price,
-          region,
-          category,
-          mileage: Number.isNaN(mileage) ? null : mileage,
-          color: color || null,
-          description,
-          equipment: equipment || null,
-          image: images && images.length > 0 ? images[0] : oldImages[0]
-        })
+        .update(updateData)
         .eq("id", Number(editingCarId));
 
       if (isSellerDashboard && currentSellerStore) {
@@ -228,7 +255,11 @@ if (addCarBtn) {
         }
       }
 
-      alert("車輛更新成功！");
+      if (isSellerDashboard && editingCar?.status === "rejected") {
+        alert("車輛已修改並重新送出審核。");
+      } else {
+        alert("車輛更新成功！");
+      }
     } else {
       
       if (isSellerDashboard) {
@@ -473,17 +504,24 @@ function renderAdminCars(list) {
         <p class="car-status-text">
           精選：${car.is_featured ? "是" : "否"}
         </p>
+
+        ${car.status === "rejected" && car.review_note ? `
+          <p class="car-review-note">
+            退回原因：${car.review_note}
+          </p>
+        ` : ""}
       </div>
 
       <div class="admin-action-row">
         <button class="admin-edit-btn" data-id="${car.id}">
-          編輯
+          ${car.status === "rejected" ? "修改後重新送審" : "編輯"}
         </button>
 
-        <button class="toggle-status-btn" data-id="${car.id}">
-          ${car.status === "active" ? "下架" : "重新上架"}
-        </button>
-
+        ${["active", "inactive"].includes(car.status) ? `
+          <button class="toggle-status-btn" data-id="${car.id}">
+            ${car.status === "active" ? "下架" : "重新上架"}
+          </button>
+        ` : ""}
         <button class="toggle-featured-btn" data-id="${car.id}">
           ${car.is_featured ? "取消精選" : "設為精選"}
         </button>
