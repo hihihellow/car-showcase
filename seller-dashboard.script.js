@@ -959,7 +959,17 @@ async function activateTestPlan(planId) {
     return;
   }
 
-  const expiresAt = new Date();
+  let expiresAt = new Date();
+
+  if (currentSubscription?.expires_at) {
+    const oldExpiresAt = new Date(currentSubscription.expires_at);
+    const now = new Date();
+
+    if (oldExpiresAt > now) {
+      expiresAt = oldExpiresAt;
+    }
+  }
+
   expiresAt.setMonth(expiresAt.getMonth() + 1);
 
   await supabase
