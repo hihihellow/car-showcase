@@ -7,75 +7,31 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="header">
-  <h1>車輛管理後台</h1>
-  <p>在這裡新增你的車輛資料</p>
-  </header>
- 
-  <section class="post-form">
-    <h2>新增車輛</h2>
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <h2>平台後台</h2>
+      <button class="admin-section-btn active" data-section="cars">車輛管理</button>
+      <button class="admin-section-btn" data-section="logs">方案紀錄</button>
+      <button class="admin-section-btn" data-section="stats">統計資料</button>
+      <a href="index.html" class="post-link-btn">返回前台</a>
+    </aside>
 
-    <input id="titleInput" placeholder="車名，例如 Toyota Corolla Cross" />
-    <input id="brandInput" placeholder="廠牌，例如 Toyota" />
-    <input id="modelInput" placeholder="車型，例如 Corolla Cross" />
-    <input id="yearInput" type="number" placeholder="年份，例如 2022" />
-    <input id="ccInput" type="number" placeholder="排氣量，例如 1800" />
+    <main class="admin-main">
+      <section id="adminCarsSection" class="admin-section active">
+        原本的新增車輛表單 + 車輛列表放這裡
+      </section>
 
-    <input id="priceInput" type="number" placeholder="價格，例如 569000" />
-    <input id="regionInput" placeholder="地區，例如 桃園市" />
-    <input id="categoryInput" placeholder="分類，例如 休旅車" />
+      <section id="adminLogsSection" class="admin-section hidden">
+        <h2>方案操作紀錄</h2>
+        <div id="subscriptionLogsList" class="subscription-logs-list"></div>
+      </section>
 
-    <input id="mileageInput" type="number" placeholder="里程，例如 38871" />
-    <input id="colorInput" placeholder="顏色，例如 白色" />
-
-    <label for="imageInput">上傳照片（可選多張）</label>
-    <input id="imageInput" type="file" accept="image/*" multiple />
-
-    <div id="imagePreviewList" class="image-preview-list"></div>
-    <p class="image-order-tip">提示：第一張會作為封面，可用「上移 / 下移」調整順序。</p>
-
-    <label for="equipmentInput">車輛配備（每行一項）</label>
-    <textarea id="equipmentInput" rows="8" placeholder="例如：
-    M-Sport運動套件
-    Apple CarPlay
-    雙前座電動椅
-    HUD抬頭顯示器
-    360環景系統"></textarea>
-
-    <input id="descInput" placeholder="簡介，例如 車況良好、原鈑件" />
-
-    <button id="addCarBtn">送出</button>
-    <button id="cancelEditBtn" type="button" class="hidden">取消編輯</button>
-    <p id="editModeText" class="edit-mode-text hidden">目前正在編輯車輛</p>
-  </section>
-
-  <section class="admin-car-section">
-    <h2>車輛列表</h2>
-
-   <input 
-      id="adminSearchInput" 
-      class="admin-search-input" 
-      placeholder="搜尋車號、車名、廠牌、車型、地區"
-    />
-
-    <div class="admin-status-tabs">
-      <button class="admin-status-tab active" data-status="all">全部車輛</button>
-      <button class="admin-status-tab" data-status="pending_review">待審核</button>
-      <button class="admin-status-tab" data-status="active">已上架</button>
-      <button class="admin-status-tab" data-status="rejected">審核未通過</button>
-      <button class="admin-status-tab" data-status="inactive">已下架</button>
-    </div>
-
-    <select id="adminStoreFilter" class="admin-store-filter">
-      <option value="all">全部車行</option>
-    </select>
-
-    <div id="adminCarList" class="admin-car-list"></div>
-  </section>
-  
-  <section class="post-entry">
-    <a href="index.html" class="post-link-btn">返回前台首頁</a>
-  </section>
+      <section id="adminStatsSection" class="admin-section hidden">
+        <h2>統計資料</h2>
+        <p>統計儀表板開發中。</p>
+      </section>
+    </main>
+  </div>
 
   <script type="module" src="admin.script.js"></script>
 </body>

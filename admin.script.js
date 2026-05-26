@@ -611,9 +611,51 @@ if (addCarBtn) {
 const adminCarList = document.getElementById("adminCarList");
 const adminSearchInput = document.getElementById("adminSearchInput");
 const adminStoreFilter = document.getElementById("adminStoreFilter");
+const subscriptionLogsList = document.getElementById("subscriptionLogsList");
+const adminSectionBtns = document.querySelectorAll(".admin-section-btn");
+const adminSections = document.querySelectorAll(".admin-section");
+
+function showAdminSection(sectionName) {
+  adminSections.forEach((section) => {
+    section.classList.add("hidden");
+    section.classList.remove("active");
+  });
+
+  adminSectionBtns.forEach((btn) => {
+    btn.classList.remove("active");
+  });
+
+  const targetSection = document.getElementById(
+    sectionName === "cars"
+      ? "adminCarsSection"
+      : sectionName === "logs"
+        ? "adminLogsSection"
+        : "adminStatsSection"
+  );
+
+  if (targetSection) {
+    targetSection.classList.remove("hidden");
+    targetSection.classList.add("active");
+  }
+
+  document
+    .querySelector(`.admin-section-btn[data-section="${sectionName}"]`)
+    ?.classList.add("active");
+
+  if (sectionName === "logs") {
+    loadSubscriptionLogs();
+  }
+}
+
+adminSectionBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    showAdminSection(btn.dataset.section);
+  });
+});
 
 let adminCars = [];
 let adminStores = [];
+let adminPlans = [];
 let currentAdminStatusFilter = "all";
 
 const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
@@ -632,6 +674,106 @@ async function loadAdminStores() {
   }
 
   adminStores = data || [];
+}
+
+async function loadAdminPlans() {
+  const { data, error } = await supabase
+    .from("plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("price", { ascending: true });
+
+  if (error) {
+    console.error("讀取方案失敗:", error);
+    adminPlans = [];
+    return;
+  }
+
+  adminPlans = data || [];
+}
+
+async function createSubscriptionLog({
+  storeId,
+  subscriptionId = null,
+  oldPlanId = null,
+  newPlanId = null,
+  action,
+  note = ""
+}) {
+  const { error } = await supabase
+    .from("subscription_logs")
+    .insert([
+      {
+        store_id: storeId,
+        subscription_id: subscriptionId,
+        old_plan_id: oldPlanId,
+        new_plan_id: newPlanId,
+        action,
+        note
+      }
+    ]);
+
+  if (error) {
+    console.error("寫入方案紀錄失敗:", error);
+  }
+}
+
+async function loadSubscriptionLogs() {
+  if (!subscriptionLogsList) return;
+
+  subscriptionLogsList.innerHTML = "<p>方案紀錄讀取中...</p>";
+
+  await loadAdminStores();
+  await loadAdminPlans();
+
+  const { data, error } = await supabase
+    .from("subscription_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (error) {
+    console.error("讀取方案紀錄失敗:", error);
+    subscriptionLogsList.innerHTML = "<p>讀取方案紀錄失敗。</p>";
+    return;
+  }
+
+  renderSubscriptionLogs(data || []);
+}
+
+function renderSubscriptionLogs(logs) {
+  if (!subscriptionLogsList) return;
+
+  if (!logs.length) {
+    subscriptionLogsList.innerHTML = "<p>目前沒有方案操作紀錄。</p>";
+    return;
+  }
+
+  subscriptionLogsList.innerHTML = "";
+
+  logs.forEach((log) => {
+    const storeName =
+      adminStores.find((store) => store.id === log.store_id)?.name || "未知車行";
+
+    const oldPlan =
+      adminPlans.find((plan) => plan.id === log.old_plan_id)?.name || "無";
+
+    const newPlan =
+      adminPlans.find((plan) => plan.id === log.new_plan_id)?.name || "無";
+
+    const item = document.createElement("div");
+    item.className = "subscription-log-item";
+
+    item.innerHTML = `
+      <strong>${storeName}</strong>
+      <p>操作：${log.action}</p>
+      <p>原方案：${oldPlan} → 新方案：${newPlan}</p>
+      <p>備註：${log.note || "無"}</p>
+      <small>${new Date(log.created_at).toLocaleString("zh-TW")}</small>
+    `;
+
+    subscriptionLogsList.appendChild(item);
+  });
 }
 
 function renderAdminStoreFilter() {
@@ -653,6 +795,7 @@ async function loadAdminCars() {
   adminCarList.innerHTML = "<p>車輛讀取中...</p>";
 
   await loadAdminStores();
+  await loadAdminPlans();
   renderAdminStoreFilter();
 
   let query = supabase
@@ -848,7 +991,7 @@ async function viewStoreInfo(storeId) {
       plans (*)
     `)
     .eq("store_id", storeId)
-    .in("status", ["active", "pending_activation"])
+    .in("status", ["active", "pending_activation", "inactive"])
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -879,6 +1022,7 @@ async function viewStoreInfo(storeId) {
   1 = 延長 1 個月
   2 = 停用方案
   3 = 重新啟用方案
+  4 = 切換方案
 
   直接取消 = 關閉`
   );
@@ -895,6 +1039,10 @@ async function viewStoreInfo(storeId) {
 
   if (action === "3") {
     await enableSubscription(subscription);
+  }
+
+  if (action === "4") {
+    await switchSubscriptionPlan(subscription, storeId);
   }
 }
 
@@ -930,6 +1078,15 @@ async function extendSubscription(subscription) {
     return;
   }
 
+  await createSubscriptionLog({
+    storeId: subscription.store_id,
+    subscriptionId: subscription.id,
+    oldPlanId: subscription.plan_id,
+    newPlanId: subscription.plan_id,
+    action: "extend",
+    note: "admin 手動延長 1 個月"
+  });
+
   alert("方案已延長 1 個月");
 }
 
@@ -956,6 +1113,15 @@ async function disableSubscription(subscription) {
     return;
   }
 
+  await createSubscriptionLog({
+    storeId: subscription.store_id,
+    subscriptionId: subscription.id,
+    oldPlanId: subscription.plan_id,
+    newPlanId: subscription.plan_id,
+    action: "disable",
+    note: "admin 手動停用方案"
+  });
+
   alert("方案已停用");
 }
 
@@ -978,7 +1144,103 @@ async function enableSubscription(subscription) {
     return;
   }
 
+  await createSubscriptionLog({
+    storeId: subscription.store_id,
+    subscriptionId: subscription.id,
+    oldPlanId: subscription.plan_id,
+    newPlanId: subscription.plan_id,
+    action: "enable",
+    note: "admin 手動重新啟用方案"
+  });
+
   alert("方案已重新啟用");
+}
+
+async function switchSubscriptionPlan(subscription, storeId) {
+  if (!adminPlans || adminPlans.length === 0) {
+    alert("目前沒有可用方案");
+    return;
+  }
+
+  const planText = adminPlans
+    .map((plan) => `${plan.id} = ${plan.name}｜${plan.max_cars} 台｜NT$ ${Number(plan.price).toLocaleString()}`)
+    .join("\n");
+
+  const input = prompt(
+`請輸入要切換的方案 ID：
+
+${planText}`
+  );
+
+  if (!input) return;
+
+  const newPlanId = Number(input);
+  const newPlan = adminPlans.find((plan) => Number(plan.id) === newPlanId);
+
+  if (!newPlan) {
+    alert("找不到這個方案 ID");
+    return;
+  }
+
+  const ok = confirm(`確定要切換成「${newPlan.name}」嗎？`);
+  if (!ok) return;
+
+  if (!subscription) {
+    const { data: newSub, error } = await supabase
+      .from("seller_subscriptions")
+      .insert([
+        {
+          store_id: storeId,
+          plan_id: newPlanId,
+          status: "pending_activation",
+          expires_at: null
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      alert("建立方案失敗");
+      return;
+    }
+
+    await createSubscriptionLog({
+      storeId,
+      subscriptionId: newSub?.id || null,
+      oldPlanId: null,
+      newPlanId,
+      action: "create",
+      note: "admin 建立新方案"
+    });
+
+    alert("已建立新方案，等待第一台車審核通過後開始計算時間。");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("seller_subscriptions")
+    .update({
+      plan_id: newPlanId
+    })
+    .eq("id", subscription.id);
+
+  if (error) {
+    console.error(error);
+    alert("切換方案失敗");
+    return;
+  }
+
+  await createSubscriptionLog({
+    storeId: subscription.store_id,
+    subscriptionId: subscription.id,
+    oldPlanId: subscription.plan_id,
+    newPlanId,
+    action: "switch",
+    note: `admin 切換方案為 ${newPlan.name}`
+  });
+
+  alert(`方案已切換為：${newPlan.name}`);
 }
 
 async function approveCar(carId) {
