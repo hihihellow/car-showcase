@@ -760,6 +760,24 @@ async function createSubscriptionLog({
   }
 }
 
+async function createNotification(storeId, title, message = "") {
+  if (!storeId) return;
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert([
+      {
+        store_id: storeId,
+        title,
+        message
+      }
+    ]);
+
+  if (error) {
+    console.error("建立通知失敗:", error);
+  }
+}
+
 async function loadSubscriptionLogs() {
   if (!subscriptionLogsList) return;
 
@@ -1457,6 +1475,14 @@ async function approveCar(carId) {
     await activateSubscriptionByFirstApprovedCar(targetCar.store_id);
   }
 
+  if (targetCar?.store_id) {
+    await createNotification(
+      targetCar.store_id,
+      "車輛審核通過",
+      `${targetCar.title || "您的車輛"} 已審核通過並公開上架。`
+    );
+  }
+
   alert("車輛已審核通過並上架。");
   await loadAdminCars();
 }
@@ -1477,6 +1503,16 @@ async function rejectCar(carId) {
     console.error("退回失敗:", error);
     alert("退回失敗，請看 Console");
     return;
+  }
+
+  const targetCar = adminCars.find((car) => String(car.id) === String(carId));
+
+  if (targetCar?.store_id) {
+    await createNotification(
+      targetCar.store_id,
+      "車輛審核未通過",
+     `${targetCar.title || "您的車輛"} 已被退回，原因：${reason || "車輛資料未通過審核"}`
+    );
   }
 
   alert("已退回此車輛。");
