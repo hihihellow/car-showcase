@@ -18,7 +18,56 @@
 
     <main class="admin-main">
       <section id="adminCarsSection" class="admin-section active">
-        原本的新增車輛表單 + 車輛列表放這裡
+        <section class="post-page">
+          <h1>平台車輛管理</h1>
+          <p id="editModeText" class="hidden">目前為編輯模式</p>
+
+          <div class="post-form">
+            <input id="titleInput" placeholder="車輛標題" />
+            <input id="brandInput" placeholder="廠牌" />
+            <input id="modelInput" placeholder="車型" />
+            <input id="yearInput" type="number" placeholder="年份" />
+            <input id="ccInput" type="number" placeholder="排氣量" />
+            <input id="priceInput" type="number" placeholder="價格" />
+            <input id="regionInput" placeholder="地區" />
+            <input id="categoryInput" placeholder="車種分類" />
+            <input id="mileageInput" type="number" placeholder="里程" />
+            <input id="colorInput" placeholder="顏色" />
+
+            <textarea id="equipmentInput" placeholder="配備"></textarea>
+            <textarea id="descInput" placeholder="車輛描述"></textarea>
+      
+            <input id="imageInput" type="file" accept="image/*" multiple />
+            <div id="imagePreviewList" class="image-preview-list"></div>
+      
+            <button id="addCarBtn" type="button">送出</button>
+            <button id="cancelEditBtn" type="button" class="hidden">取消編輯</button>
+          </div>
+        </section>
+ 
+        <section class="admin-car-section">
+          <h2>車輛列表</h2>
+ 
+          <input 
+            id="adminSearchInput" 
+            class="admin-search-input" 
+            placeholder="搜尋車號、車名、廠牌、車型、地區"
+          />
+
+          <div class="admin-status-tabs">
+            <button class="admin-status-tab active" data-status="all">全部車輛</button>
+            <button class="admin-status-tab" data-status="pending_review">待審核</button>
+            <button class="admin-status-tab" data-status="active">已上架</button>
+            <button class="admin-status-tab" data-status="rejected">審核未通過</button>
+            <button class="admin-status-tab" data-status="inactive">已下架</button>
+          </div>
+
+          <select id="adminStoreFilter" class="admin-store-filter">
+            <option value="all">全部車行</option>
+          </select>
+
+          <div id="adminCarList" class="admin-car-list"></div>
+        </section>
       </section>
 
       <section id="adminLogsSection" class="admin-section hidden">
