@@ -857,6 +857,8 @@ async function viewStoreInfo(storeId) {
   const subStatus =
     subscription?.status === "active"
       ? "使用中"
+      : subscription?.status === "inactive"
+        ? "已停用"
       : subscription?.status === "pending_activation"
         ? "等待第一台車審核通過"
         : "尚未啟用";
@@ -865,22 +867,118 @@ async function viewStoreInfo(storeId) {
     ? new Date(subscription.expires_at).toLocaleDateString("zh-TW")
     : "尚未開始計算";
 
-  alert(
-`車行名稱：${store.name || "未命名"}
+  const action = prompt(
+  `車行名稱：${store.name || "未命名"}
 
-車行介紹：
-${store.description || "尚未填寫"}
+  目前方案：${planName}
+  方案狀態：${subStatus}
+  到期日：${expiresText}
 
-目前方案：${planName}
-方案狀態：${subStatus}
-到期日：${expiresText}
+  請輸入操作：
 
-車輛數量：
-已上架：${activeCount}
-待審核：${pendingCount}
-審核未通過：${rejectedCount}
-已下架：${inactiveCount}`
+  1 = 延長 1 個月
+  2 = 停用方案
+  3 = 重新啟用方案
+
+  直接取消 = 關閉`
   );
+
+  if (!action) return;
+
+  if (action === "1") {
+    await extendSubscription(subscription);
+  }
+
+  if (action === "2") {
+    await disableSubscription(subscription);
+  }
+
+  if (action === "3") {
+    await enableSubscription(subscription);
+  }
+}
+
+async function extendSubscription(subscription) {
+  if (!subscription) {
+    alert("找不到方案資料");
+    return;
+  }
+
+  let expiresAt = new Date();
+
+  if (subscription.expires_at) {
+    const oldDate = new Date(subscription.expires_at);
+
+    if (oldDate > new Date()) {
+      expiresAt = oldDate;
+    }
+  }
+
+  expiresAt.setMonth(expiresAt.getMonth() + 1);
+
+  const { error } = await supabase
+    .from("seller_subscriptions")
+    .update({
+      expires_at: expiresAt.toISOString(),
+      status: "active"
+    })
+    .eq("id", subscription.id);
+
+  if (error) {
+    console.error(error);
+    alert("延長方案失敗");
+    return;
+  }
+
+  alert("方案已延長 1 個月");
+}
+
+async function disableSubscription(subscription) {
+  if (!subscription) {
+    alert("找不到方案資料");
+    return;
+  }
+
+  const ok = confirm("確定要停用這個方案嗎？");
+
+  if (!ok) return;
+
+  const { error } = await supabase
+    .from("seller_subscriptions")
+    .update({
+      status: "inactive"
+    })
+    .eq("id", subscription.id);
+
+  if (error) {
+    console.error(error);
+    alert("停用失敗");
+    return;
+  }
+
+  alert("方案已停用");
+}
+
+async function enableSubscription(subscription) {
+  if (!subscription) {
+    alert("找不到方案資料");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("seller_subscriptions")
+    .update({
+      status: "active"
+    })
+    .eq("id", subscription.id);
+
+  if (error) {
+    console.error(error);
+    alert("重新啟用失敗");
+    return;
+  }
+
+  alert("方案已重新啟用");
 }
 
 async function approveCar(carId) {
