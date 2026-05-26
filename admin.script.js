@@ -610,17 +610,50 @@ if (addCarBtn) {
 // =========================
 const adminCarList = document.getElementById("adminCarList");
 const adminSearchInput = document.getElementById("adminSearchInput");
+const adminStoreFilter = document.getElementById("adminStoreFilter");
 
 let adminCars = [];
+let adminStores = [];
 let currentAdminStatusFilter = "all";
 
 const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
 let currentSellerStore = null;
 
+async function loadAdminStores() {
+  const { data, error } = await supabase
+    .from("stores")
+    .select("*")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("讀取車行失敗:", error);
+    adminStores = [];
+    return;
+  }
+
+  adminStores = data || [];
+}
+
+function renderAdminStoreFilter() {
+  if (!adminStoreFilter) return;
+
+  adminStoreFilter.innerHTML = `<option value="all">全部車行</option>`;
+
+  adminStores.forEach((store) => {
+    const option = document.createElement("option");
+    option.value = store.id;
+    option.textContent = store.name;
+    adminStoreFilter.appendChild(option);
+  });
+}
+
 async function loadAdminCars() {
   if (!adminCarList) return;
 
   adminCarList.innerHTML = "<p>車輛讀取中...</p>";
+
+  await loadAdminStores();
+  renderAdminStoreFilter();
 
   let query = supabase
     .from("cars")
@@ -676,6 +709,10 @@ function applyAdminFilters() {
 
   let filtered = [...adminCars];
 
+  if (adminStoreFilter && adminStoreFilter.value !== "all") {
+    filtered = filtered.filter((car) => car.store_id === adminStoreFilter.value);
+  }
+
   if (currentAdminStatusFilter !== "all") {
     filtered = filtered.filter((car) => car.status === currentAdminStatusFilter);
   }
@@ -717,6 +754,9 @@ function renderAdminCars(list) {
         <h3>#${car.admin_no || "未編號"}｜${car.title}</h3>
         <p>NT$ ${Number(car.price).toLocaleString()}</p>
         <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
+        <p>車行：${
+          adminStores.find((store) => store.id === car.store_id)?.name || "平台車輛 / 未指定"
+        }</p>
         <p>狀態：${
           car.status === "active"
             ? "上架中"
@@ -864,6 +904,12 @@ document.querySelectorAll(".admin-status-tab").forEach((btn) => {
     applyAdminFilters();
   });
 });
+
+if (adminStoreFilter) {
+  adminStoreFilter.addEventListener("change", () => {
+    applyAdminFilters();
+  });
+}
 
 async function startEditCar(carId) {
   const car = adminCars.find(item => Number(item.id) === Number(carId));

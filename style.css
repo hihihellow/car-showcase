@@ -4010,3 +4010,13 @@ body:has(.store-page) {
   color: #ff8b8b;
   font-weight: 800;
 }
+
+.admin-store-filter {
+  width: 100%;
+  max-width: 280px;
+  padding: 12px 14px;
+  margin: 0 0 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
