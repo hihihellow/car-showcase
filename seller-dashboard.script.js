@@ -191,6 +191,15 @@ if (addCarBtn) {
       if (isSellerDashboard && editingCar?.status === "rejected") {
         await loadSellerSubscription();
 
+        if (!currentSellerStore) {
+          currentSellerStore = await getMyStore();
+        }
+
+        if (currentSellerStore?.status === "suspended") {
+          alert("你的車行目前已被平台停權，無法重新送審車輛。");
+          return;
+        }
+
         if (!currentSubscription || !currentPlan) {
           alert("請先選擇方案，才能重新送審。");
           return;
