@@ -4020,3 +4020,15 @@ body:has(.store-page) {
   border: 1px solid rgba(244,196,48,0.35);
   font-weight: 800;
 }
+
+.view-store-btn {
+  margin-left: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}

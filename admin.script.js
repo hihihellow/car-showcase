@@ -754,9 +754,15 @@ function renderAdminCars(list) {
         <h3>#${car.admin_no || "未編號"}｜${car.title}</h3>
         <p>NT$ ${Number(car.price).toLocaleString()}</p>
         <p>${car.brand || ""} ${car.model || ""}｜${car.category || ""}｜${car.region || ""}</p>
-        <p>車行：${
-          adminStores.find((store) => store.id === car.store_id)?.name || "平台車輛 / 未指定"
-        }</p>
+        <p>
+          車行：${adminStores.find((store) => store.id === car.store_id)?.name || "平台車輛 / 未指定"}
+
+          ${
+            car.store_id
+              ? `<button class="view-store-btn" data-store-id="${car.store_id}">查看車行</button>`
+              : ""
+          }
+        </p>
         <p>狀態：${
           car.status === "active"
             ? "上架中"
@@ -812,6 +818,69 @@ function renderAdminCars(list) {
       await deleteCar(btn.dataset.id);
     });
   });
+
+  document.querySelectorAll(".view-store-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await viewStoreInfo(btn.dataset.storeId);
+    });
+  });
+}
+
+async function viewStoreInfo(storeId) {
+  const store = adminStores.find((item) => String(item.id) === String(storeId));
+
+  if (!store) {
+    alert("找不到車行資料");
+    return;
+  }
+
+  const storeCars = adminCars.filter((car) => String(car.store_id) === String(storeId));
+
+  const activeCount = storeCars.filter((car) => car.status === "active").length;
+  const pendingCount = storeCars.filter((car) => car.status === "pending_review").length;
+  const rejectedCount = storeCars.filter((car) => car.status === "rejected").length;
+  const inactiveCount = storeCars.filter((car) => car.status === "inactive").length;
+
+  const { data: subscription } = await supabase
+    .from("seller_subscriptions")
+    .select(`
+      *,
+      plans (*)
+    `)
+    .eq("store_id", storeId)
+    .in("status", ["active", "pending_activation"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const planName = subscription?.plans?.name || "尚未選擇方案";
+  const subStatus =
+    subscription?.status === "active"
+      ? "使用中"
+      : subscription?.status === "pending_activation"
+        ? "等待第一台車審核通過"
+        : "尚未啟用";
+
+  const expiresText = subscription?.expires_at
+    ? new Date(subscription.expires_at).toLocaleDateString("zh-TW")
+    : "尚未開始計算";
+
+  alert(
+`車行名稱：${store.name || "未命名"}
+
+車行介紹：
+${store.description || "尚未填寫"}
+
+目前方案：${planName}
+方案狀態：${subStatus}
+到期日：${expiresText}
+
+車輛數量：
+已上架：${activeCount}
+待審核：${pendingCount}
+審核未通過：${rejectedCount}
+已下架：${inactiveCount}`
+  );
 }
 
 async function approveCar(carId) {
