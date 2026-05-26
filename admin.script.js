@@ -653,7 +653,9 @@ function showAdminSection(sectionName) {
   }
 
   if (sectionName === "stats") {
-    renderAdminStats();
+    loadAdminSubscriptions().then(() => {
+      renderAdminStats();
+    });
   }
 }
 
@@ -678,6 +680,7 @@ if (refreshLogsBtn) {
 let adminCars = [];
 let adminStores = [];
 let adminPlans = [];
+let adminSubscriptions = [];
 let currentAdminStatusFilter = "all";
 
 const isSellerDashboard = window.location.pathname.includes("seller-dashboard.html");
@@ -712,6 +715,23 @@ async function loadAdminPlans() {
   }
 
   adminPlans = data || [];
+}
+
+async function loadAdminSubscriptions() {
+  const { data, error } = await supabase
+    .from("seller_subscriptions")
+    .select(`
+      *,
+      plans (*)
+    `);
+
+  if (error) {
+    console.error("讀取訂閱資料失敗:", error);
+    adminSubscriptions = [];
+    return;
+  }
+
+  adminSubscriptions = data || [];
 }
 
 async function createSubscriptionLog({
@@ -840,6 +860,15 @@ function renderAdminStats() {
   const rejectedCars = adminCars.filter((car) => car.status === "rejected").length;
   const inactiveCars = adminCars.filter((car) => car.status === "inactive").length;
   const totalStores = adminStores.length;
+  const activeSubs = adminSubscriptions.filter((sub) => sub.status === "active").length;
+  const pendingSubs = adminSubscriptions.filter((sub) => sub.status === "pending_activation").length;
+  const inactiveSubs = adminSubscriptions.filter((sub) => sub.status === "inactive").length;
+
+  const monthlyRevenue = adminSubscriptions
+    .filter((sub) => sub.status === "active")
+    .reduce((sum, sub) => {
+      return sum + Number(sub.plans?.price || 0);
+    }, 0);
 
   adminStatsGrid.innerHTML = `
     <div class="admin-stat-card">
@@ -870,6 +899,26 @@ function renderAdminStats() {
     <div class="admin-stat-card">
       <span>車行數量</span>
       <strong>${totalStores}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>使用中方案</span>
+      <strong>${activeSubs}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>等待啟用方案</span>
+      <strong>${pendingSubs}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>已停用方案</span>
+      <strong>${inactiveSubs}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>預估月收入</span>
+      <strong>NT$ ${monthlyRevenue.toLocaleString()}</strong>
     </div>
   `;
 }
