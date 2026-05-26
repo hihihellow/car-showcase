@@ -647,7 +647,26 @@ async function loadAdminCars() {
   }
 
   adminCars = data || [];
-  renderAdminCars(adminCars);
+  updateAdminStatusCounts();
+  applyAdminFilters();
+}
+
+function updateAdminStatusCounts() {
+  const counts = {
+    all: adminCars.length,
+    pending_review: adminCars.filter((car) => car.status === "pending_review").length,
+    active: adminCars.filter((car) => car.status === "active").length,
+    rejected: adminCars.filter((car) => car.status === "rejected").length,
+    inactive: adminCars.filter((car) => car.status === "inactive").length
+  };
+
+  document.querySelectorAll(".admin-status-tab").forEach((btn) => {
+    const status = btn.dataset.status;
+    const label = btn.dataset.label || btn.textContent.replace(/\s*\d+$/, "");
+
+    btn.dataset.label = label;
+    btn.textContent = `${label} ${counts[status] || 0}`;
+  });
 }
 
 function applyAdminFilters() {
@@ -778,7 +797,6 @@ async function approveCar(carId) {
 
   alert("車輛已審核通過並上架。");
   await loadAdminCars();
-  applyAdminFilters();
 }
 
 async function rejectCar(carId) {
@@ -801,7 +819,6 @@ async function rejectCar(carId) {
 
   alert("已退回此車輛。");
   await loadAdminCars();
-  applyAdminFilters();
 }
 
 async function activateSubscriptionByFirstApprovedCar(storeId) {
