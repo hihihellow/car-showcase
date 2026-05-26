@@ -81,6 +81,24 @@
 
       <section id="adminLogsSection" class="admin-section hidden">
         <h2>方案操作紀錄</h2>
+
+        <div class="admin-log-tools">
+          <select id="logStoreFilter">
+            <option value="all">全部車行</option>
+          </select>
+
+          <select id="logActionFilter">
+            <option value="all">全部操作</option>
+            <option value="create">建立方案</option>
+            <option value="switch">切換方案</option>
+            <option value="extend">延長方案</option>
+            <option value="disable">停用方案</option>
+            <option value="enable">重新啟用</option>
+          </select>
+
+          <button id="refreshLogsBtn" type="button">重新整理</button>
+        </div>
+
         <div id="subscriptionLogsList" class="subscription-logs-list"></div>
       </section>
 

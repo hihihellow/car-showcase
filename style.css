@@ -4095,3 +4095,24 @@ body:has(.store-page) {
 .subscription-log-item small {
   color: #777;
 }
+
+.admin-log-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 22px;
+}
+
+.admin-log-tools select,
+.admin-log-tools button {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
+
+.admin-log-tools button {
+  background: #111;
+  color: #f4c430;
+  cursor: pointer;
+}

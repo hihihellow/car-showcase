@@ -614,6 +614,11 @@ const adminStoreFilter = document.getElementById("adminStoreFilter");
 const subscriptionLogsList = document.getElementById("subscriptionLogsList");
 const adminSectionBtns = document.querySelectorAll(".admin-section-btn");
 const adminSections = document.querySelectorAll(".admin-section");
+const logStoreFilter = document.getElementById("logStoreFilter");
+const logActionFilter = document.getElementById("logActionFilter");
+const refreshLogsBtn = document.getElementById("refreshLogsBtn");
+
+let subscriptionLogs = [];
 
 function showAdminSection(sectionName) {
   adminSections.forEach((section) => {
@@ -652,6 +657,18 @@ adminSectionBtns.forEach((btn) => {
     showAdminSection(btn.dataset.section);
   });
 });
+
+if (logStoreFilter) {
+  logStoreFilter.addEventListener("change", applySubscriptionLogFilters);
+}
+
+if (logActionFilter) {
+  logActionFilter.addEventListener("change", applySubscriptionLogFilters);
+}
+
+if (refreshLogsBtn) {
+  refreshLogsBtn.addEventListener("click", loadSubscriptionLogs);
+}
 
 let adminCars = [];
 let adminStores = [];
@@ -738,7 +755,40 @@ async function loadSubscriptionLogs() {
     return;
   }
 
-  renderSubscriptionLogs(data || []);
+  subscriptionLogs = data || [];
+  renderLogStoreFilter();
+  applySubscriptionLogFilters();
+}
+
+function renderLogStoreFilter() {
+  if (!logStoreFilter) return;
+
+  const currentValue = logStoreFilter.value || "all";
+
+  logStoreFilter.innerHTML = `<option value="all">全部車行</option>`;
+
+  adminStores.forEach((store) => {
+    const option = document.createElement("option");
+    option.value = store.id;
+    option.textContent = store.name;
+    logStoreFilter.appendChild(option);
+  });
+
+  logStoreFilter.value = currentValue;
+}
+
+function applySubscriptionLogFilters() {
+  let filtered = [...subscriptionLogs];
+
+  if (logStoreFilter && logStoreFilter.value !== "all") {
+    filtered = filtered.filter((log) => log.store_id === logStoreFilter.value);
+  }
+
+  if (logActionFilter && logActionFilter.value !== "all") {
+    filtered = filtered.filter((log) => log.action === logActionFilter.value);
+  }
+
+  renderSubscriptionLogs(filtered);
 }
 
 function renderSubscriptionLogs(logs) {
