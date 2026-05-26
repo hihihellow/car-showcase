@@ -196,15 +196,27 @@ async function loadCarsFromSupabase() {
     .order("is_featured", { ascending: false })
     .order("created_at", { ascending: false });
 
-  console.log("cars data:", data);
-  console.log("cars error:", error);
-
   if (error) {
     console.error("讀取 cars 失敗:", error);
     return [];
   }
 
-  return data;
+  const { data: activeStores, error: storeError } = await supabase
+    .from("stores")
+    .select("id")
+    .eq("status", "active");
+
+  if (storeError) {
+    console.error("讀取 active stores 失敗:", storeError);
+    return data || [];
+  }
+
+  const activeStoreIds = new Set((activeStores || []).map((store) => store.id));
+
+  return (data || []).filter((car) => {
+    if (!car.store_id) return true;
+    return activeStoreIds.has(car.store_id);
+  });
 }
 
 function renderCars(carArray) {
@@ -913,6 +925,17 @@ if (carDetail) {
           console.error("讀取車行資料失敗:", storeError);
         } else {
           store = storeData;
+        }
+
+        if (store?.status === "suspended") {
+          carDetail.innerHTML = `
+            <div class="detail-content">
+              <h2 class="detail-title">此車輛暫停顯示</h2>
+              <div class="detail-desc">此車行目前已被平台暫停服務。</div>
+            </div>
+          `;
+          hidePageLoader();
+          return;
         }
       }
 
