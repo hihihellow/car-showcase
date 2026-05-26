@@ -265,6 +265,15 @@ if (addCarBtn) {
       if (isSellerDashboard) {
         await loadSellerSubscription();
 
+        if (!currentSellerStore) {
+          currentSellerStore = await getMyStore();
+        }
+
+        if (currentSellerStore?.status === "suspended") {
+          alert("你的車行目前已被平台停權，無法新增或送審車輛。");
+          return;
+        }
+
         if (!currentSubscription || !currentPlan) {
           alert("請先選擇方案，才能送出車輛審核。");
           return;

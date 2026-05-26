@@ -1159,6 +1159,7 @@ async function viewStoreInfo(storeId) {
 
   const action = prompt(
   `車行名稱：${store.name || "未命名"}
+  車行狀態：${store.status === "suspended" ? "已停權" : "正常"}
 
   目前方案：${planName}
   方案狀態：${subStatus}
@@ -1170,6 +1171,8 @@ async function viewStoreInfo(storeId) {
   2 = 停用方案
   3 = 重新啟用方案
   4 = 切換方案
+  5 = 停權車行
+  6 = 解除停權
 
   直接取消 = 關閉`
   );
@@ -1190,6 +1193,14 @@ async function viewStoreInfo(storeId) {
 
   if (action === "4") {
     await switchSubscriptionPlan(subscription, storeId);
+  }
+
+  if (action === "5") {
+    await suspendStore(storeId);
+  }
+
+  if (action === "6") {
+    await activateStore(storeId);
   }
 }
 
@@ -1388,6 +1399,41 @@ ${planText}`
   });
 
   alert(`方案已切換為：${newPlan.name}`);
+}
+
+async function suspendStore(storeId) {
+  const ok = confirm("確定要停權這間車行嗎？停權後賣家將不能新增或送審車輛。");
+  if (!ok) return;
+
+  const { error } = await supabase
+    .from("stores")
+    .update({ status: "suspended" })
+    .eq("id", storeId);
+
+  if (error) {
+    console.error(error);
+    alert("停權失敗");
+    return;
+  }
+
+  alert("車行已停權");
+  await loadAdminStores();
+}
+
+async function activateStore(storeId) {
+  const { error } = await supabase
+    .from("stores")
+    .update({ status: "active" })
+    .eq("id", storeId);
+
+  if (error) {
+    console.error(error);
+    alert("解除停權失敗");
+    return;
+  }
+
+  alert("車行已解除停權");
+  await loadAdminStores();
 }
 
 async function approveCar(carId) {
