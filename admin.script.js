@@ -617,6 +617,7 @@ const adminSections = document.querySelectorAll(".admin-section");
 const logStoreFilter = document.getElementById("logStoreFilter");
 const logActionFilter = document.getElementById("logActionFilter");
 const refreshLogsBtn = document.getElementById("refreshLogsBtn");
+const adminStatsGrid = document.getElementById("adminStatsGrid");
 
 let subscriptionLogs = [];
 
@@ -649,6 +650,10 @@ function showAdminSection(sectionName) {
 
   if (sectionName === "logs") {
     loadSubscriptionLogs();
+  }
+
+  if (sectionName === "stats") {
+    renderAdminStats();
   }
 }
 
@@ -824,6 +829,49 @@ function renderSubscriptionLogs(logs) {
 
     subscriptionLogsList.appendChild(item);
   });
+}
+
+function renderAdminStats() {
+  if (!adminStatsGrid) return;
+
+  const totalCars = adminCars.length;
+  const pendingCars = adminCars.filter((car) => car.status === "pending_review").length;
+  const activeCars = adminCars.filter((car) => car.status === "active").length;
+  const rejectedCars = adminCars.filter((car) => car.status === "rejected").length;
+  const inactiveCars = adminCars.filter((car) => car.status === "inactive").length;
+  const totalStores = adminStores.length;
+
+  adminStatsGrid.innerHTML = `
+    <div class="admin-stat-card">
+      <span>總車輛數</span>
+      <strong>${totalCars}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>待審核</span>
+      <strong>${pendingCars}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>已上架</span>
+      <strong>${activeCars}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>審核未通過</span>
+      <strong>${rejectedCars}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>已下架</span>
+      <strong>${inactiveCars}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>車行數量</span>
+      <strong>${totalStores}</strong>
+    </div>
+  `;
 }
 
 function renderAdminStoreFilter() {
