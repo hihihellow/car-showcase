@@ -77,13 +77,15 @@ async function loadStorePage() {
   }
 
   if (store.status === "suspended") {
-    storeBody.innerHTML = `
+    storeInfo.innerHTML = `
       <div class="store-empty">
         <h2>此車行目前暫停顯示</h2>
         <p>此車行已被平台暫停服務，暫時無法查看店面內容。</p>
         <a href="index.html">返回首頁</a>
       </div>
     `;
+
+    storeCarList.innerHTML = "";
     return;
   }
 
