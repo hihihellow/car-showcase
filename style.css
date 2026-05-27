@@ -4345,3 +4345,36 @@ body:has(.store-page) {
   font-weight: 900;
   cursor: pointer;
 }
+
+.buyer-chat-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+}
+
+.buyer-chat-room {
+  min-height: 520px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.buyer-open-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.55);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .buyer-chat-layout,
+  .seller-chat-layout {
+    grid-template-columns: 1fr;
+  }
+}
