@@ -426,6 +426,7 @@ let currentPlan = null;
 
 const notificationList = document.getElementById("notificationList");
 const sellerChatList = document.getElementById("sellerChatList");
+const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
 
@@ -1045,6 +1046,15 @@ async function loadSellerChats() {
   }
 
   renderSellerChats(data || []);
+
+  await supabase
+    .from("chat_messages")
+    .update({ read_at: new Date().toISOString() })
+    .in("thread_id", (data || []).map((thread) => thread.id))
+    .eq("sender_role", "buyer")
+    .is("read_at", null);
+
+  await updateSellerChatBadge();
 }
 
 function renderSellerChats(threads) {
@@ -1140,6 +1150,38 @@ async function replySellerChat(threadId) {
 
   alert("已回覆買家。");
   await loadSellerChats();
+}
+
+async function updateSellerChatBadge() {
+  if (!sellerChatBadge) return;
+
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  const { data: threads } = await supabase
+    .from("chat_threads")
+    .select("id")
+    .eq("store_id", currentSellerStore.id);
+
+  const threadIds = (threads || []).map((t) => t.id);
+
+  if (!threadIds.length) {
+    sellerChatBadge.classList.add("hidden");
+    return;
+  }
+
+  const { data: messages } = await supabase
+    .from("chat_messages")
+    .select("id")
+    .in("thread_id", threadIds)
+    .eq("sender_role", "buyer")
+    .is("read_at", null);
+
+  const count = messages?.length || 0;
+
+  sellerChatBadge.textContent = count;
+  sellerChatBadge.classList.toggle("hidden", count === 0);
 }
 
 function renderNotifications(notifications) {

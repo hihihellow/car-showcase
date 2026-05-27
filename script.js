@@ -1407,6 +1407,7 @@ const tabContents = {
   chat: document.getElementById("chatTab")
 };
 const buyerChatList = document.getElementById("buyerChatList");
+const buyerChatBadge = document.getElementById("buyerChatBadge");
 
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
@@ -1592,6 +1593,15 @@ async function loadBuyerChats() {
   }
 
   renderBuyerChats(data || []);
+
+  await supabase
+    .from("chat_messages")
+    .update({ read_at: new Date().toISOString() })
+    .in("thread_id", (data || []).map((thread) => thread.id))
+    .eq("sender_role", "seller")
+    .is("read_at", null);
+
+  await updateBuyerChatBadge();
 }
 
 function renderBuyerChats(threads) {
@@ -1629,6 +1639,37 @@ function renderBuyerChats(threads) {
       await replyBuyerChat(btn.dataset.threadId);
     });
   });
+}
+
+async function updateBuyerChatBadge() {
+  if (!buyerChatBadge) return;
+
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  const { data: threads } = await supabase
+    .from("chat_threads")
+    .select("id")
+    .eq("buyer_id", user.id);
+
+  const threadIds = (threads || []).map((t) => t.id);
+
+  if (!threadIds.length) {
+    buyerChatBadge.classList.add("hidden");
+    return;
+  }
+
+  const { data: messages } = await supabase
+    .from("chat_messages")
+    .select("id")
+    .in("thread_id", threadIds)
+    .eq("sender_role", "seller")
+    .is("read_at", null);
+
+  const count = messages?.length || 0;
+
+  buyerChatBadge.textContent = count;
+  buyerChatBadge.classList.toggle("hidden", count === 0);
 }
 
 async function replyBuyerChat(threadId) {
