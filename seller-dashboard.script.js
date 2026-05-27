@@ -424,6 +424,8 @@ let currentSellerStore = null;
 let currentSubscription = null;
 let currentPlan = null;
 
+const notificationList = document.getElementById("notificationList");
+const sellerChatList = document.getElementById("sellerChatList");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
 
@@ -449,6 +451,14 @@ sellerNavBtns.forEach((btn) => {
 
     if (btn.dataset.page === "plan") {
       await renderPlanPage();
+    }
+
+    if (btn.dataset.page === "notifications") {
+      await loadNotifications();
+    }
+
+    if (btn.dataset.page === "chat") {
+      await loadSellerChats();
     }
   });
 });
@@ -970,6 +980,172 @@ async function renderPlanPage() {
   }
 
   await loadPlanList();
+}
+
+async function loadNotifications() {
+  if (!notificationList) return;
+
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  if (!currentSellerStore) {
+    notificationList.innerHTML = "<p>找不到車行資料。</p>";
+    return;
+  }
+
+  notificationList.innerHTML = "<p>通知讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("store_id", currentSellerStore.id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error("讀取通知失敗:", error);
+    notificationList.innerHTML = "<p>通知讀取失敗。</p>";
+    return;
+  }
+
+  renderNotifications(data || []);
+}
+
+async function loadSellerChats() {
+  if (!sellerChatList) return;
+
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  if (!currentSellerStore) {
+    sellerChatList.innerHTML = "<p>找不到車行資料。</p>";
+    return;
+  }
+
+  sellerChatList.innerHTML = "<p>聊天讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("chat_threads")
+    .select(`
+      *,
+      cars (
+        title,
+        image
+      )
+    `)
+    .eq("store_id", currentSellerStore.id)
+    .order("last_message_at", { ascending: false });
+
+  if (error) {
+    console.error("讀取聊天失敗:", error);
+    sellerChatList.innerHTML = "<p>讀取聊天失敗。</p>";
+    return;
+  }
+
+  renderSellerChats(data || []);
+}
+
+function renderSellerChats(threads) {
+  if (!sellerChatList) return;
+
+  if (!threads.length) {
+    sellerChatList.innerHTML = "<p>目前沒有聊天訊息。</p>";
+    return;
+  }
+
+  sellerChatList.innerHTML = "";
+
+  threads.forEach((thread) => {
+    const card = document.createElement("div");
+    card.className = "seller-chat-card";
+
+    card.innerHTML = `
+      <div>
+        <strong>${thread.cars?.title || "未知車輛"}</strong>
+        <p>${thread.last_message || "尚無訊息"}</p>
+        <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+      </div>
+
+      <button class="reply-chat-btn" data-thread-id="${thread.id}">
+        回覆
+      </button>
+    `;
+
+    sellerChatList.appendChild(card);
+  });
+
+  document.querySelectorAll(".reply-chat-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await replySellerChat(btn.dataset.threadId);
+    });
+  });
+}
+
+async function replySellerChat(threadId) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請重新登入");
+    return;
+  }
+
+  const message = prompt("請輸入回覆內容：");
+
+  if (!message || !message.trim()) return;
+
+  const { error } = await supabase
+    .from("chat_messages")
+    .insert([
+      {
+        thread_id: Number(threadId),
+        sender_id: user.id,
+        sender_role: "seller",
+        message: message.trim()
+      }
+    ]);
+
+  if (error) {
+    console.error("回覆失敗:", error);
+    alert("回覆失敗");
+    return;
+  }
+
+  await supabase
+    .from("chat_threads")
+    .update({
+      last_message: message.trim(),
+      last_message_at: new Date().toISOString()
+    })
+    .eq("id", threadId);
+
+  alert("已回覆買家。");
+  await loadSellerChats();
+}
+
+function renderNotifications(notifications) {
+  if (!notificationList) return;
+
+  if (!notifications.length) {
+    notificationList.innerHTML = "<p>目前沒有通知。</p>";
+    return;
+  }
+
+  notificationList.innerHTML = "";
+
+  notifications.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = `notification-card ${item.is_read ? "" : "unread"}`;
+
+    card.innerHTML = `
+      <strong>${item.title}</strong>
+      <p>${item.message || ""}</p>
+      <small>${new Date(item.created_at).toLocaleString("zh-TW")}</small>
+    `;
+
+    notificationList.appendChild(card);
+  });
 }
 
 async function loadPlanList() {

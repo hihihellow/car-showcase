@@ -1134,10 +1134,89 @@ if (carDetail) {
         });
       }
 
-      if (contactSellerBtn && contactInfo) {
-        contactSellerBtn.addEventListener("click", () => {
-          contactInfo.style.display =
-            contactInfo.style.display === "block" ? "none" : "block";
+      if (contactSellerBtn) {
+        contactSellerBtn.addEventListener("click", async () => {
+          const user = await getCurrentUser();
+
+          if (!user) {
+            alert("請先登入會員，才能聯絡賣家。");
+            window.location.href = "login.html";
+            return;
+          }
+
+          if (!car.store_id) {
+            alert("這台車沒有對應車行，暫時無法聯絡。");
+            return;
+          }
+
+          const message = prompt("請輸入想詢問賣家的內容：", `您好，我想詢問 ${car.title}`);
+
+          if (!message || !message.trim()) return;
+
+          let { data: thread, error: threadError } = await supabase
+            .from("chat_threads")
+            .select("*")
+            .eq("buyer_id", user.id)
+            .eq("store_id", car.store_id)
+            .eq("car_id", car.id)
+            .maybeSingle();
+
+          if (threadError) {
+            console.error("讀取聊天室失敗:", threadError);
+            alert("建立聊天室失敗");
+            return;
+          }
+
+          if (!thread) {
+            const { data: newThread, error: createError } = await supabase
+              .from("chat_threads")
+              .insert([
+                {
+                  buyer_id: user.id,
+                  store_id: car.store_id,
+                  car_id: car.id,
+                  last_message: message.trim(),
+                  last_message_at: new Date().toISOString()
+                }
+              ])
+              .select()
+              .single();
+
+            if (createError) {
+              console.error("建立聊天室失敗:", createError);
+              alert("建立聊天室失敗");
+              return;
+            }
+
+            thread = newThread;
+          }
+
+          const { error: messageError } = await supabase
+            .from("chat_messages")
+            .insert([
+              {
+                thread_id: thread.id,
+                sender_id: user.id,
+                sender_role: "buyer",
+                message: message.trim()
+              }
+            ]);
+
+          if (messageError) {
+            console.error("送出訊息失敗:", messageError);
+            alert("送出訊息失敗");
+            return;
+          }
+
+          await supabase
+            .from("chat_threads")
+            .update({
+              last_message: message.trim(),
+              last_message_at: new Date().toISOString()
+            })
+            .eq("id", thread.id);
+
+          alert("訊息已送出，賣家會在後台看到。");
         });
       }
 
@@ -1327,6 +1406,7 @@ const tabContents = {
   favorites: document.getElementById("favoritesTab"),
   chat: document.getElementById("chatTab")
 };
+const buyerChatList = document.getElementById("buyerChatList");
 
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
@@ -1335,6 +1415,10 @@ tabs.forEach(tab => {
 
     Object.values(tabContents).forEach(c => c.classList.remove("active"));
     tabContents[tab.dataset.tab].classList.add("active");
+
+    if (tab.dataset.tab === "chat") {
+      loadBuyerChats();
+    }
   });
 });
 
@@ -1471,6 +1555,121 @@ async function loadFavoriteCars() {
       toggleFavorite(btn.dataset.id, btn);
     });
   });
+}
+
+async function loadBuyerChats() {
+  if (!window.location.pathname.includes("member.html")) return;
+  if (!buyerChatList) return;
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    buyerChatList.innerHTML = "<p>請先登入會員。</p>";
+    return;
+  }
+
+  buyerChatList.innerHTML = "<p>聊天讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("chat_threads")
+    .select(`
+      *,
+      cars (
+        title,
+        image
+      ),
+      stores (
+        name
+      )
+    `)
+    .eq("buyer_id", user.id)
+    .order("last_message_at", { ascending: false });
+
+  if (error) {
+    console.error("讀取買家聊天失敗:", error);
+    buyerChatList.innerHTML = "<p>讀取聊天失敗。</p>";
+    return;
+  }
+
+  renderBuyerChats(data || []);
+}
+
+function renderBuyerChats(threads) {
+  if (!buyerChatList) return;
+
+  if (!threads.length) {
+    buyerChatList.innerHTML = "<p>目前沒有聊天紀錄。</p>";
+    return;
+  }
+
+  buyerChatList.innerHTML = "";
+
+  threads.forEach((thread) => {
+    const card = document.createElement("div");
+    card.className = "buyer-chat-card";
+
+    card.innerHTML = `
+      <div>
+        <strong>${thread.cars?.title || "未知車輛"}</strong>
+        <p>車行：${thread.stores?.name || "未知車行"}</p>
+        <p>${thread.last_message || "尚無訊息"}</p>
+        <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+      </div>
+
+      <button class="buyer-reply-chat-btn" data-thread-id="${thread.id}">
+        回覆
+      </button>
+    `;
+
+    buyerChatList.appendChild(card);
+  });
+
+  document.querySelectorAll(".buyer-reply-chat-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await replyBuyerChat(btn.dataset.threadId);
+    });
+  });
+}
+
+async function replyBuyerChat(threadId) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請先登入");
+    return;
+  }
+
+  const message = prompt("請輸入回覆內容：");
+
+  if (!message || !message.trim()) return;
+
+  const { error } = await supabase
+    .from("chat_messages")
+    .insert([
+      {
+        thread_id: Number(threadId),
+        sender_id: user.id,
+        sender_role: "buyer",
+        message: message.trim()
+      }
+    ]);
+
+  if (error) {
+    console.error("買家回覆失敗:", error);
+    alert("回覆失敗");
+    return;
+  }
+
+  await supabase
+    .from("chat_threads")
+    .update({
+      last_message: message.trim(),
+      last_message_at: new Date().toISOString()
+    })
+    .eq("id", threadId);
+
+  alert("已送出回覆。");
+  await loadBuyerChats();
 }
 
 loadFavoriteCars();

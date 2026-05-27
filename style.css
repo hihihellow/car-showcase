@@ -4148,3 +4148,114 @@ body:has(.store-page) {
     grid-template-columns: 1fr;
   }
 }
+
+.notification-list {
+  display: grid;
+  gap: 14px;
+}
+
+.notification-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.notification-card.unread {
+  border-color: rgba(244,196,48,0.55);
+  background: rgba(244,196,48,0.08);
+}
+
+.notification-card strong {
+  display: block;
+  color: #f4c430;
+  margin-bottom: 8px;
+}
+
+.notification-card p {
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.82);
+}
+
+.notification-card small {
+  color: rgba(255,255,255,0.55);
+}
+
+.seller-chat-list {
+  display: grid;
+  gap: 14px;
+}
+
+.seller-chat-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.seller-chat-card strong {
+  color: #f4c430;
+}
+
+.seller-chat-card p {
+  color: rgba(255,255,255,0.82);
+  margin: 8px 0;
+}
+
+.seller-chat-card small {
+  color: rgba(255,255,255,0.55);
+}
+
+.reply-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.buyer-chat-list {
+  display: grid;
+  gap: 14px;
+}
+
+.buyer-chat-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.buyer-chat-card strong {
+  color: #111;
+}
+
+.buyer-chat-card p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.buyer-chat-card small {
+  color: #888;
+}
+
+.buyer-reply-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.55);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
