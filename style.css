@@ -4274,3 +4274,74 @@ body:has(.store-page) {
   font-size: 12px;
   font-weight: 900;
 }
+
+.seller-chat-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+}
+
+.seller-chat-room {
+  min-height: 520px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.chat-message-list {
+  height: 440px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 72%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.chat-bubble.me {
+  align-self: flex-end;
+  background: rgba(244,196,48,0.18);
+  border: 1px solid rgba(244,196,48,0.35);
+}
+
+.chat-bubble.other {
+  align-self: flex-start;
+}
+
+.chat-bubble p {
+  margin: 0 0 6px;
+}
+
+.chat-bubble small {
+  color: rgba(255,255,255,0.55);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: none;
+}
+
+.chat-input-row button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: #f4c430;
+  color: #111;
+  font-weight: 900;
+  cursor: pointer;
+}

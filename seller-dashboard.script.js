@@ -426,6 +426,9 @@ let currentPlan = null;
 
 const notificationList = document.getElementById("notificationList");
 const sellerChatList = document.getElementById("sellerChatList");
+const sellerChatRoom = document.getElementById("sellerChatRoom");
+let currentSellerChatThreadId = null;
+
 const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
@@ -1078,19 +1081,110 @@ function renderSellerChats(threads) {
         <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
       </div>
 
-      <button class="reply-chat-btn" data-thread-id="${thread.id}">
-        回覆
+      <button class="open-chat-btn" data-thread-id="${thread.id}">
+        開啟
       </button>
     `;
 
     sellerChatList.appendChild(card);
   });
 
-  document.querySelectorAll(".reply-chat-btn").forEach((btn) => {
+  document.querySelectorAll(".open-chat-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
-      await replySellerChat(btn.dataset.threadId);
+      await openSellerChatRoom(btn.dataset.threadId);
     });
   });
+}
+
+async function openSellerChatRoom(threadId) {
+  if (!sellerChatRoom) return;
+
+  currentSellerChatThreadId = Number(threadId);
+  sellerChatRoom.innerHTML = "<p>聊天內容讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("thread_id", currentSellerChatThreadId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    console.error("讀取聊天內容失敗:", error);
+    sellerChatRoom.innerHTML = "<p>讀取聊天內容失敗。</p>";
+    return;
+  }
+
+  sellerChatRoom.innerHTML = `
+    <div id="sellerChatMessages" class="chat-message-list"></div>
+
+    <div class="chat-input-row">
+      <input id="sellerChatInput" placeholder="輸入回覆內容..." />
+      <button id="sellerChatSendBtn" type="button">送出</button>
+    </div>
+  `;
+
+  renderSellerChatMessages(data || []);
+
+  document.getElementById("sellerChatSendBtn").addEventListener("click", sendSellerChatMessage);
+}
+
+function renderSellerChatMessages(messages) {
+  const box = document.getElementById("sellerChatMessages");
+  if (!box) return;
+
+  box.innerHTML = "";
+
+  messages.forEach((msg) => {
+    const item = document.createElement("div");
+    item.className = `chat-bubble ${msg.sender_role === "seller" ? "me" : "other"}`;
+
+    item.innerHTML = `
+      <p>${msg.message}</p>
+      <small>${new Date(msg.created_at).toLocaleString("zh-TW")}</small>
+    `;
+
+    box.appendChild(item);
+  });
+
+  box.scrollTop = box.scrollHeight;
+}
+
+async function sendSellerChatMessage() {
+  const input = document.getElementById("sellerChatInput");
+  const message = input?.value.trim();
+
+  if (!message || !currentSellerChatThreadId) return;
+
+  const user = await getCurrentUser();
+
+  const { error } = await supabase
+    .from("chat_messages")
+    .insert([
+      {
+        thread_id: currentSellerChatThreadId,
+        sender_id: user.id,
+        sender_role: "seller",
+        message
+      }
+    ]);
+
+  if (error) {
+    console.error("送出訊息失敗:", error);
+    alert("送出失敗");
+    return;
+  }
+
+  await supabase
+    .from("chat_threads")
+    .update({
+      last_message: message,
+      last_message_at: new Date().toISOString()
+    })
+    .eq("id", currentSellerChatThreadId);
+
+  input.value = "";
+  await openSellerChatRoom(currentSellerChatThreadId);
+  await loadSellerChats();
 }
 
 async function replySellerChat(threadId) {
