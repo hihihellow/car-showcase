@@ -1085,13 +1085,31 @@ function renderSellerChats(threads) {
 
 async function replySellerChat(threadId) {
   const user = await getCurrentUser();
+  const { data: messages, error: msgError } = await supabase
+    .from("chat_messages")
+    .select("*")
+    .eq("thread_id", Number(threadId))
+    .order("created_at", { ascending: true });
+
+  if (msgError) {
+    console.error("讀取聊天內容失敗:", msgError);
+  }
+
+  const historyText = (messages || [])
+    .map((msg) => {
+      const name = msg.sender_role === "buyer" ? "買家" : "賣家";
+      return `${name}：${msg.message}`;
+    })
+    .join("\n");
 
   if (!user) {
     alert("請重新登入");
     return;
   }
 
-  const message = prompt("請輸入回覆內容：");
+  const message = prompt(
+    `聊天紀錄：\n\n${historyText || "目前沒有訊息"}\n\n請輸入回覆內容：`
+  );
 
   if (!message || !message.trim()) return;
 
