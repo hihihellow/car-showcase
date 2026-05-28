@@ -1410,6 +1410,7 @@ const buyerChatList = document.getElementById("buyerChatList");
 const buyerChatBadge = document.getElementById("buyerChatBadge");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
+let buyerChatChannel = null;
 
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
@@ -1595,15 +1596,6 @@ async function loadBuyerChats() {
   }
 
   renderBuyerChats(data || []);
-
-  await supabase
-    .from("chat_messages")
-    .update({ read_at: new Date().toISOString() })
-    .in("thread_id", (data || []).map((thread) => thread.id))
-    .eq("sender_role", "seller")
-    .is("read_at", null);
-
-  await updateBuyerChatBadge();
 }
 
 function renderBuyerChats(threads) {
@@ -1680,6 +1672,15 @@ async function openBuyerChatRoom(threadId) {
   currentBuyerChatThreadId = Number(threadId);
   buyerChatRoom.innerHTML = "<p>聊天內容讀取中...</p>";
 
+  await supabase
+    .from("chat_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("thread_id", currentBuyerChatThreadId)
+    .eq("sender_role", "seller")
+    .is("read_at", null);
+
+  await updateBuyerChatBadge();
+
   const { data, error } = await supabase
     .from("chat_messages")
     .select("*")
@@ -1706,6 +1707,40 @@ async function openBuyerChatRoom(threadId) {
   document
     .getElementById("buyerChatSendBtn")
     .addEventListener("click", sendBuyerChatMessage);
+  
+  
+  document.getElementById("buyerChatInput").addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      await sendBuyerChatMessage();
+    }
+  });
+
+  subscribeBuyerChatRoom(currentBuyerChatThreadId);
+}
+
+function subscribeBuyerChatRoom(threadId) {
+  if (buyerChatChannel) {
+    supabase.removeChannel(buyerChatChannel);
+  }
+
+  buyerChatChannel = supabase
+    .channel(`buyer-chat-${threadId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "chat_messages",
+        filter: `thread_id=eq.${threadId}`
+      },
+      async () => {
+        await openBuyerChatRoom(threadId);
+        await loadBuyerChats();
+        await updateBuyerChatBadge();
+      }
+    )
+    .subscribe();
 }
 
 function renderBuyerChatMessages(messages) {

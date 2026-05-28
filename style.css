@@ -4378,3 +4378,9 @@ body:has(.store-page) {
     grid-template-columns: 1fr;
   }
 }
+
+.seller-chat-card.active,
+.buyer-chat-card.active {
+  border-color: rgba(244,196,48,0.75);
+  background: rgba(244,196,48,0.1);
+}

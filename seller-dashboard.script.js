@@ -428,6 +428,7 @@ const notificationList = document.getElementById("notificationList");
 const sellerChatList = document.getElementById("sellerChatList");
 const sellerChatRoom = document.getElementById("sellerChatRoom");
 let currentSellerChatThreadId = null;
+let sellerChatChannel = null;
 
 const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
@@ -1049,15 +1050,6 @@ async function loadSellerChats() {
   }
 
   renderSellerChats(data || []);
-
-  await supabase
-    .from("chat_messages")
-    .update({ read_at: new Date().toISOString() })
-    .in("thread_id", (data || []).map((thread) => thread.id))
-    .eq("sender_role", "buyer")
-    .is("read_at", null);
-
-  await updateSellerChatBadge();
 }
 
 function renderSellerChats(threads) {
@@ -1102,6 +1094,15 @@ async function openSellerChatRoom(threadId) {
   currentSellerChatThreadId = Number(threadId);
   sellerChatRoom.innerHTML = "<p>聊天內容讀取中...</p>";
 
+  await supabase
+    .from("chat_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("thread_id", currentSellerChatThreadId)
+    .eq("sender_role", "buyer")
+    .is("read_at", null);
+
+  await updateSellerChatBadge();
+
   const { data, error } = await supabase
     .from("chat_messages")
     .select("*")
@@ -1126,6 +1127,39 @@ async function openSellerChatRoom(threadId) {
   renderSellerChatMessages(data || []);
 
   document.getElementById("sellerChatSendBtn").addEventListener("click", sendSellerChatMessage);
+
+  document.getElementById("sellerChatInput").addEventListener("keydown", async (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      await sendSellerChatMessage();
+    }
+  });
+
+  subscribeSellerChatRoom(currentSellerChatThreadId);
+}
+
+function subscribeSellerChatRoom(threadId) {
+  if (sellerChatChannel) {
+    supabase.removeChannel(sellerChatChannel);
+  }
+
+  sellerChatChannel = supabase
+    .channel(`seller-chat-${threadId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "chat_messages",
+        filter: `thread_id=eq.${threadId}`
+      },
+      async () => {
+        await openSellerChatRoom(threadId);
+        await loadSellerChats();
+        await updateSellerChatBadge();
+      }
+    )
+    .subscribe();
 }
 
 function renderSellerChatMessages(messages) {
