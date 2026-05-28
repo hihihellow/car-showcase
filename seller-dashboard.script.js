@@ -432,6 +432,8 @@ let adminSellerThreads = [];
 let sellerChatChannel = null;
 
 const sellerChatBadge = document.getElementById("sellerChatBadge");
+const sellerChatBell = document.getElementById("sellerChatBell");
+const sellerChatBellBadge = document.getElementById("sellerChatBellBadge");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
 
@@ -1038,7 +1040,7 @@ async function loadSellerChats() {
       *,
       cars (
         title,
-        image
+        image,
         price
       )
     `)
@@ -1340,6 +1342,23 @@ async function updateSellerChatBadge() {
 
   sellerChatBadge.textContent = count;
   sellerChatBadge.classList.toggle("hidden", count === 0);
+
+  if (sellerChatBellBadge) {
+    sellerChatBellBadge.textContent = count;
+    sellerChatBellBadge.classList.toggle("hidden", count === 0);
+  }
+}
+
+if (sellerChatBell) {
+  sellerChatBell.addEventListener("click", async () => {
+    showSellerPage("chat");
+
+    document.querySelectorAll(".seller-nav-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.page === "chat");
+    });
+
+    await loadSellerChats();
+  });
 }
 
 function renderNotifications(notifications) {

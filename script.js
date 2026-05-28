@@ -1408,6 +1408,8 @@ const tabContents = {
 };
 const buyerChatList = document.getElementById("buyerChatList");
 const buyerChatBadge = document.getElementById("buyerChatBadge");
+const buyerChatBell = document.getElementById("buyerChatBell");
+const buyerChatBellBadge = document.getElementById("buyerChatBellBadge");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
@@ -1581,7 +1583,7 @@ async function loadBuyerChats() {
       *,
       cars (
         title,
-        image
+        image,
         price
       ),
       stores (
@@ -1667,6 +1669,34 @@ async function updateBuyerChatBadge() {
 
   buyerChatBadge.textContent = count;
   buyerChatBadge.classList.toggle("hidden", count === 0);
+
+  if (buyerChatBellBadge) {
+    buyerChatBellBadge.textContent = count;
+    buyerChatBellBadge.classList.toggle("hidden", count === 0);
+  }
+}
+
+if (buyerChatBell) {
+  buyerChatBell.addEventListener("click", async () => {
+    if (!window.location.pathname.includes("member.html")) {
+      window.location.href = "member.html";
+      return;
+    }
+
+    document.querySelectorAll(".member-sidebar li").forEach((item) => {
+      item.classList.remove("active");
+    });
+
+    document.querySelector('.member-sidebar li[data-tab="chat"]')?.classList.add("active");
+
+    Object.values(tabContents).forEach((tab) => {
+      tab.classList.remove("active");
+    });
+
+    tabContents.chat.classList.add("active");
+
+    await loadBuyerChats();
+  });
 }
 
 async function openBuyerChatRoom(threadId) {

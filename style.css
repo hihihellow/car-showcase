@@ -4432,3 +4432,38 @@ body:has(.store-page) {
 .buyer-chat-room .chat-empty-text {
   color: #777;
 }
+
+.seller-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-bell-btn {
+  position: relative;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.chat-bell-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff4d4d;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
