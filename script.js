@@ -1410,6 +1410,7 @@ const buyerChatList = document.getElementById("buyerChatList");
 const buyerChatBadge = document.getElementById("buyerChatBadge");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
+let buyerChatThreads = [];
 let buyerChatChannel = null;
 
 tabs.forEach(tab => {
@@ -1581,6 +1582,7 @@ async function loadBuyerChats() {
       cars (
         title,
         image
+        price
       ),
       stores (
         name
@@ -1595,6 +1597,7 @@ async function loadBuyerChats() {
     return;
   }
 
+  buyerChatThreads = data || [];
   renderBuyerChats(data || []);
 }
 
@@ -1693,7 +1696,25 @@ async function openBuyerChatRoom(threadId) {
     return;
   }
 
+  const thread = buyerChatThreads.find(
+    (t) => Number(t.id) === Number(threadId)
+  );
+
   buyerChatRoom.innerHTML = `
+    <div class="chat-room-header">
+      ${
+        thread?.cars?.image
+          ? `<img src="${thread.cars.image}" class="chat-room-car-image" />`
+          : ""
+      }
+
+      <div>
+        <strong>${thread?.cars?.title || "未知車輛"}</strong>
+        <p>車行：${thread?.stores?.name || "未知車行"}</p>
+        <p>${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : ""}</p>
+      </div>
+    </div>
+
     <div id="buyerChatMessages" class="chat-message-list"></div>
 
     <div class="chat-input-row">

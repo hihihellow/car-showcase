@@ -428,6 +428,7 @@ const notificationList = document.getElementById("notificationList");
 const sellerChatList = document.getElementById("sellerChatList");
 const sellerChatRoom = document.getElementById("sellerChatRoom");
 let currentSellerChatThreadId = null;
+let adminSellerThreads = [];
 let sellerChatChannel = null;
 
 const sellerChatBadge = document.getElementById("sellerChatBadge");
@@ -1038,6 +1039,7 @@ async function loadSellerChats() {
       cars (
         title,
         image
+        price
       )
     `)
     .eq("store_id", currentSellerStore.id)
@@ -1049,6 +1051,7 @@ async function loadSellerChats() {
     return;
   }
 
+  adminSellerThreads = data || [];
   renderSellerChats(data || []);
 }
 
@@ -1115,9 +1118,26 @@ async function openSellerChatRoom(threadId) {
     return;
   }
 
-  sellerChatRoom.innerHTML = `
-    <div id="sellerChatMessages" class="chat-message-list"></div>
+  const thread = adminSellerThreads?.find(
+    (t) => Number(t.id) === Number(threadId)
+  );
 
+  sellerChatRoom.innerHTML = `
+    <div class="chat-room-header">
+      ${
+        thread?.cars?.image
+          ? `<img src="${thread.cars.image}" class="chat-room-car-image" />`
+          : ""
+      }
+
+      <div>
+        <strong>${thread?.cars?.title || "未知車輛"}</strong>
+        <p>${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : ""}</p>
+      </div>
+    </div>
+
+    <div id="sellerChatMessages" class="chat-message-list"></div>
+  
     <div class="chat-input-row">
       <input id="sellerChatInput" placeholder="輸入回覆內容..." />
       <button id="sellerChatSendBtn" type="button">送出</button>
@@ -1174,13 +1194,23 @@ function renderSellerChatMessages(messages) {
 
     item.innerHTML = `
       <p>${msg.message}</p>
-      <small>${new Date(msg.created_at).toLocaleString("zh-TW")}</small>
+      <small>
+        ${new Date(msg.created_at).toLocaleDateString("zh-TW")}
+        ${new Date(msg.created_at).toLocaleTimeString("zh-TW", {
+          hour: "2-digit",
+          minute: "2-digit"
+        })}
+      </small>
     `;
 
     box.appendChild(item);
   });
 
   box.scrollTop = box.scrollHeight;
+
+  setTimeout(() => {
+    box.scrollTop = box.scrollHeight;
+  }, 50);
 }
 
 async function sendSellerChatMessage() {
