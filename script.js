@@ -1415,6 +1415,7 @@ const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
 let buyerChatChannel = null;
+let buyerBellChannel = null;
 
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
@@ -1748,6 +1749,34 @@ async function loadBuyerBellDropdown() {
   });
 }
 
+async function subscribeBuyerBellRealtime() {
+  if (buyerBellChannel) {
+    supabase.removeChannel(buyerBellChannel);
+  }
+
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  buyerBellChannel = supabase
+    .channel(`buyer-bell-${user.id}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "chat_messages"
+      },
+      async () => {
+        await updateBuyerChatBadge();
+
+        if (buyerBellDropdown && !buyerBellDropdown.classList.contains("hidden")) {
+          await loadBuyerBellDropdown();
+        }
+      }
+    )
+    .subscribe();
+}
+
 if (buyerChatBell) {
   buyerChatBell.addEventListener("click", async () => {
     if (!window.location.pathname.includes("member.html")) {
@@ -1983,5 +2012,17 @@ async function replyBuyerChat(threadId) {
   await loadBuyerChats();
 }
 
+document.addEventListener("click", (e) => {
+  if (!buyerBellDropdown || !buyerChatBell) return;
+
+  const clickedInsideBell =
+    buyerChatBell.contains(e.target) || buyerBellDropdown.contains(e.target);
+
+  if (!clickedInsideBell) {
+    buyerBellDropdown.classList.add("hidden");
+  }
+});
+
 loadFavoriteCars();
 updateBuyerChatBadge();
+subscribeBuyerBellRealtime();

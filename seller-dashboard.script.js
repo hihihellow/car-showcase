@@ -430,6 +430,7 @@ const sellerChatRoom = document.getElementById("sellerChatRoom");
 let currentSellerChatThreadId = null;
 let adminSellerThreads = [];
 let sellerChatChannel = null;
+let sellerBellChannel = null;
 
 const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerChatBell = document.getElementById("sellerChatBell");
@@ -1410,6 +1411,35 @@ async function loadSellerBellDropdown() {
   });
 }
 
+async function subscribeSellerBellRealtime() {
+  if (sellerBellChannel) {
+    supabase.removeChannel(sellerBellChannel);
+  }
+
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  sellerBellChannel = supabase
+    .channel(`seller-bell-${currentSellerStore.id}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "chat_messages"
+      },
+      async () => {
+        await updateSellerChatBadge();
+
+        if (sellerBellDropdown && !sellerBellDropdown.classList.contains("hidden")) {
+          await loadSellerBellDropdown();
+        }
+      }
+    )
+    .subscribe();
+}
+
 if (sellerChatBell) {
   sellerChatBell.addEventListener("click", async () => {
     if (!sellerBellDropdown) return;
@@ -1788,6 +1818,18 @@ if (saveStoreBtn) {
   });
 }
 
+document.addEventListener("click", (e) => {
+  if (!sellerBellDropdown || !sellerChatBell) return;
+
+  const clickedInsideBell =
+    sellerChatBell.contains(e.target) || sellerBellDropdown.contains(e.target);
+
+  if (!clickedInsideBell) {
+    sellerBellDropdown.classList.add("hidden");
+  }
+});
+
 loadSellerStoreSettings();
 loadAdminCars();
 updateSellerChatBadge();
+subscribeSellerBellRealtime();
