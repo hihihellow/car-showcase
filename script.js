@@ -1410,6 +1410,7 @@ const buyerChatList = document.getElementById("buyerChatList");
 const buyerChatBadge = document.getElementById("buyerChatBadge");
 const buyerChatBell = document.getElementById("buyerChatBell");
 const buyerChatBellBadge = document.getElementById("buyerChatBellBadge");
+const buyerBellDropdown = document.getElementById("buyerBellDropdown");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
@@ -1676,6 +1677,77 @@ async function updateBuyerChatBadge() {
   }
 }
 
+async function loadBuyerBellDropdown() {
+  if (!buyerBellDropdown) return;
+
+  const user = await getCurrentUser();
+  if (!user) return;
+
+  const { data: threads } = await supabase
+    .from("chat_threads")
+    .select(`
+      id,
+      last_message,
+      last_message_at,
+      cars (title),
+      stores (name)
+    `)
+    .eq("buyer_id", user.id)
+    .order("last_message_at", { ascending: false })
+    .limit(10);
+
+  const threadIds = (threads || []).map((t) => t.id);
+
+  if (!threadIds.length) {
+    buyerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有訊息</p>`;
+    return;
+  }
+
+  const { data: unreadMessages } = await supabase
+    .from("chat_messages")
+    .select("thread_id")
+    .in("thread_id", threadIds)
+    .eq("sender_role", "seller")
+    .is("read_at", null);
+
+  const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
+  const unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
+
+  if (!unreadThreads.length) {
+    buyerBellDropdown.innerHTML = `<p class="bell-empty">沒有未讀聊天</p>`;
+    return;
+  }
+
+  buyerBellDropdown.innerHTML = unreadThreads.map((thread) => `
+    <button class="bell-message-item" data-thread-id="${thread.id}">
+      <strong>${thread.cars?.title || "未知車輛"}</strong>
+      <span>${thread.stores?.name || "未知車行"}：${thread.last_message || "新訊息"}</span>
+      <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+    </button>
+  `).join("");
+
+  buyerBellDropdown.querySelectorAll(".bell-message-item").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      buyerBellDropdown.classList.add("hidden");
+
+      document.querySelectorAll(".member-sidebar li").forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      document.querySelector('.member-sidebar li[data-tab="chat"]')?.classList.add("active");
+
+      Object.values(tabContents).forEach((tab) => {
+        tab.classList.remove("active");
+      });
+
+      tabContents.chat.classList.add("active");
+
+      await loadBuyerChats();
+      await openBuyerChatRoom(btn.dataset.threadId);
+    });
+  });
+}
+
 if (buyerChatBell) {
   buyerChatBell.addEventListener("click", async () => {
     if (!window.location.pathname.includes("member.html")) {
@@ -1683,19 +1755,13 @@ if (buyerChatBell) {
       return;
     }
 
-    document.querySelectorAll(".member-sidebar li").forEach((item) => {
-      item.classList.remove("active");
-    });
+    if (!buyerBellDropdown) return;
 
-    document.querySelector('.member-sidebar li[data-tab="chat"]')?.classList.add("active");
+    buyerBellDropdown.classList.toggle("hidden");
 
-    Object.values(tabContents).forEach((tab) => {
-      tab.classList.remove("active");
-    });
-
-    tabContents.chat.classList.add("active");
-
-    await loadBuyerChats();
+    if (!buyerBellDropdown.classList.contains("hidden")) {
+      await loadBuyerBellDropdown();
+    }
   });
 }
 
@@ -1918,3 +1984,4 @@ async function replyBuyerChat(threadId) {
 }
 
 loadFavoriteCars();
+updateBuyerChatBadge();

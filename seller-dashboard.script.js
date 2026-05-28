@@ -434,6 +434,7 @@ let sellerChatChannel = null;
 const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerChatBell = document.getElementById("sellerChatBell");
 const sellerChatBellBadge = document.getElementById("sellerChatBellBadge");
+const sellerBellDropdown = document.getElementById("sellerBellDropdown");
 const sellerNavBtns = document.querySelectorAll(".seller-nav-btn");
 const sellerPages = document.querySelectorAll(".seller-page");
 
@@ -1349,15 +1350,75 @@ async function updateSellerChatBadge() {
   }
 }
 
+async function loadSellerBellDropdown() {
+  if (!sellerBellDropdown) return;
+
+  if (!currentSellerStore) {
+    currentSellerStore = await getMyStore();
+  }
+
+  const { data: threads } = await supabase
+    .from("chat_threads")
+    .select("id, car_id, last_message, last_message_at, cars(title)")
+    .eq("store_id", currentSellerStore.id)
+    .order("last_message_at", { ascending: false })
+    .limit(10);
+
+  const threadIds = (threads || []).map((t) => t.id);
+
+  if (!threadIds.length) {
+    sellerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有訊息</p>`;
+    return;
+  }
+
+  const { data: unreadMessages } = await supabase
+    .from("chat_messages")
+    .select("thread_id")
+    .in("thread_id", threadIds)
+    .eq("sender_role", "buyer")
+    .is("read_at", null);
+
+  const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
+
+  const unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
+
+  if (!unreadThreads.length) {
+    sellerBellDropdown.innerHTML = `<p class="bell-empty">沒有未讀聊天</p>`;
+    return;
+  }
+
+  sellerBellDropdown.innerHTML = unreadThreads.map((thread) => `
+    <button class="bell-message-item" data-thread-id="${thread.id}">
+      <strong>${thread.cars?.title || "未知車輛"}</strong>
+      <span>${thread.last_message || "新訊息"}</span>
+      <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+    </button>
+  `).join("");
+
+  sellerBellDropdown.querySelectorAll(".bell-message-item").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      sellerBellDropdown.classList.add("hidden");
+      showSellerPage("chat");
+
+      document.querySelectorAll(".seller-nav-btn").forEach((item) => {
+        item.classList.toggle("active", item.dataset.page === "chat");
+      });
+
+      await loadSellerChats();
+      await openSellerChatRoom(btn.dataset.threadId);
+    });
+  });
+}
+
 if (sellerChatBell) {
   sellerChatBell.addEventListener("click", async () => {
-    showSellerPage("chat");
+    if (!sellerBellDropdown) return;
 
-    document.querySelectorAll(".seller-nav-btn").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.page === "chat");
-    });
+    sellerBellDropdown.classList.toggle("hidden");
 
-    await loadSellerChats();
+    if (!sellerBellDropdown.classList.contains("hidden")) {
+      await loadSellerBellDropdown();
+    }
   });
 }
 
@@ -1729,3 +1790,4 @@ if (saveStoreBtn) {
 
 loadSellerStoreSettings();
 loadAdminCars();
+updateSellerChatBadge();

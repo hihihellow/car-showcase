@@ -4467,3 +4467,51 @@ body:has(.store-page) {
   align-items: center;
   justify-content: center;
 }
+
+.chat-bell-wrap {
+  position: relative;
+}
+
+.chat-bell-dropdown {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: #111;
+  border: 1px solid rgba(244,196,48,0.35);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+  padding: 10px;
+  z-index: 999;
+}
+
+.bell-message-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  color: white;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.bell-message-item strong {
+  display: block;
+  color: #f4c430;
+  margin-bottom: 4px;
+}
+
+.bell-message-item span {
+  display: block;
+  color: rgba(255,255,255,0.82);
+  font-size: 13px;
+}
+
+.bell-message-item small,
+.bell-empty {
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+}
