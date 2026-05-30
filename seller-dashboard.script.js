@@ -1020,6 +1020,14 @@ async function loadNotifications() {
   }
 
   renderNotifications(data || []);
+
+  await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("store_id", currentSellerStore.id)
+    .eq("is_read", false);
+
+  await updateSellerChatBadge();
 }
 
 async function loadSellerChats() {
@@ -1315,11 +1323,13 @@ async function replySellerChat(threadId) {
 }
 
 async function updateSellerChatBadge() {
-  if (!sellerChatBadge) return;
+  if (!sellerChatBadge && !sellerChatBellBadge) return;
 
   if (!currentSellerStore) {
     currentSellerStore = await getMyStore();
   }
+
+  if (!currentSellerStore) return;
 
   const { data: threads } = await supabase
     .from("chat_threads")
@@ -1328,26 +1338,36 @@ async function updateSellerChatBadge() {
 
   const threadIds = (threads || []).map((t) => t.id);
 
-  if (!threadIds.length) {
-    sellerChatBadge.classList.add("hidden");
-    return;
+  let chatCount = 0;
+
+  if (threadIds.length) {
+    const { data: messages } = await supabase
+      .from("chat_messages")
+      .select("id")
+      .in("thread_id", threadIds)
+      .eq("sender_role", "buyer")
+      .is("read_at", null);
+
+    chatCount = messages?.length || 0;
   }
 
-  const { data: messages } = await supabase
-    .from("chat_messages")
+  const { data: notifications } = await supabase
+    .from("notifications")
     .select("id")
-    .in("thread_id", threadIds)
-    .eq("sender_role", "buyer")
-    .is("read_at", null);
+    .eq("store_id", currentSellerStore.id)
+    .eq("is_read", false);
 
-  const count = messages?.length || 0;
+  const systemCount = notifications?.length || 0;
+  const totalCount = chatCount + systemCount;
 
-  sellerChatBadge.textContent = count;
-  sellerChatBadge.classList.toggle("hidden", count === 0);
+  if (sellerChatBadge) {
+    sellerChatBadge.textContent = chatCount;
+    sellerChatBadge.classList.toggle("hidden", chatCount === 0);
+  }
 
   if (sellerChatBellBadge) {
-    sellerChatBellBadge.textContent = count;
-    sellerChatBellBadge.classList.toggle("hidden", count === 0);
+    sellerChatBellBadge.textContent = totalCount;
+    sellerChatBellBadge.classList.toggle("hidden", totalCount === 0);
   }
 }
 
@@ -1383,10 +1403,38 @@ async function loadSellerBellDropdown() {
 
   const unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
 
-  if (!unreadThreads.length) {
-    sellerBellDropdown.innerHTML = `<p class="bell-empty">沒有未讀聊天</p>`;
+  const { data: systemNotifications } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("store_id", currentSellerStore.id)
+    .eq("is_read", false)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  const chatHtml = unreadThreads.map((thread) => `
+    <button class="bell-message-item" data-type="chat" data-thread-id="${thread.id}">
+      <strong>聊天訊息｜${thread.cars?.title || "未知車輛"}</strong>
+      <span>${thread.last_message || "新訊息"}</span>
+      <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+    </button>
+  `).join("");
+
+  const notificationHtml = (systemNotifications || []).map((item) => `
+    <button class="bell-message-item" data-type="notification" data-id="${item.id}">
+      <strong>系統通知｜${item.title}</strong>
+      <span>${item.message || ""}</span>
+      <small>${new Date(item.created_at).toLocaleString("zh-TW")}</small>
+    </button>
+  `).join("");
+
+  const finalHtml = chatHtml + notificationHtml;
+
+  if (!finalHtml) {
+    sellerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有未讀通知</p>`;
     return;
   }
+
+  sellerBellDropdown.innerHTML = finalHtml;
 
   sellerBellDropdown.innerHTML = unreadThreads.map((thread) => `
     <button class="bell-message-item" data-thread-id="${thread.id}">
@@ -1399,14 +1447,34 @@ async function loadSellerBellDropdown() {
   sellerBellDropdown.querySelectorAll(".bell-message-item").forEach((btn) => {
     btn.addEventListener("click", async () => {
       sellerBellDropdown.classList.add("hidden");
-      showSellerPage("chat");
 
-      document.querySelectorAll(".seller-nav-btn").forEach((item) => {
-        item.classList.toggle("active", item.dataset.page === "chat");
-      });
+      if (btn.dataset.type === "chat") {
+        showSellerPage("chat");
 
-      await loadSellerChats();
-      await openSellerChatRoom(btn.dataset.threadId);
+        document.querySelectorAll(".seller-nav-btn").forEach((item) => {
+          item.classList.toggle("active", item.dataset.page === "chat");
+        });
+
+        await loadSellerChats();
+        await openSellerChatRoom(btn.dataset.threadId);
+        return;
+      }
+
+      if (btn.dataset.type === "notification") {
+        await supabase
+          .from("notifications")
+          .update({ is_read: true })
+          .eq("id", btn.dataset.id);
+
+        showSellerPage("notifications");
+
+        document.querySelectorAll(".seller-nav-btn").forEach((item) => {
+          item.classList.toggle("active", item.dataset.page === "notifications");
+        });
+
+        await loadNotifications();
+        await updateSellerChatBadge();
+      }
     });
   });
 }
