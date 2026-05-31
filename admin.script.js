@@ -429,6 +429,8 @@ if (addCarBtn) {
     let savedCar = null;
 
     if (editingCarId) {
+      const editingCar = adminCars.find((car) => Number(car.id) === Number(editingCarId));
+
       let updateQuery = supabase
         .from("cars")
         .update({
@@ -468,6 +470,15 @@ if (addCarBtn) {
       }
 
       savedCar = updatedCar;
+
+      if (editingCar && Number(editingCar.price) !== Number(updatedCar.price)) {
+        await notifyFavoriteBuyersPriceChanged(
+          updatedCar.id,
+          updatedCar.title,
+          editingCar.price,
+          updatedCar.price
+        );
+      }
 
       if (selectedImageFiles.length > 0) {
         await supabase
@@ -775,6 +786,37 @@ async function createNotification(storeId, title, message = "") {
 
   if (error) {
     console.error("建立通知失敗:", error);
+  }
+}
+
+async function notifyFavoriteBuyersPriceChanged(carId, carTitle, oldPrice, newPrice) {
+  if (Number(oldPrice) === Number(newPrice)) return;
+
+  const { data: favoriteRows, error: favoriteError } = await supabase
+    .from("favorites")
+    .select("user_id")
+    .eq("car_id", Number(carId));
+
+  if (favoriteError) {
+    console.error("讀取收藏買家失敗:", favoriteError);
+    return;
+  }
+
+  if (!favoriteRows || favoriteRows.length === 0) return;
+
+  const notificationRows = favoriteRows.map((item) => ({
+    buyer_id: item.user_id,
+    title: "收藏車輛價格異動",
+    message: `${carTitle || "您收藏的車輛"} 價格已由 NT$ ${Number(oldPrice).toLocaleString()} 調整為 NT$ ${Number(newPrice).toLocaleString()}。`,
+    is_read: false
+  }));
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert(notificationRows);
+
+  if (error) {
+    console.error("建立價格異動通知失敗:", error);
   }
 }
 

@@ -241,6 +241,15 @@ if (addCarBtn) {
 
       savedCar = updatedCar;
 
+      if (editingCar && Number(editingCar.price) !== Number(updatedCar.price)) {
+        await notifyFavoriteBuyersPriceChanged(
+          updatedCar.id,
+          updatedCar.title,
+          editingCar.price,
+          updatedCar.price
+        );
+      }
+
       if (selectedImageFiles.length > 0) {
         await supabase
           .from("car_images")
@@ -992,6 +1001,37 @@ async function renderPlanPage() {
   await loadPlanList();
 }
 
+async function notifyFavoriteBuyersPriceChanged(carId, carTitle, oldPrice, newPrice) {
+  if (Number(oldPrice) === Number(newPrice)) return;
+
+  const { data: favoriteRows, error: favoriteError } = await supabase
+    .from("favorites")
+    .select("user_id")
+    .eq("car_id", Number(carId));
+
+  if (favoriteError) {
+    console.error("讀取收藏買家失敗:", favoriteError);
+    return;
+  }
+
+  if (!favoriteRows || favoriteRows.length === 0) return;
+
+  const notificationRows = favoriteRows.map((item) => ({
+    buyer_id: item.user_id,
+    title: "收藏車輛價格異動",
+    message: `${carTitle || "您收藏的車輛"} 價格已由 NT$ ${Number(oldPrice).toLocaleString()} 調整為 NT$ ${Number(newPrice).toLocaleString()}。`,
+    is_read: false
+  }));
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert(notificationRows);
+
+  if (error) {
+    console.error("建立價格異動通知失敗:", error);
+  }
+}
+
 async function loadNotifications() {
   if (!notificationList) return;
 
@@ -1020,14 +1060,6 @@ async function loadNotifications() {
   }
 
   renderNotifications(data || []);
-
-  await supabase
-    .from("notifications")
-    .update({ is_read: true })
-    .eq("store_id", currentSellerStore.id)
-    .eq("is_read", false);
-
-  await updateSellerChatBadge();
 }
 
 async function loadSellerChats() {
@@ -1378,6 +1410,11 @@ async function loadSellerBellDropdown() {
     currentSellerStore = await getMyStore();
   }
 
+  if (!currentSellerStore) {
+    sellerBellDropdown.innerHTML = `<p class="bell-empty">找不到車行資料</p>`;
+    return;
+  }
+
   const { data: threads } = await supabase
     .from("chat_threads")
     .select("id, car_id, last_message, last_message_at, cars(title)")
@@ -1387,21 +1424,19 @@ async function loadSellerBellDropdown() {
 
   const threadIds = (threads || []).map((t) => t.id);
 
-  if (!threadIds.length) {
-    sellerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有訊息</p>`;
-    return;
+  let unreadThreads = [];
+
+  if (threadIds.length) {
+    const { data: unreadMessages } = await supabase
+      .from("chat_messages")
+      .select("thread_id")
+      .in("thread_id", threadIds)
+      .eq("sender_role", "buyer")
+      .is("read_at", null);
+
+    const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
+    unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
   }
-
-  const { data: unreadMessages } = await supabase
-    .from("chat_messages")
-    .select("thread_id")
-    .in("thread_id", threadIds)
-    .eq("sender_role", "buyer")
-    .is("read_at", null);
-
-  const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
-
-  const unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
 
   const { data: systemNotifications } = await supabase
     .from("notifications")
@@ -1435,14 +1470,6 @@ async function loadSellerBellDropdown() {
   }
 
   sellerBellDropdown.innerHTML = finalHtml;
-
-  sellerBellDropdown.innerHTML = unreadThreads.map((thread) => `
-    <button class="bell-message-item" data-thread-id="${thread.id}">
-      <strong>${thread.cars?.title || "未知車輛"}</strong>
-      <span>${thread.last_message || "新訊息"}</span>
-      <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
-    </button>
-  `).join("");
 
   sellerBellDropdown.querySelectorAll(".bell-message-item").forEach((btn) => {
     btn.addEventListener("click", async () => {
@@ -1505,6 +1532,23 @@ async function subscribeSellerBellRealtime() {
         }
       }
     )
+
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications"
+      },
+      async () => {
+        await updateSellerChatBadge();
+
+        if (sellerBellDropdown && !sellerBellDropdown.classList.contains("hidden")) {
+          await loadSellerBellDropdown();
+        }
+      }
+    )
+
     .subscribe();
 }
 
@@ -1538,10 +1582,40 @@ function renderNotifications(notifications) {
       <strong>${item.title}</strong>
       <p>${item.message || ""}</p>
       <small>${new Date(item.created_at).toLocaleString("zh-TW")}</small>
+
+      ${
+        item.is_read
+          ? ""
+          : `<button class="mark-notification-read-btn" data-id="${item.id}">
+              標記已讀
+            </button>`
+      }
     `;
 
     notificationList.appendChild(card);
   });
+
+  document.querySelectorAll(".mark-notification-read-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await markNotificationRead(btn.dataset.id);
+    });
+  });
+}
+
+async function markNotificationRead(notificationId) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notificationId);
+
+  if (error) {
+    console.error("標記已讀失敗:", error);
+    alert("標記已讀失敗");
+    return;
+  }
+
+  await loadNotifications();
+  await updateSellerChatBadge();
 }
 
 async function loadPlanList() {

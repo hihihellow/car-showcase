@@ -4515,3 +4515,25 @@ body:has(.store-page) {
   color: rgba(255,255,255,0.55);
   font-size: 12px;
 }
+
+.mark-notification-read-btn {
+  margin-top: 10px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: transparent;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.mark-buyer-notification-read-btn {
+  margin-top: 10px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: transparent;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 900;
+  cursor: pointer;
+}

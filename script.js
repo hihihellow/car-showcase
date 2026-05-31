@@ -1404,13 +1404,15 @@ const tabs = document.querySelectorAll(".member-sidebar li");
 const tabContents = {
   profile: document.getElementById("profileTab"),
   favorites: document.getElementById("favoritesTab"),
-  chat: document.getElementById("chatTab")
+  chat: document.getElementById("chatTab"),
+  notifications: document.getElementById("notificationsTab")
 };
 const buyerChatList = document.getElementById("buyerChatList");
 const buyerChatBadge = document.getElementById("buyerChatBadge");
 const buyerChatBell = document.getElementById("buyerChatBell");
 const buyerChatBellBadge = document.getElementById("buyerChatBellBadge");
 const buyerBellDropdown = document.getElementById("buyerBellDropdown");
+const buyerNotificationList = document.getElementById("buyerNotificationList");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
@@ -1427,6 +1429,10 @@ tabs.forEach(tab => {
 
     if (tab.dataset.tab === "chat") {
       loadBuyerChats();
+    }
+
+    if (tab.dataset.tab === "notifications") {
+      loadBuyerNotifications();
     }
   });
 });
@@ -1655,27 +1661,116 @@ async function updateBuyerChatBadge() {
 
   const threadIds = (threads || []).map((t) => t.id);
 
-  if (!threadIds.length) {
-    buyerChatBadge.classList.add("hidden");
-    return;
+  let chatCount = 0;
+
+  if (threadIds.length) {
+    const { data: messages } = await supabase
+      .from("chat_messages")
+      .select("id")
+      .in("thread_id", threadIds)
+      .eq("sender_role", "seller")
+      .is("read_at", null);
+
+    chatCount = messages?.length || 0;
   }
 
-  const { data: messages } = await supabase
-    .from("chat_messages")
+  const { data: buyerNotifications } = await supabase
+    .from("notifications")
     .select("id")
-    .in("thread_id", threadIds)
-    .eq("sender_role", "seller")
-    .is("read_at", null);
+    .eq("buyer_id", user.id)
+    .eq("is_read", false);
 
-  const count = messages?.length || 0;
+  const systemCount = buyerNotifications?.length || 0;
+  const count = chatCount + systemCount;
 
-  buyerChatBadge.textContent = count;
-  buyerChatBadge.classList.toggle("hidden", count === 0);
+  buyerChatBadge.textContent = chatCount;
+  buyerChatBadge.classList.toggle("hidden", chatCount === 0);
 
   if (buyerChatBellBadge) {
     buyerChatBellBadge.textContent = count;
     buyerChatBellBadge.classList.toggle("hidden", count === 0);
   }
+}
+
+async function loadBuyerNotifications() {
+  if (!buyerNotificationList) return;
+
+  const user = await getCurrentUser();
+  if (!user) {
+    buyerNotificationList.innerHTML = "<p>請先登入。</p>";
+    return;
+  }
+
+  buyerNotificationList.innerHTML = "<p>通知讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("buyer_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    console.error("讀取買家通知失敗:", error);
+    buyerNotificationList.innerHTML = "<p>通知讀取失敗。</p>";
+    return;
+  }
+
+  renderBuyerNotifications(data || []);
+}
+
+function renderBuyerNotifications(notifications) {
+  if (!buyerNotificationList) return;
+
+  if (!notifications.length) {
+    buyerNotificationList.innerHTML = "<p>目前沒有通知。</p>";
+    return;
+  }
+
+  buyerNotificationList.innerHTML = "";
+
+  notifications.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = `notification-card ${item.is_read ? "" : "unread"}`;
+
+    card.innerHTML = `
+      <strong>${item.title}</strong>
+      <p>${item.message || ""}</p>
+      <small>${new Date(item.created_at).toLocaleString("zh-TW")}</small>
+
+      ${
+        item.is_read
+          ? ""
+          : `<button class="mark-buyer-notification-read-btn" data-id="${item.id}">
+              標記已讀
+            </button>`
+      }
+    `;
+
+    buyerNotificationList.appendChild(card);
+  });
+
+  document.querySelectorAll(".mark-buyer-notification-read-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      await markBuyerNotificationRead(btn.dataset.id);
+    });
+  });
+}
+
+async function markBuyerNotificationRead(notificationId) {
+  const { error } = await supabase
+    .from("notifications")
+    .update({ is_read: true })
+    .eq("id", notificationId);
+
+  if (error) {
+    console.error("標記買家通知已讀失敗:", error);
+    alert("標記已讀失敗");
+    return;
+  }
+
+  await loadBuyerNotifications();
+  await updateBuyerChatBadge();
 }
 
 async function loadBuyerBellDropdown() {
@@ -1699,52 +1794,96 @@ async function loadBuyerBellDropdown() {
 
   const threadIds = (threads || []).map((t) => t.id);
 
-  if (!threadIds.length) {
-    buyerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有訊息</p>`;
-    return;
+  let unreadThreads = [];
+
+  if (threadIds.length) {
+    const { data: unreadMessages } = await supabase
+      .from("chat_messages")
+      .select("thread_id")
+      .in("thread_id", threadIds)
+      .eq("sender_role", "seller")
+      .is("read_at", null);
+
+    const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
+    unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
   }
 
-  const { data: unreadMessages } = await supabase
-    .from("chat_messages")
-    .select("thread_id")
-    .in("thread_id", threadIds)
-    .eq("sender_role", "seller")
-    .is("read_at", null);
+  const { data: systemNotifications } = await supabase
+    .from("notifications")
+    .select("*")
+    .eq("buyer_id", user.id)
+    .eq("is_read", false)
+    .order("created_at", { ascending: false })
+    .limit(10);
 
-  const unreadThreadIds = new Set((unreadMessages || []).map((m) => m.thread_id));
-  const unreadThreads = (threads || []).filter((t) => unreadThreadIds.has(t.id));
-
-  if (!unreadThreads.length) {
-    buyerBellDropdown.innerHTML = `<p class="bell-empty">沒有未讀聊天</p>`;
-    return;
-  }
-
-  buyerBellDropdown.innerHTML = unreadThreads.map((thread) => `
-    <button class="bell-message-item" data-thread-id="${thread.id}">
-      <strong>${thread.cars?.title || "未知車輛"}</strong>
+  const chatHtml = unreadThreads.map((thread) => `
+    <button class="bell-message-item" data-type="chat" data-thread-id="${thread.id}">
+      <strong>聊天訊息｜${thread.cars?.title || "未知車輛"}</strong>
       <span>${thread.stores?.name || "未知車行"}：${thread.last_message || "新訊息"}</span>
       <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
     </button>
   `).join("");
 
+  const notificationHtml = (systemNotifications || []).map((item) => `
+    <button class="bell-message-item" data-type="notification" data-id="${item.id}">
+      <strong>系統通知｜${item.title}</strong>
+      <span>${item.message || ""}</span>
+      <small>${new Date(item.created_at).toLocaleString("zh-TW")}</small>
+    </button>
+  `).join("");
+
+  const finalHtml = chatHtml + notificationHtml;
+
+  if (!finalHtml) {
+    buyerBellDropdown.innerHTML = `<p class="bell-empty">目前沒有未讀通知</p>`;
+    return;
+  }
+
+  buyerBellDropdown.innerHTML = finalHtml;
+
   buyerBellDropdown.querySelectorAll(".bell-message-item").forEach((btn) => {
     btn.addEventListener("click", async () => {
       buyerBellDropdown.classList.add("hidden");
 
-      document.querySelectorAll(".member-sidebar li").forEach((item) => {
-        item.classList.remove("active");
-      });
+      if (btn.dataset.type === "chat") {
+        document.querySelectorAll(".member-sidebar li").forEach((item) => {
+          item.classList.remove("active");
+        });
 
-      document.querySelector('.member-sidebar li[data-tab="chat"]')?.classList.add("active");
+        document.querySelector('.member-sidebar li[data-tab="chat"]')?.classList.add("active");
 
-      Object.values(tabContents).forEach((tab) => {
-        tab.classList.remove("active");
-      });
+        Object.values(tabContents).forEach((tab) => {
+          tab.classList.remove("active");
+        });
 
-      tabContents.chat.classList.add("active");
+        tabContents.chat.classList.add("active");
 
-      await loadBuyerChats();
-      await openBuyerChatRoom(btn.dataset.threadId);
+        await loadBuyerChats();
+        await openBuyerChatRoom(btn.dataset.threadId);
+        return;
+      }
+
+      if (btn.dataset.type === "notification") {
+        await supabase
+          .from("notifications")
+          .update({ is_read: true })
+          .eq("id", btn.dataset.id);
+
+        document.querySelectorAll(".member-sidebar li").forEach((item) => {
+          item.classList.remove("active");
+        });
+
+        document.querySelector('.member-sidebar li[data-tab="notifications"]')?.classList.add("active");
+
+        Object.values(tabContents).forEach((tab) => {
+          tab.classList.remove("active");
+        });
+
+        tabContents.notifications.classList.add("active");
+
+        await loadBuyerNotifications();
+        await updateBuyerChatBadge();
+      }
     });
   });
 }
@@ -1774,6 +1913,23 @@ async function subscribeBuyerBellRealtime() {
         }
       }
     )
+
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "notifications"
+      },
+      async () => {
+        await updateBuyerChatBadge();
+
+        if (buyerBellDropdown && !buyerBellDropdown.classList.contains("hidden")) {
+          await loadBuyerBellDropdown();
+        }
+      }
+    )
+
     .subscribe();
 }
 
