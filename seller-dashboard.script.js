@@ -757,6 +757,10 @@ async function toggleCarStatus(carId) {
     return;
   }
 
+  if (nextStatus === "inactive") {
+    await notifyFavoriteBuyersCarUnavailable(targetCar.id, targetCar.title);
+  }
+
   alert(nextStatus === "active" ? "車輛已重新上架" : "車輛已下架");
   loadAdminCars();
 }
@@ -1029,6 +1033,35 @@ async function notifyFavoriteBuyersPriceChanged(carId, carTitle, oldPrice, newPr
 
   if (error) {
     console.error("建立價格異動通知失敗:", error);
+  }
+}
+
+async function notifyFavoriteBuyersCarUnavailable(carId, carTitle) {
+  const { data: favoriteRows, error: favoriteError } = await supabase
+    .from("favorites")
+    .select("user_id")
+    .eq("car_id", Number(carId));
+
+  if (favoriteError) {
+    console.error("讀取收藏買家失敗:", favoriteError);
+    return;
+  }
+
+  if (!favoriteRows || favoriteRows.length === 0) return;
+
+  const notificationRows = favoriteRows.map((item) => ({
+    buyer_id: item.user_id,
+    title: "收藏車輛已下架",
+    message: `${carTitle || "您收藏的車輛"} 目前已下架，暫時無法查看。`,
+    is_read: false
+  }));
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert(notificationRows);
+
+  if (error) {
+    console.error("建立下架通知失敗:", error);
   }
 }
 

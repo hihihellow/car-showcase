@@ -12,6 +12,8 @@ const storeInfo = document.getElementById("storeInfo");
 const storeCarList = document.getElementById("storeCarList");
 const storeTitle = document.getElementById("storeTitle");
 const storeDesc = document.getElementById("storeDesc");
+let currentStore = null;
+let currentUser = null;
 
 async function loadStorePage() {
   if (!storeInfo || !storeCarList) return;
@@ -36,6 +38,12 @@ async function loadStorePage() {
     }
 
     store = data;
+
+    currentStore = store;
+
+  const { data: authData } = await supabase.auth.getUser();
+  currentUser = authData?.user || null;
+
   } else {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user;
@@ -60,6 +68,11 @@ async function loadStorePage() {
     }
 
     store = data;
+
+    currentStore = store;
+
+    const { data: authData } = await supabase.auth.getUser();
+    currentUser = authData?.user || null;
 
     if (store?.slug) {
       window.history.replaceState(
@@ -122,11 +135,17 @@ async function loadStorePage() {
       </div>
 
       <div class="store-profile-actions">
+        <button id="followStoreBtn" class="store-outline-btn" type="button">
+          ♡ 追蹤車行
+        </button>
+        <span id="storeFollowerCount" class="store-follower-count">0 人追蹤</span>
         <a href="index.html" class="store-outline-btn">返回首頁</a>
         <a href="#storeCars" class="store-primary-btn">查看車輛</a>
       </div>
     </div>
   `;
+
+  await loadStoreFollowerStatus();
 
   const { data: cars, error: carsError } = await supabase
     .from("cars")
@@ -168,6 +187,69 @@ async function loadStorePage() {
 
     storeCarList.appendChild(card);
   });
+}
+
+async function loadStoreFollowerStatus() {
+  if (!currentStore) return;
+
+  const countEl = document.getElementById("storeFollowerCount");
+  const followBtn = document.getElementById("followStoreBtn");
+
+  const { count } = await supabase
+    .from("store_followers")
+    .select("*", { count: "exact", head: true })
+    .eq("store_id", currentStore.id);
+
+  if (countEl) {
+    countEl.textContent = `${count || 0} 人追蹤`;
+  }
+
+  if (!currentUser || !followBtn) return;
+
+  const { data } = await supabase
+    .from("store_followers")
+    .select("id")
+    .eq("store_id", currentStore.id)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  followBtn.textContent = data ? "♥ 已追蹤" : "♡ 追蹤車行";
+  followBtn.classList.toggle("active", !!data);
+
+  followBtn.onclick = toggleStoreFollow;
+}
+
+async function toggleStoreFollow() {
+  if (!currentUser) {
+    alert("請先登入會員");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const followBtn = document.getElementById("followStoreBtn");
+
+  const { data } = await supabase
+    .from("store_followers")
+    .select("id")
+    .eq("store_id", currentStore.id)
+    .eq("user_id", currentUser.id)
+    .maybeSingle();
+
+  if (data) {
+    await supabase
+      .from("store_followers")
+      .delete()
+      .eq("id", data.id);
+  } else {
+    await supabase
+      .from("store_followers")
+      .insert({
+        store_id: currentStore.id,
+        user_id: currentUser.id
+      });
+  }
+
+  await loadStoreFollowerStatus();
 }
 
 loadStorePage();

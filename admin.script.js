@@ -789,6 +789,37 @@ async function createNotification(storeId, title, message = "") {
   }
 }
 
+async function notifyStoreFollowersNewCar(storeId, carTitle) {
+  if (!storeId) return;
+
+  const { data: followers, error: followerError } = await supabase
+    .from("store_followers")
+    .select("user_id")
+    .eq("store_id", storeId);
+
+  if (followerError) {
+    console.error("讀取追蹤者失敗:", followerError);
+    return;
+  }
+
+  if (!followers || followers.length === 0) return;
+
+  const notificationRows = followers.map((item) => ({
+    buyer_id: item.user_id,
+    title: "追蹤車行新車上架",
+    message: `${carTitle || "有新車"} 已公開上架，快去看看吧！`,
+    is_read: false
+  }));
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert(notificationRows);
+
+  if (error) {
+    console.error("建立追蹤車行通知失敗:", error);
+  }
+}
+
 async function notifyFavoriteBuyersPriceChanged(carId, carTitle, oldPrice, newPrice) {
   if (Number(oldPrice) === Number(newPrice)) return;
 
@@ -817,6 +848,35 @@ async function notifyFavoriteBuyersPriceChanged(carId, carTitle, oldPrice, newPr
 
   if (error) {
     console.error("建立價格異動通知失敗:", error);
+  }
+}
+
+async function notifyFavoriteBuyersCarUnavailable(carId, carTitle) {
+  const { data: favoriteRows, error: favoriteError } = await supabase
+    .from("favorites")
+    .select("user_id")
+    .eq("car_id", Number(carId));
+
+  if (favoriteError) {
+    console.error("讀取收藏買家失敗:", favoriteError);
+    return;
+  }
+
+  if (!favoriteRows || favoriteRows.length === 0) return;
+
+  const notificationRows = favoriteRows.map((item) => ({
+    buyer_id: item.user_id,
+    title: "收藏車輛已下架",
+    message: `${carTitle || "您收藏的車輛"} 目前已下架，暫時無法查看。`,
+    is_read: false
+  }));
+
+  const { error } = await supabase
+    .from("notifications")
+    .insert(notificationRows);
+
+  if (error) {
+    console.error("建立下架通知失敗:", error);
   }
 }
 
@@ -1525,6 +1585,13 @@ async function approveCar(carId) {
     );
   }
 
+  if (targetCar?.store_id) {
+    await notifyStoreFollowersNewCar(
+     targetCar.store_id,
+      targetCar.title
+    );
+  }
+
   alert("車輛已審核通過並上架。");
   await loadAdminCars();
 }
@@ -1666,6 +1733,13 @@ async function startEditCar(carId) {
 }
 
 async function deleteCar(carId) {
+
+  const targetCar = adminCars.find((car) => String(car.id) === String(carId));
+
+  if (targetCar) {
+    await notifyFavoriteBuyersCarUnavailable(targetCar.id, targetCar.title);
+  }
+
   const { error: imageError } = await supabase
     .from("car_images")
     .delete()

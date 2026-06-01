@@ -912,6 +912,8 @@ if (carDetail) {
         return;
       }
 
+      await recordRecentView(car.id);
+
       let store = null;
 
       if (car.store_id) {
@@ -1404,6 +1406,7 @@ const tabs = document.querySelectorAll(".member-sidebar li");
 const tabContents = {
   profile: document.getElementById("profileTab"),
   favorites: document.getElementById("favoritesTab"),
+  recent: document.getElementById("recentTab"),
   chat: document.getElementById("chatTab"),
   notifications: document.getElementById("notificationsTab")
 };
@@ -1413,6 +1416,7 @@ const buyerChatBell = document.getElementById("buyerChatBell");
 const buyerChatBellBadge = document.getElementById("buyerChatBellBadge");
 const buyerBellDropdown = document.getElementById("buyerBellDropdown");
 const buyerNotificationList = document.getElementById("buyerNotificationList");
+const recentViewList = document.getElementById("recentViewList");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
@@ -1426,6 +1430,10 @@ tabs.forEach(tab => {
 
     Object.values(tabContents).forEach(c => c.classList.remove("active"));
     tabContents[tab.dataset.tab].classList.add("active");
+
+    if (tab.dataset.tab === "recent") {
+      loadRecentViews();
+    }
 
     if (tab.dataset.tab === "chat") {
       loadBuyerChats();
@@ -1488,10 +1496,33 @@ async function loadMemberProfile() {
 
 loadMemberProfile();
 
+async function recordRecentView(carId) {
+  const user = await getCurrentUser();
+  if (!user || !carId) return;
+
+  const { error } = await supabase
+    .from("recent_views")
+    .upsert(
+      {
+        user_id: user.id,
+        car_id: Number(carId),
+        viewed_at: new Date().toISOString()
+      },
+      {
+        onConflict: "user_id,car_id"
+      }
+    );
+
+  if (error) {
+    console.error("記錄最近瀏覽失敗:", error);
+  }
+}
+
 async function loadFavoriteCars() {
   if (!window.location.pathname.includes("member.html")) return;
 
   const favoriteList = document.getElementById("favoriteList");
+
   if (!favoriteList) return;
 
   const user = await getCurrentUser();
@@ -1570,6 +1601,83 @@ async function loadFavoriteCars() {
       toggleFavorite(btn.dataset.id, btn);
     });
   });
+}
+
+function renderRecentViewCars(carArray) {
+  if (!recentViewList) return;
+
+  recentViewList.innerHTML = "";
+
+  carArray.forEach((car) => {
+    const card = document.createElement("div");
+    card.className = "car-card";
+
+    card.innerHTML = `
+      <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
+
+      <a href="detail.html?id=${car.id}" class="car-link">
+        <img src="${car.image}" alt="${car.title}">
+        ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
+        <div class="car-content">
+          <h2 class="car-title">${car.title}</h2>
+          <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
+          <div class="car-meta">
+            ${car.category || "-"}｜${car.region || "-"}｜${car.year ? car.year + " 年" : "-"}
+          </div>
+        </div>
+      </a>
+    `;
+
+    recentViewList.appendChild(card);
+  });
+
+  recentViewList.querySelectorAll(".favorite-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.id, btn);
+    });
+  });
+}
+
+async function loadRecentViews() {
+  if (!recentViewList) return;
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    recentViewList.innerHTML = "<p>請先登入會員。</p>";
+    return;
+  }
+
+  recentViewList.innerHTML = "<p>最近瀏覽讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("recent_views")
+    .select(`
+      viewed_at,
+      cars (*)
+    `)
+    .eq("user_id", user.id)
+    .order("viewed_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error("讀取最近瀏覽失敗:", error);
+    recentViewList.innerHTML = "<p>讀取最近瀏覽失敗。</p>";
+    return;
+  }
+
+  const recentCars = (data || [])
+    .map((item) => item.cars)
+    .filter(Boolean);
+
+  if (!recentCars.length) {
+    recentViewList.innerHTML = "<p>目前沒有最近瀏覽紀錄。</p>";
+    return;
+  }
+
+  renderRecentViewCars(recentCars);
 }
 
 async function loadBuyerChats() {
