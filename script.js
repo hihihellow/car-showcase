@@ -1061,6 +1061,7 @@ if (carDetail) {
           <div class="detail-action-row">
             <button id="detailFavoriteBtn" class="favorite-btn detail-favorite" type="button" data-id="${car.id}">🤍 收藏</button>
             <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
+            <button id="appointmentBtn" class="contact-btn">預約看車</button>
           </div>
 
           <div class="contact-info" id="contactInfo">
@@ -1123,6 +1124,7 @@ if (carDetail) {
 
       const contactSellerBtn = document.getElementById("contactSellerBtn");
       const contactInfo = document.getElementById("contactInfo");
+      const appointmentBtn = document.getElementById("appointmentBtn");
 
       const detailFavoriteBtn = document.getElementById("detailFavoriteBtn");
 
@@ -1219,6 +1221,15 @@ if (carDetail) {
             .eq("id", thread.id);
 
           alert("訊息已送出，賣家會在後台看到。");
+        });
+      }
+
+      if (appointmentBtn) {
+        appointmentBtn.addEventListener("click", async () => {
+          await startCarChat(
+            car,
+            "請問這台車還在嗎？我想預約看車。"
+          );
         });
       }
 
@@ -1450,6 +1461,46 @@ tabs.forEach(tab => {
     }
   });
 });
+
+async function openMemberTabFromUrl() {
+  if (!window.location.pathname.includes("member.html")) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const tabName = params.get("tab");
+  const threadId = params.get("thread");
+
+  if (!tabName) return;
+
+  const targetTab = document.querySelector(`.member-sidebar li[data-tab="${tabName}"]`);
+
+  if (!targetTab || !tabContents[tabName]) return;
+
+  tabs.forEach(t => t.classList.remove("active"));
+  targetTab.classList.add("active");
+
+  Object.values(tabContents).forEach(c => c.classList.remove("active"));
+  tabContents[tabName].classList.add("active");
+
+  if (tabName === "chat") {
+    await loadBuyerChats();
+
+    if (threadId) {
+      await openBuyerChatRoom(threadId);
+    }
+  }
+
+  if (tabName === "recent") {
+    await loadRecentViews();
+  }
+
+  if (tabName === "followedStores") {
+    await loadFollowedStores();
+  }
+
+  if (tabName === "notifications") {
+    await loadBuyerNotifications();
+  }
+}
 
 async function loadMemberProfile() {
   if (!window.location.pathname.includes("member.html")) return;
@@ -2118,7 +2169,7 @@ async function subscribeBuyerBellRealtime() {
 if (buyerChatBell) {
   buyerChatBell.addEventListener("click", async () => {
     if (!window.location.pathname.includes("member.html")) {
-      window.location.href = "member.html";
+      window.location.href = "member.html?tab=chat";
       return;
     }
 
@@ -2361,6 +2412,87 @@ document.addEventListener("click", (e) => {
   }
 });
 
+async function startCarChat(car, message) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請先登入會員。");
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (!car.store_id) {
+    alert("這台車沒有對應車行，暫時無法聯絡。");
+    return;
+  }
+
+  let { data: thread, error: threadError } = await supabase
+    .from("chat_threads")
+    .select("*")
+    .eq("buyer_id", user.id)
+    .eq("store_id", car.store_id)
+    .eq("car_id", car.id)
+    .maybeSingle();
+
+  if (threadError) {
+    console.error("讀取聊天室失敗:", threadError);
+    alert("建立聊天室失敗");
+    return;
+  }
+
+  if (!thread) {
+    const { data: newThread, error: createError } = await supabase
+      .from("chat_threads")
+      .insert([
+        {
+          buyer_id: user.id,
+          store_id: car.store_id,
+          car_id: car.id,
+          last_message: message,
+          last_message_at: new Date().toISOString()
+        }
+      ])
+      .select()
+      .single();
+
+    if (createError) {
+      console.error("建立聊天室失敗:", createError);
+      alert("建立聊天室失敗");
+      return;
+    }
+
+    thread = newThread;
+  }
+
+  const { error: messageError } = await supabase
+    .from("chat_messages")
+    .insert([
+      {
+        thread_id: thread.id,
+        sender_id: user.id,
+        sender_role: "buyer",
+        message
+      }
+    ]);
+
+  if (messageError) {
+    console.error("送出訊息失敗:", messageError);
+    alert("送出訊息失敗");
+    return;
+  }
+
+  await supabase
+    .from("chat_threads")
+    .update({
+      last_message: message,
+      last_message_at: new Date().toISOString()
+    })
+    .eq("id", thread.id);
+
+  window.location.href = `member.html?tab=chat&thread=${thread.id}`;
+}
+
 loadFavoriteCars();
 updateBuyerChatBadge();
 subscribeBuyerBellRealtime();
+openMemberTabFromUrl();
