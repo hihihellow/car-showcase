@@ -669,6 +669,7 @@ function showAdminSection(sectionName) {
       await loadTopFavoriteCars();
       await loadTopFollowedStores();
       await loadTopChatCars();
+      await loadAdminOverviewMetrics();
     });
   }
 }
@@ -986,6 +987,9 @@ function renderAdminStats() {
   const activeSubs = adminSubscriptions.filter((sub) => sub.status === "active").length;
   const pendingSubs = adminSubscriptions.filter((sub) => sub.status === "pending_activation").length;
   const inactiveSubs = adminSubscriptions.filter((sub) => sub.status === "inactive").length;
+  const totalFavorites = 0;
+  const totalFollowers = 0;
+  const totalChats = 0;
 
   const monthlyRevenue = adminSubscriptions
     .filter((sub) => sub.status === "active")
@@ -1042,6 +1046,21 @@ function renderAdminStats() {
     <div class="admin-stat-card">
       <span>預估月收入</span>
       <strong>NT$ ${monthlyRevenue.toLocaleString()}</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>本月收藏</span>
+      <strong id="adminMonthlyFavoriteCount">讀取中</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>總追蹤數</span>
+      <strong id="adminTotalFollowCount">讀取中</strong>
+    </div>
+
+    <div class="admin-stat-card">
+      <span>本月詢問</span>
+      <strong id="adminMonthlyChatCount">讀取中</strong>
     </div>
   `;
 }
@@ -1290,6 +1309,34 @@ async function loadTopChatCars() {
   `;
 
   adminStatsGrid.appendChild(section);
+}
+
+async function loadAdminOverviewMetrics() {
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const favoriteEl = document.getElementById("adminMonthlyFavoriteCount");
+  const followEl = document.getElementById("adminTotalFollowCount");
+  const chatEl = document.getElementById("adminMonthlyChatCount");
+
+  const { count: favoriteCount } = await supabase
+    .from("favorites")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", monthStart.toISOString());
+
+  const { count: followCount } = await supabase
+    .from("store_followers")
+    .select("*", { count: "exact", head: true });
+
+  const { count: chatCount } = await supabase
+    .from("chat_threads")
+    .select("*", { count: "exact", head: true })
+    .gte("last_message_at", monthStart.toISOString());
+
+  if (favoriteEl) favoriteEl.textContent = `${favoriteCount || 0} 次`;
+  if (followEl) followEl.textContent = `${followCount || 0} 人`;
+  if (chatEl) chatEl.textContent = `${chatCount || 0} 筆`;
 }
 
 function renderAdminStoreFilter() {
