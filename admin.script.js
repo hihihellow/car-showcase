@@ -668,6 +668,7 @@ function showAdminSection(sectionName) {
       renderAdminStats();
       await loadTopFavoriteCars();
       await loadTopFollowedStores();
+      await loadTopChatCars();
     });
   }
 }
@@ -1198,6 +1199,90 @@ async function loadTopFollowedStores() {
 
             <div class="admin-top-favorite-count">
               ${store.followerCount} 追蹤
+            </div>
+          </div>
+        `).join("")
+    }
+  `;
+
+  adminStatsGrid.appendChild(section);
+}
+
+async function loadTopChatCars() {
+  if (!adminStatsGrid) return;
+
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { data: threads, error } = await supabase
+    .from("chat_threads")
+    .select(`
+      car_id,
+      last_message_at,
+      cars (
+        id,
+        title,
+        image,
+        price
+      )
+    `)
+    .gte("last_message_at", monthStart.toISOString());
+
+  if (error) {
+    console.error("讀取本月詢問車輛排行失敗:", error);
+    return;
+  }
+
+  const carMap = {};
+
+  (threads || []).forEach((thread) => {
+    const car = thread.cars;
+    if (!car) return;
+
+    if (!carMap[car.id]) {
+      carMap[car.id] = {
+        ...car,
+        chatCount: 0
+      };
+    }
+
+    carMap[car.id].chatCount += 1;
+  });
+
+  const topCars = Object.values(carMap)
+    .sort((a, b) => b.chatCount - a.chatCount)
+    .slice(0, 10);
+
+  const section = document.createElement("div");
+  section.className = "admin-top-favorite-section";
+
+  section.innerHTML = `
+    <h3>本月詢問車輛 TOP 10</h3>
+    <p class="admin-top-favorite-summary">
+      本月詢問車輛：${threads?.length || 0} 筆
+    </p>
+
+    ${
+      topCars.length === 0
+        ? `<p>目前尚無詢問資料。</p>`
+        : topCars.map((car, index) => `
+          <div class="admin-top-favorite-item">
+            <div class="admin-top-rank">${index + 1}</div>
+
+            <img 
+              src="${car.image || ""}" 
+              class="admin-top-car-img"
+              alt="${car.title || "車輛"}"
+            >
+
+            <div class="admin-top-car-info">
+              <strong>${car.title || "未命名車輛"}</strong>
+              <small>NT$ ${car.price ? Number(car.price).toLocaleString() : "未填"}</small>
+            </div>
+
+            <div class="admin-top-favorite-count">
+              ${car.chatCount} 詢問
             </div>
           </div>
         `).join("")
