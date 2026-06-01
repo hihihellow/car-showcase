@@ -664,8 +664,10 @@ function showAdminSection(sectionName) {
   }
 
   if (sectionName === "stats") {
-    loadAdminSubscriptions().then(() => {
+    loadAdminSubscriptions().then(async () => {
       renderAdminStats();
+      await loadTopFavoriteCars();
+      await loadTopFollowedStores();
     });
   }
 }
@@ -1041,6 +1043,168 @@ function renderAdminStats() {
       <strong>NT$ ${monthlyRevenue.toLocaleString()}</strong>
     </div>
   `;
+}
+
+async function loadTopFavoriteCars() {
+  if (!adminStatsGrid) return;
+
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  const { data: favorites, error } = await supabase
+    .from("favorites")
+    .select(`
+      car_id,
+      created_at,
+      cars (
+        id,
+        title,
+        brand,
+        model,
+        image,
+        price,
+        store_id
+      )
+    `)
+    .gte("created_at", monthStart.toISOString());
+
+  if (error) {
+    console.error("讀取熱門收藏排行失敗:", error);
+    return;
+  }
+
+  const carMap = {};
+
+  (favorites || []).forEach((item) => {
+    const car = item.cars;
+    if (!car) return;
+
+    if (!carMap[car.id]) {
+      carMap[car.id] = {
+        ...car,
+        favoriteCount: 0
+      };
+    }
+
+    carMap[car.id].favoriteCount += 1;
+  });
+
+  const topCars = Object.values(carMap)
+    .sort((a, b) => b.favoriteCount - a.favoriteCount)
+    .slice(0, 10);
+
+  const section = document.createElement("div");
+  section.className = "admin-top-favorite-section";
+
+  section.innerHTML = `
+    <h3>本月熱門車款收藏排行 TOP 10</h3>
+    <p class="admin-top-favorite-summary">
+      本月總收藏：${favorites?.length || 0} 次
+    </p>
+
+    ${
+      topCars.length === 0
+        ? `<p>目前尚無收藏資料。</p>`
+        : topCars.map((car, index) => `
+          <div class="admin-top-favorite-item">
+            <div class="admin-top-rank">${index + 1}</div>
+
+            <img 
+              src="${car.image || ""}" 
+              class="admin-top-car-img"
+              alt="${car.title || "車輛"}"
+            >
+
+            <div class="admin-top-car-info">
+              <strong>${car.title || "未命名車輛"}</strong>
+              <p>${car.brand || ""} ${car.model || ""}</p>
+              <small>NT$ ${car.price ? Number(car.price).toLocaleString() : "未填"}</small>
+            </div>
+
+            <div class="admin-top-favorite-count">
+              ${car.favoriteCount} 收藏
+            </div>
+          </div>
+        `).join("")
+    }
+  `;
+
+  adminStatsGrid.appendChild(section);
+}
+
+async function loadTopFollowedStores() {
+  if (!adminStatsGrid) return;
+
+  const { data: follows, error } = await supabase
+    .from("store_followers")
+    .select(`
+      store_id,
+      stores (
+        id,
+        name,
+        slug,
+        logo_url
+      )
+    `);
+
+  if (error) {
+    console.error("讀取熱門追蹤車行失敗:", error);
+    return;
+  }
+
+  const storeMap = {};
+
+  (follows || []).forEach((item) => {
+    const store = item.stores;
+    if (!store) return;
+
+    if (!storeMap[store.id]) {
+      storeMap[store.id] = {
+        ...store,
+        followerCount: 0
+      };
+    }
+
+    storeMap[store.id].followerCount += 1;
+  });
+
+  const topStores = Object.values(storeMap)
+    .sort((a, b) => b.followerCount - a.followerCount)
+    .slice(0, 10);
+
+  const section = document.createElement("div");
+  section.className = "admin-top-favorite-section";
+
+  section.innerHTML = `
+    <h3>熱門追蹤車行 TOP 10</h3>
+    ${
+      topStores.length === 0
+        ? `<p>目前尚無追蹤資料。</p>`
+        : topStores.map((store, index) => `
+          <div class="admin-top-favorite-item">
+            <div class="admin-top-rank">${index + 1}</div>
+
+            ${
+              store.logo_url
+                ? `<img src="${store.logo_url}" class="admin-top-car-img" alt="${store.name}">`
+                : `<div class="admin-top-car-img admin-top-store-empty">車行</div>`
+            }
+
+            <div class="admin-top-car-info">
+              <strong>${store.name || "未命名車行"}</strong>
+              <p>${store.slug || ""}</p>
+            </div>
+
+            <div class="admin-top-favorite-count">
+              ${store.followerCount} 追蹤
+            </div>
+          </div>
+        `).join("")
+    }
+  `;
+
+  adminStatsGrid.appendChild(section);
 }
 
 function renderAdminStoreFilter() {
