@@ -1140,87 +1140,46 @@ if (carDetail) {
 
       if (contactSellerBtn) {
         contactSellerBtn.addEventListener("click", async () => {
-          const user = await getCurrentUser();
+          const choice = prompt(
+      `請選擇想詢問的問題：
 
-          if (!user) {
-            alert("請先登入會員，才能聯絡賣家。");
-            window.location.href = "login.html";
-            return;
+      1. 車況問題
+      2. 價格可談嗎
+      3. 是否可以試車
+      4. 是否可以貸款
+      5. 自行輸入`
+          );
+
+          let message = "";
+
+          switch (choice) {
+           case "1":
+              message = "請問這台車車況如何？有沒有事故或泡水紀錄？";
+              break;
+
+            case "2":
+              message = "請問這台車價格還有空間可以談嗎？";
+              break;
+
+            case "3":
+              message = "請問這台車可以預約試車嗎？";
+              break;
+
+            case "4":
+              message = "請問這台車可以協助辦理貸款嗎？";
+              break;
+
+            case "5":
+              message = prompt("請輸入想詢問賣家的內容：", `您好，我想詢問 ${car.title}`);
+              break;
+
+            default:
+              return;
           }
-
-          if (!car.store_id) {
-            alert("這台車沒有對應車行，暫時無法聯絡。");
-            return;
-          }
-
-          const message = prompt("請輸入想詢問賣家的內容：", `您好，我想詢問 ${car.title}`);
 
           if (!message || !message.trim()) return;
 
-          let { data: thread, error: threadError } = await supabase
-            .from("chat_threads")
-            .select("*")
-            .eq("buyer_id", user.id)
-            .eq("store_id", car.store_id)
-            .eq("car_id", car.id)
-            .maybeSingle();
-
-          if (threadError) {
-            console.error("讀取聊天室失敗:", threadError);
-            alert("建立聊天室失敗");
-            return;
-          }
-
-          if (!thread) {
-            const { data: newThread, error: createError } = await supabase
-              .from("chat_threads")
-              .insert([
-                {
-                  buyer_id: user.id,
-                  store_id: car.store_id,
-                  car_id: car.id,
-                  last_message: message.trim(),
-                  last_message_at: new Date().toISOString()
-                }
-              ])
-              .select()
-              .single();
-
-            if (createError) {
-              console.error("建立聊天室失敗:", createError);
-              alert("建立聊天室失敗");
-              return;
-            }
-
-            thread = newThread;
-          }
-
-          const { error: messageError } = await supabase
-            .from("chat_messages")
-            .insert([
-              {
-                thread_id: thread.id,
-                sender_id: user.id,
-                sender_role: "buyer",
-                message: message.trim()
-              }
-            ]);
-
-          if (messageError) {
-            console.error("送出訊息失敗:", messageError);
-            alert("送出訊息失敗");
-            return;
-          }
-
-          await supabase
-            .from("chat_threads")
-            .update({
-              last_message: message.trim(),
-              last_message_at: new Date().toISOString()
-            })
-            .eq("id", thread.id);
-
-          alert("訊息已送出，賣家會在後台看到。");
+          await startCarChat(car, message.trim());
         });
       }
 
