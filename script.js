@@ -188,6 +188,88 @@ async function setupFavoriteButtons() {
   });
 }
 
+function getCompareIds() {
+  return JSON.parse(localStorage.getItem("compareCars") || "[]");
+}
+
+function saveCompareIds(ids) {
+  localStorage.setItem("compareCars", JSON.stringify(ids));
+}
+
+function setupCompareButtons() {
+  document.querySelectorAll(".compare-btn").forEach((btn) => {
+    const ids = getCompareIds();
+    btn.classList.toggle("active", ids.includes(String(btn.dataset.id)));
+    btn.textContent = ids.includes(String(btn.dataset.id)) ? "✓" : "⇄";
+
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      let compareIds = getCompareIds();
+      const id = String(btn.dataset.id);
+
+      if (compareIds.includes(id)) {
+        compareIds = compareIds.filter((item) => item !== id);
+      } else {
+        if (compareIds.length >= 3) {
+          alert("最多只能比較 3 台車。");
+          return;
+        }
+
+        compareIds.push(id);
+      }
+
+      saveCompareIds(compareIds);
+      setupCompareButtons();
+      renderCompareBar();
+    };
+  });
+}
+
+function renderCompareBar() {
+  let bar = document.getElementById("compareFloatBar");
+  const compareIds = getCompareIds();
+
+  if (compareIds.length === 0) {
+    if (bar) bar.remove();
+    return;
+  }
+
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "compareFloatBar";
+    bar.className = "compare-float-bar";
+    document.body.appendChild(bar);
+  }
+
+  bar.innerHTML = `
+    <div>
+      已加入比較：<strong>${compareIds.length}/3</strong>
+    </div>
+
+    <div class="compare-float-actions">
+      <button id="clearCompareBtn" type="button">清除</button>
+      <button id="startCompareBtn" type="button">開始比較</button>
+    </div>
+  `;
+
+  document.getElementById("clearCompareBtn").onclick = () => {
+    saveCompareIds([]);
+    renderCompareBar();
+    setupCompareButtons();
+  };
+
+  document.getElementById("startCompareBtn").onclick = () => {
+    if (compareIds.length < 2) {
+      alert("至少選 2 台車才能比較。");
+      return;
+    }
+
+    window.location.href = "compare.html";
+  };
+}
+
 async function loadCarsFromSupabase() {
   const { data, error } = await supabase
     .from("cars")
@@ -239,6 +321,7 @@ function renderCars(carArray) {
 
     card.innerHTML = `
       <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
+      <button class="compare-btn" data-id="${car.id}" type="button">⇄</button>
 
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
@@ -257,6 +340,8 @@ function renderCars(carArray) {
   });
 
   setupFavoriteButtons();
+  setupCompareButtons();
+  renderCompareBar();
   renderPagination(carArray.length);
 }
 
@@ -1623,7 +1708,6 @@ function renderRecentViewCars(carArray) {
 
     card.innerHTML = `
       <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
-
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
         ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
@@ -2453,6 +2537,100 @@ async function startCarChat(car, message) {
 
   window.location.href = `member.html?tab=chat&thread=${thread.id}`;
 }
+
+async function loadComparePage() {
+  const compareWrap = document.getElementById("compareTableWrap");
+  if (!compareWrap) return;
+
+  const compareIds = getCompareIds();
+
+  if (compareIds.length < 2) {
+    compareWrap.innerHTML = `
+      <p>請先選擇至少 2 台車進行比較。</p>
+      <a href="index.html#carSection" class="compare-back-btn">回車輛列表</a>
+    `;
+    return;
+  }
+
+  compareWrap.innerHTML = "<p>比較資料讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("cars")
+    .select(`
+      id,
+      title,
+      image,
+      price,
+      year,
+      mileage,
+      cc,
+      category,
+      region,
+      brand,
+      model,
+      stores (
+        name
+      )
+    `)
+    .in("id", compareIds);
+
+  if (error) {
+    console.error("讀取比較車輛失敗:", error);
+    compareWrap.innerHTML = "<p>讀取比較資料失敗。</p>";
+    return;
+  }
+
+  const cars = compareIds
+    .map((id) => data.find((car) => String(car.id) === String(id)))
+    .filter(Boolean);
+
+  compareWrap.innerHTML = `
+    <div class="compare-table">
+      <div class="compare-row compare-head">
+        <div class="compare-label">項目</div>
+        ${cars.map((car) => `
+          <div class="compare-car-head">
+            <img src="${car.image || ""}" alt="${car.title}">
+            <strong>${car.title}</strong>
+          </div>
+        `).join("")}
+      </div>
+
+      ${renderCompareRow("價格", cars.map(car => car.price ? `NT$ ${Number(car.price).toLocaleString()}` : "未填"))}
+      ${renderCompareRow("年份", cars.map(car => car.year ? `${car.year} 年` : "未填"))}
+      ${renderCompareRow("里程", cars.map(car => car.mileage ? `${Number(car.mileage).toLocaleString()} km` : "未填"))}
+      ${renderCompareRow("排氣量", cars.map(car => car.cc ? `${car.cc} cc` : "未填"))}
+      ${renderCompareRow("車型分類", cars.map(car => car.category || "未填"))}
+      ${renderCompareRow("地區", cars.map(car => car.region || "未填"))}
+      ${renderCompareRow("車行", cars.map(car => car.stores?.name || "未填"))}
+    </div>
+
+    <div class="compare-page-actions">
+      <a href="index.html#carSection">繼續看車</a>
+      <button id="clearCompareOnPageBtn" type="button">清除比較</button>
+    </div>
+  `;
+
+  const clearBtn = document.getElementById("clearCompareOnPageBtn");
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      saveCompareIds([]);
+      window.location.href = "index.html#carSection";
+    };
+  }
+}
+
+function renderCompareRow(label, values) {
+  return `
+    <div class="compare-row">
+      <div class="compare-label">${label}</div>
+      ${values.map(value => `<div class="compare-value">${value}</div>`).join("")}
+    </div>
+  `;
+}
+
+loadComparePage();
+renderCompareBar();
 
 loadFavoriteCars();
 updateBuyerChatBadge();
