@@ -1996,15 +1996,7 @@ if (carDetail) {
 
           <div class="detail-action-row">
             <button id="detailFavoriteBtn" class="favorite-btn detail-favorite" type="button" data-id="${car.id}">🤍 收藏</button>
-            <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
           </div>
-
-          <div class="contact-info" id="contactInfo">
-            <p>📞 0912-345-678</p>
-            <p>LINE：car_seller</p>
-            <p>✉️ seller@example.com</p>
-          </div>
-
         </div>
       </div>
       ${equipmentList.length > 0 ? `
@@ -2057,9 +2049,6 @@ if (carDetail) {
         });
       });
 
-      const contactSellerBtn = document.getElementById("contactSellerBtn");
-      const contactInfo = document.getElementById("contactInfo");
-
       const detailFavoriteBtn = document.getElementById("detailFavoriteBtn");
 
       if (detailFavoriteBtn) {
@@ -2069,13 +2058,6 @@ if (carDetail) {
 
         detailFavoriteBtn.addEventListener("click", () => {
           toggleFavorite(car.id, detailFavoriteBtn);
-        });
-      }
-
-      if (contactSellerBtn && contactInfo) {
-        contactSellerBtn.addEventListener("click", () => {
-          contactInfo.style.display =
-            contactInfo.style.display === "block" ? "none" : "block";
         });
       }
 

@@ -1064,11 +1064,20 @@ if (carDetail) {
             <button id="appointmentBtn" class="contact-btn">預約看車</button>
           </div>
 
-          <div class="contact-info" id="contactInfo">
-            <p>📞 0912-345-678</p>
-            <p>LINE：car_seller</p>
-            <p>✉️ seller@example.com</p>
+         <div class="contact-menu hidden" id="contactQuestionMenu">
+          <div class="contact-menu-card">
+            <div class="contact-menu-head">
+              <h3>想詢問賣家什麼？</h3>
+              <button id="closeContactMenu" type="button">×</button>
+            </div>
+
+            <button class="quick-question-btn" data-message="請問這台車車況如何？有沒有事故或泡水紀錄？">車況問題</button>
+            <button class="quick-question-btn" data-message="請問這台車價格還有空間可以談嗎？">價格可談嗎</button>
+            <button class="quick-question-btn" data-message="請問這台車可以預約試車嗎？">是否可以試車</button>
+            <button class="quick-question-btn" data-message="請問這台車可以協助辦理貸款嗎？">是否可以貸款</button>
+            <button class="quick-question-btn custom-question" data-custom="true">輸入訊息</button>
           </div>
+        </div>
 
         </div>
       </div>
@@ -1123,7 +1132,9 @@ if (carDetail) {
       });
 
       const contactSellerBtn = document.getElementById("contactSellerBtn");
-      const contactInfo = document.getElementById("contactInfo");
+      const contactQuestionMenu = document.getElementById("contactQuestionMenu");
+      const closeContactMenu = document.getElementById("closeContactMenu");
+      const quickQuestionBtns = document.querySelectorAll(".quick-question-btn");
       const appointmentBtn = document.getElementById("appointmentBtn");
 
       const detailFavoriteBtn = document.getElementById("detailFavoriteBtn");
@@ -1138,50 +1149,32 @@ if (carDetail) {
         });
       }
 
-      if (contactSellerBtn) {
-        contactSellerBtn.addEventListener("click", async () => {
-          const choice = prompt(
-      `請選擇想詢問的問題：
+      if (contactSellerBtn && contactQuestionMenu) {
+        contactSellerBtn.addEventListener("click", () => {
+          contactQuestionMenu.classList.remove("hidden");
+        });
+      }
 
-      1. 車況問題
-      2. 價格可談嗎
-      3. 是否可以試車
-      4. 是否可以貸款
-      5. 自行輸入`
-          );
+      if (closeContactMenu && contactQuestionMenu) {
+        closeContactMenu.addEventListener("click", () => {
+          contactQuestionMenu.classList.add("hidden");
+        });
+      }
 
-          let message = "";
+      quickQuestionBtns.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          let message = btn.dataset.message || "";
 
-          switch (choice) {
-           case "1":
-              message = "請問這台車車況如何？有沒有事故或泡水紀錄？";
-              break;
-
-            case "2":
-              message = "請問這台車價格還有空間可以談嗎？";
-              break;
-
-            case "3":
-              message = "請問這台車可以預約試車嗎？";
-              break;
-
-            case "4":
-              message = "請問這台車可以協助辦理貸款嗎？";
-              break;
-
-            case "5":
-              message = prompt("請輸入想詢問賣家的內容：", `您好，我想詢問 ${car.title}`);
-              break;
-
-            default:
-              return;
+          if (btn.dataset.custom === "true") {
+            message = prompt("請輸入想詢問賣家的內容：", `您好，我想詢問 ${car.title}`);
           }
 
           if (!message || !message.trim()) return;
 
+          contactQuestionMenu.classList.add("hidden");
           await startCarChat(car, message.trim());
         });
-      }
+      });
 
       if (appointmentBtn) {
         appointmentBtn.addEventListener("click", async () => {
@@ -1818,11 +1811,19 @@ function renderBuyerChats(threads) {
     card.className = "buyer-chat-card";
 
     card.innerHTML = `
-      <div>
-        <strong>${thread.cars?.title || "未知車輛"}</strong>
-        <p>車行：${thread.stores?.name || "未知車行"}</p>
-        <p>${thread.last_message || "尚無訊息"}</p>
-        <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+      <div class="chat-list-item">
+        ${
+          thread.cars?.image
+            ? `<img src="${thread.cars.image}" class="chat-list-img" />`
+            : `<div class="chat-list-img empty">車</div>`
+        }
+
+        <div class="chat-list-info">
+          <strong>${thread.cars?.title || "未知車輛"}</strong>
+          <p>車行：${thread.stores?.name || "未知車行"}</p>
+          <p>${thread.last_message || "尚無訊息"}</p>
+          <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+        </div>
       </div>
 
       <button class="buyer-open-chat-btn" data-thread-id="${thread.id}">

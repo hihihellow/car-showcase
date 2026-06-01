@@ -4385,48 +4385,10 @@ body:has(.store-page) {
   background: rgba(244,196,48,0.1);
 }
 
-.chat-room-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 18px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.chat-room-header strong {
-  display: block;
-  font-size: 18px;
-}
-
-.chat-room-header p {
-  margin: 4px 0 0;
-  color: rgba(255,255,255,0.65);
-}
-
-.chat-room-car-image {
-  width: 74px;
-  height: 74px;
-  object-fit: cover;
-  border-radius: 16px;
-}
-
 .chat-empty-text {
   color: rgba(255,255,255,0.55);
   text-align: center;
   margin-top: 180px;
-}
-
-.buyer-chat-room .chat-room-header {
-  border-bottom-color: rgba(0,0,0,0.08);
-}
-
-.buyer-chat-room .chat-room-header strong {
-  color: #111;
-}
-
-.buyer-chat-room .chat-room-header p {
-  color: #666;
 }
 
 .buyer-chat-room .chat-empty-text {
@@ -4641,4 +4603,104 @@ body:has(.store-page) {
   font-size: 17px;
   font-weight: 900;
   color: #e74c3c;
+}
+
+.contact-menu {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.contact-menu.hidden {
+  display: none;
+}
+
+.contact-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.contact-menu-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.contact-menu-head h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#closeContactMenu {
+  border: none;
+  background: #f2f2f2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.quick-question-btn {
+  width: 100%;
+  border: 1px solid #eee;
+  background: #fafafa;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quick-question-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-list-img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f2f2f2;
+  flex-shrink: 0;
+}
+
+.chat-list-img.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-weight: 800;
+}
+
+.chat-list-info strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.chat-list-info p {
+  margin: 2px 0;
+  color: #666;
+}
+
+.chat-list-info small {
+  color: #999;
 }

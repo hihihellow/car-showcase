@@ -1147,10 +1147,18 @@ function renderSellerChats(threads) {
     card.className = "seller-chat-card";
 
     card.innerHTML = `
-      <div>
-        <strong>${thread.cars?.title || "未知車輛"}</strong>
-        <p>${thread.last_message || "尚無訊息"}</p>
-        <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+      <div class="chat-list-item">
+        ${
+          thread.cars?.image
+            ? `<img src="${thread.cars.image}" class="chat-list-img" />`
+            : `<div class="chat-list-img empty">車</div>`
+        }
+
+        <div class="chat-list-info">
+          <strong>${thread.cars?.title || "未知車輛"}</strong>
+          <p>${thread.last_message || "尚無訊息"}</p>
+          <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
+        </div>
       </div>
 
       <button class="open-chat-btn" data-thread-id="${thread.id}">
