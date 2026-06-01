@@ -1200,16 +1200,18 @@ async function openSellerChatRoom(threadId) {
   );
 
   sellerChatRoom.innerHTML = `
-    <div class="chat-room-header">
+    <div class="chat-product-card">
       ${
         thread?.cars?.image
-          ? `<img src="${thread.cars.image}" class="chat-room-car-image" />`
-          : ""
+          ? `<img src="${thread.cars.image}" class="chat-product-img" />`
+          : `<div class="chat-product-img empty">車</div>`
       }
 
-      <div>
-        <strong>${thread?.cars?.title || "未知車輛"}</strong>
-        <p>${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : ""}</p>
+      <div class="chat-product-info">
+        <div class="chat-product-title">${thread?.cars?.title || "未知車輛"}</div>
+        <div class="chat-product-price">
+          ${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : "價格未填"}
+        </div>
       </div>
     </div>
 

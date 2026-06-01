@@ -4595,3 +4595,50 @@ body:has(.store-page) {
   font-weight: 700;
   text-decoration: none;
 }
+
+.chat-product-card {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+}
+
+.chat-product-img {
+  width: 86px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #f3f3f3;
+  flex-shrink: 0;
+}
+
+.chat-product-img.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-weight: 800;
+}
+
+.chat-product-title {
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.chat-product-store {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.chat-product-price {
+  font-size: 17px;
+  font-weight: 900;
+  color: #e74c3c;
+}
