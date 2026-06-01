@@ -981,15 +981,9 @@ function renderAdminStats() {
   const totalCars = adminCars.length;
   const pendingCars = adminCars.filter((car) => car.status === "pending_review").length;
   const activeCars = adminCars.filter((car) => car.status === "active").length;
-  const rejectedCars = adminCars.filter((car) => car.status === "rejected").length;
-  const inactiveCars = adminCars.filter((car) => car.status === "inactive").length;
   const totalStores = adminStores.length;
   const activeSubs = adminSubscriptions.filter((sub) => sub.status === "active").length;
-  const pendingSubs = adminSubscriptions.filter((sub) => sub.status === "pending_activation").length;
   const inactiveSubs = adminSubscriptions.filter((sub) => sub.status === "inactive").length;
-  const totalFavorites = 0;
-  const totalFollowers = 0;
-  const totalChats = 0;
 
   const monthlyRevenue = adminSubscriptions
     .filter((sub) => sub.status === "active")
@@ -1014,16 +1008,6 @@ function renderAdminStats() {
     </div>
 
     <div class="admin-stat-card">
-      <span>審核未通過</span>
-      <strong>${rejectedCars}</strong>
-    </div>
-
-    <div class="admin-stat-card">
-      <span>已下架</span>
-      <strong>${inactiveCars}</strong>
-    </div>
-
-    <div class="admin-stat-card">
       <span>車行數量</span>
       <strong>${totalStores}</strong>
     </div>
@@ -1034,35 +1018,33 @@ function renderAdminStats() {
     </div>
 
     <div class="admin-stat-card">
-      <span>等待啟用方案</span>
-      <strong>${pendingSubs}</strong>
-    </div>
-
-    <div class="admin-stat-card">
       <span>已停用方案</span>
       <strong>${inactiveSubs}</strong>
     </div>
 
-    <div class="admin-stat-card">
+    <div class="admin-stat-card highlight">
       <span>預估月收入</span>
       <strong>NT$ ${monthlyRevenue.toLocaleString()}</strong>
     </div>
 
-    <div class="admin-stat-card">
+    <div class="admin-stat-card highlight">
       <span>本月收藏</span>
       <strong id="adminMonthlyFavoriteCount">讀取中</strong>
     </div>
 
-    <div class="admin-stat-card">
+    <div class="admin-stat-card highlight">
       <span>總追蹤數</span>
       <strong id="adminTotalFollowCount">讀取中</strong>
     </div>
 
-    <div class="admin-stat-card">
+    <div class="admin-stat-card highlight">
       <span>本月詢問</span>
       <strong id="adminMonthlyChatCount">讀取中</strong>
     </div>
   `;
+
+  const rankingGrid = document.getElementById("adminRankingGrid");
+  if (rankingGrid) rankingGrid.innerHTML = "";
 }
 
 async function loadTopFavoriteCars() {
@@ -1150,7 +1132,8 @@ async function loadTopFavoriteCars() {
     }
   `;
 
-  adminStatsGrid.appendChild(section);
+  const rankingGrid = document.getElementById("adminRankingGrid");
+  if (rankingGrid) rankingGrid.appendChild(section);
 }
 
 async function loadTopFollowedStores() {
@@ -1224,7 +1207,8 @@ async function loadTopFollowedStores() {
     }
   `;
 
-  adminStatsGrid.appendChild(section);
+  const rankingGrid = document.getElementById("adminRankingGrid");
+  if (rankingGrid) rankingGrid.appendChild(section);
 }
 
 async function loadTopChatCars() {
@@ -1308,7 +1292,8 @@ async function loadTopChatCars() {
     }
   `;
 
-  adminStatsGrid.appendChild(section);
+  const rankingGrid = document.getElementById("adminRankingGrid");
+  if (rankingGrid) rankingGrid.appendChild(section);
 }
 
 async function loadAdminOverviewMetrics() {

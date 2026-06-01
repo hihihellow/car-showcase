@@ -4119,9 +4119,32 @@ body:has(.store-page) {
 
 .admin-stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
   margin-top: 20px;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.admin-stat-card.highlight {
+  border: 1px solid rgba(244,196,48,0.55);
+  background: linear-gradient(135deg, #fff, #fff8d8);
+}
+
+.admin-ranking-title {
+  margin: 38px 0 18px;
+  color: white;
+}
+
+.admin-ranking-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
 }
 
 .admin-stat-card {
@@ -4706,7 +4729,6 @@ body:has(.store-page) {
 }
 
 .admin-top-favorite-section {
-  grid-column: 1 / -1;
   background: #fff;
   border-radius: 18px;
   padding: 20px;
@@ -4778,4 +4800,20 @@ body:has(.store-page) {
   color: #999;
   font-size: 13px;
   font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-ranking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
