@@ -4902,7 +4902,7 @@ body:has(.store-page) {
 
 .compare-row {
   display: grid;
-  grid-template-columns: 150px repeat(3, minmax(0, 1fr));
+  grid-template-columns: 150px repeat(var(--compare-count, 3), minmax(0, 1fr));
   border-bottom: 1px solid #eee;
 }
 
@@ -4963,7 +4963,7 @@ body:has(.store-page) {
 
 @media (max-width: 768px) {
   .compare-row {
-    grid-template-columns: 110px repeat(3, 180px);
+    grid-template-columns: 110px repeat(var(--compare-count, 3), 180px);
   }
 
   .compare-table {

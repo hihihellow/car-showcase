@@ -1669,6 +1669,7 @@ async function loadFavoriteCars() {
 
     card.innerHTML = `
       <button class="favorite-btn active" data-id="${car.id}" type="button">❤️</button>
+      <button class="compare-btn" data-id="${car.id}" type="button">⇄</button>
 
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
@@ -1695,6 +1696,9 @@ async function loadFavoriteCars() {
       toggleFavorite(btn.dataset.id, btn);
     });
   });
+
+  setupCompareButtons();
+  renderCompareBar();
 }
 
 function renderRecentViewCars(carArray) {
@@ -1708,6 +1712,7 @@ function renderRecentViewCars(carArray) {
 
     card.innerHTML = `
       <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
+      <button class="compare-btn" data-id="${car.id}" type="button">⇄</button>
       <a href="detail.html?id=${car.id}" class="car-link">
         <img src="${car.image}" alt="${car.title}">
         ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
@@ -1731,6 +1736,9 @@ function renderRecentViewCars(carArray) {
       toggleFavorite(btn.dataset.id, btn);
     });
   });
+
+  setupCompareButtons();
+  renderCompareBar();
 }
 
 async function loadRecentViews() {
@@ -2585,7 +2593,7 @@ async function loadComparePage() {
     .filter(Boolean);
 
   compareWrap.innerHTML = `
-    <div class="compare-table">
+    <div class="compare-table" style="--compare-count:${cars.length}">
       <div class="compare-row compare-head">
         <div class="compare-label">項目</div>
         ${cars.map((car) => `
