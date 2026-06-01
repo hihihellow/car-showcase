@@ -1407,6 +1407,7 @@ const tabContents = {
   profile: document.getElementById("profileTab"),
   favorites: document.getElementById("favoritesTab"),
   recent: document.getElementById("recentTab"),
+  followedStores: document.getElementById("followedStoresTab"),
   chat: document.getElementById("chatTab"),
   notifications: document.getElementById("notificationsTab")
 };
@@ -1417,6 +1418,7 @@ const buyerChatBellBadge = document.getElementById("buyerChatBellBadge");
 const buyerBellDropdown = document.getElementById("buyerBellDropdown");
 const buyerNotificationList = document.getElementById("buyerNotificationList");
 const recentViewList = document.getElementById("recentViewList");
+const followedStoreList = document.getElementById("followedStoreList");
 const buyerChatRoom = document.getElementById("buyerChatRoom");
 let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
@@ -1441,6 +1443,10 @@ tabs.forEach(tab => {
 
     if (tab.dataset.tab === "notifications") {
       loadBuyerNotifications();
+    }
+
+    if (tab.dataset.tab === "followedStores") {
+      loadFollowedStores();
     }
   });
 });
@@ -1678,6 +1684,74 @@ async function loadRecentViews() {
   }
 
   renderRecentViewCars(recentCars);
+}
+
+async function loadFollowedStores() {
+  if (!followedStoreList) return;
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    followedStoreList.innerHTML = "<p>請先登入會員。</p>";
+    return;
+  }
+
+  followedStoreList.innerHTML = "<p>追蹤車行讀取中...</p>";
+
+  const { data, error } = await supabase
+    .from("store_followers")
+    .select(`
+      id,
+      created_at,
+      stores (
+        id,
+        name,
+        slug,
+        description,
+        logo_url
+      )
+    `)
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("讀取追蹤車行失敗:", error);
+    followedStoreList.innerHTML = "<p>讀取追蹤車行失敗。</p>";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    followedStoreList.innerHTML = "<p>目前尚未追蹤任何車行。</p>";
+    return;
+  }
+
+  followedStoreList.innerHTML = "";
+
+  data.forEach((item) => {
+    const store = item.stores;
+    if (!store) return;
+
+    const card = document.createElement("div");
+    card.className = "followed-store-card";
+
+    card.innerHTML = `
+      <div class="followed-store-logo">
+        ${
+          store.logo_url
+            ? `<img src="${store.logo_url}" alt="${store.name}">`
+            : `<span>${store.name?.slice(0, 1) || "車"}</span>`
+        }
+      </div>
+
+      <div class="followed-store-info">
+        <h3>${store.name}</h3>
+        <p>${store.description || "尚未填寫車行介紹"}</p>
+        <a href="store.html?store=${store.slug}">查看車行</a>
+      </div>
+    `;
+
+    followedStoreList.appendChild(card);
+  });
 }
 
 async function loadBuyerChats() {
