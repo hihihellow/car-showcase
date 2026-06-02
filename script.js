@@ -1145,6 +1145,7 @@ if (carDetail) {
 
           <div class="detail-action-row">
             <button id="detailFavoriteBtn" class="favorite-btn detail-favorite" type="button" data-id="${car.id}">🤍 收藏</button>
+            <button id="detailCompareBtn" class="contact-btn detail-compare-btn" type="button" data-id="${car.id}">加入比較</button>
             <button id="contactSellerBtn" class="contact-btn">聯絡賣家</button>
             <button id="appointmentBtn" class="contact-btn">預約看車</button>
           </div>
@@ -1223,6 +1224,7 @@ if (carDetail) {
       const appointmentBtn = document.getElementById("appointmentBtn");
 
       const detailFavoriteBtn = document.getElementById("detailFavoriteBtn");
+      const detailCompareBtn = document.getElementById("detailCompareBtn");
 
       if (detailFavoriteBtn) {
         const favoriteIds = await getFavoriteCarIds();
@@ -1231,6 +1233,37 @@ if (carDetail) {
 
         detailFavoriteBtn.addEventListener("click", () => {
           toggleFavorite(car.id, detailFavoriteBtn);
+        });
+      }
+
+      if (detailCompareBtn) {
+        const updateDetailCompareBtn = () => {
+          const ids = getCompareIds();
+          const isActive = ids.includes(String(car.id));
+          detailCompareBtn.textContent = isActive ? "已加入比較" : "加入比較";
+          detailCompareBtn.classList.toggle("active", isActive);
+        };
+
+        updateDetailCompareBtn();
+
+        detailCompareBtn.addEventListener("click", () => {
+          let ids = getCompareIds();
+          const id = String(car.id);
+
+          if (ids.includes(id)) {
+            ids = ids.filter((item) => item !== id);
+          } else {
+            if (ids.length >= 3) {
+              alert("最多只能比較 3 台車。");
+              return;
+            }
+
+            ids.push(id);
+          }
+
+          saveCompareIds(ids);
+          updateDetailCompareBtn();
+          renderCompareBar();
         });
       }
 

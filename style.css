@@ -4979,3 +4979,9 @@ body:has(.store-page) {
 .admin-top-favorite-section strong {
   color: #111;
 }
+
+.detail-compare-btn.active {
+  background: #111;
+  color: #f4c430;
+  border-color: #111;
+}

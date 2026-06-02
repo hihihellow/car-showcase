@@ -195,13 +195,17 @@ async function loadStoreFollowerStatus() {
   const countEl = document.getElementById("storeFollowerCount");
   const followBtn = document.getElementById("followStoreBtn");
 
-  const { count } = await supabase
-    .from("store_followers")
-    .select("*", { count: "exact", head: true })
-    .eq("store_id", currentStore.id);
+  const { data: followerCount, error: countError } = await supabase
+    .rpc("get_store_follower_count", {
+      target_store_id: currentStore.id
+    });
+
+  if (countError) {
+    console.error("讀取追蹤數失敗:", countError);
+  }
 
   if (countEl) {
-    countEl.textContent = `${count || 0} 人追蹤`;
+    countEl.textContent = `${followerCount || 0} 人追蹤`;
   }
 
   if (!currentUser || !followBtn) return;
