@@ -438,6 +438,7 @@ const sellerChatList = document.getElementById("sellerChatList");
 const sellerChatRoom = document.getElementById("sellerChatRoom");
 let currentSellerChatThreadId = null;
 let adminSellerThreads = [];
+let currentSellerChatThread = null;
 let sellerChatChannel = null;
 let sellerBellChannel = null;
 
@@ -1136,43 +1137,50 @@ function renderSellerChats(threads) {
   if (!sellerChatList) return;
 
   if (!threads.length) {
-    sellerChatList.innerHTML = "<p>目前沒有聊天訊息。</p>";
+    sellerChatList.innerHTML = "<p class='chat-empty-list'>目前沒有聊天訊息。</p>";
     return;
   }
 
   sellerChatList.innerHTML = "";
 
   threads.forEach((thread) => {
-    const card = document.createElement("div");
+    const card = document.createElement("button");
+    card.type = "button";
     card.className = "seller-chat-card";
+    card.dataset.threadId = thread.id;
+
+    const avatar = thread.cars?.image
+      ? `<img src="${thread.cars.image}" class="chat-avatar" />`
+      : `<div class="chat-avatar empty">車</div>`;
 
     card.innerHTML = `
-      <div class="chat-list-item">
-        ${
-          thread.cars?.image
-            ? `<img src="${thread.cars.image}" class="chat-list-img" />`
-            : `<div class="chat-list-img empty">車</div>`
-        }
-
-        <div class="chat-list-info">
-          <strong>${thread.cars?.title || "未知車輛"}</strong>
-          <p>${thread.last_message || "尚無訊息"}</p>
-          <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
-        </div>
+      <div class="chat-avatar-wrap">
+        ${avatar}
       </div>
 
-      <button class="open-chat-btn" data-thread-id="${thread.id}">
-        開啟
-      </button>
+      <div class="chat-row-main">
+        <div class="chat-row-head">
+          <strong>${thread.cars?.title || "未知車輛"}</strong>
+          <span>${thread.last_message_at ? new Date(thread.last_message_at).toLocaleTimeString("zh-TW", {
+            hour: "2-digit",
+            minute: "2-digit"
+          }) : ""}</span>
+        </div>
+
+        <p>${thread.last_message || "尚無訊息"}</p>
+      </div>
     `;
 
-    sellerChatList.appendChild(card);
-  });
+    card.addEventListener("click", async () => {
+      document.querySelectorAll(".seller-chat-card").forEach((item) => {
+        item.classList.remove("active");
+      });
 
-  document.querySelectorAll(".open-chat-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await openSellerChatRoom(btn.dataset.threadId);
+      card.classList.add("active");
+      await openSellerChatRoom(thread.id);
     });
+
+    sellerChatList.appendChild(card);
   });
 }
 
@@ -1207,8 +1215,35 @@ async function openSellerChatRoom(threadId) {
     (t) => Number(t.id) === Number(threadId)
   );
 
+  currentSellerChatThread = thread;
+
   sellerChatRoom.innerHTML = `
-    <div class="chat-product-card">
+    <div class="chat-room-header">
+      <div class="chat-room-user">
+        ${
+          thread?.cars?.image
+            ? `<img src="${thread.cars.image}" class="chat-room-avatar" />`
+            : `<div class="chat-room-avatar empty">車</div>`
+        }
+
+        <div>
+          <strong>${thread?.cars?.title || "未知車輛"}</strong>
+          <span>買家詢問中</span>
+        </div>
+      </div>
+
+     <button id="chatMoreBtn" class="chat-more-btn" type="button">☰</button>
+  
+      <div id="chatMoreMenu" class="chat-more-menu hidden">
+        <button type="button">👤 對方資訊</button>
+        <button type="button">📅 查詢預約</button>
+        <button type="button">🚗 查看車輛</button>
+        <button type="button" class="danger">🚫 封鎖此用戶</button>
+        <button type="button" class="danger">🗑 刪除聊天紀錄</button>
+      </div>
+    </div>
+
+    <div class="chat-product-card messenger-product">
       ${
         thread?.cars?.image
           ? `<img src="${thread.cars.image}" class="chat-product-img" />`
@@ -1224,16 +1259,21 @@ async function openSellerChatRoom(threadId) {
     </div>
 
     <div id="sellerChatMessages" class="chat-message-list"></div>
-  
+
     <div class="chat-input-row">
-      <input id="sellerChatInput" placeholder="輸入回覆內容..." />
-      <button id="sellerChatSendBtn" type="button">送出</button>
+      <button type="button" class="chat-plus-btn">＋</button>
+      <input id="sellerChatInput" placeholder="輸入訊息..." />
+      <button id="sellerChatSendBtn" type="button">➤</button>
     </div>
   `;
 
   renderSellerChatMessages(data || []);
 
   document.getElementById("sellerChatSendBtn").addEventListener("click", sendSellerChatMessage);
+
+  document.getElementById("chatMoreBtn")?.addEventListener("click", () => {
+    document.getElementById("chatMoreMenu")?.classList.toggle("hidden");
+  });
 
   document.getElementById("sellerChatInput").addEventListener("keydown", async (e) => {
     if (e.key === "Enter") {
