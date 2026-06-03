@@ -1,0 +1,842 @@
+.admin-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+
+.admin-status-tab {
+  border: 1px solid rgba(244,196,48,0.28);
+  background: rgba(0,0,0,0.06);
+  color: #222;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.admin-status-tab.active {
+  background: #111;
+  color: #f4c430;
+  border-color: #f4c430;
+}
+
+.car-review-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  color: #ff8b8b;
+  font-weight: 800;
+}
+
+.admin-store-filter {
+  width: 100%;
+  max-width: 280px;
+  padding: 12px 14px;
+  margin: 0 0 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
+
+.view-store-btn {
+  margin-left: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  background: #111;
+  color: white;
+  padding: 24px;
+}
+
+.admin-sidebar h2 {
+  margin: 0 0 24px;
+  color: #f4c430;
+}
+
+.admin-section-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.25);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-section-btn.active {
+  background: #f4c430;
+  color: #111;
+}
+
+.admin-main {
+  padding: 24px;
+}
+
+.admin-section.hidden {
+  display: none;
+}
+
+.subscription-log-item {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.subscription-log-item strong {
+  font-size: 18px;
+}
+
+.subscription-log-item p {
+  margin: 8px 0;
+}
+
+.subscription-log-item small {
+  color: #777;
+}
+
+.admin-log-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 22px;
+}
+
+.admin-log-tools select,
+.admin-log-tools button {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
+
+.admin-log-tools button {
+  background: #111;
+  color: #f4c430;
+  cursor: pointer;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.admin-stat-card.highlight {
+  border: 1px solid rgba(244,196,48,0.55);
+  background: linear-gradient(135deg, #fff, #fff8d8);
+}
+
+.admin-ranking-title {
+  margin: 38px 0 18px;
+  color: white;
+}
+
+.admin-ranking-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.admin-stat-card span {
+  display: block;
+  color: #777;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.admin-stat-card strong {
+  font-size: 36px;
+  color: #111;
+}
+
+@media (max-width: 900px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.notification-list {
+  display: grid;
+  gap: 14px;
+}
+
+.notification-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.notification-card.unread {
+  border-color: rgba(244,196,48,0.55);
+  background: rgba(244,196,48,0.08);
+}
+
+.notification-card strong {
+  display: block;
+  color: #f4c430;
+  margin-bottom: 8px;
+}
+
+.notification-card p {
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.82);
+}
+
+.notification-card small {
+  color: rgba(255,255,255,0.55);
+}
+
+.seller-chat-list {
+  display: grid;
+  gap: 14px;
+}
+
+.seller-chat-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.seller-chat-card strong {
+  color: #f4c430;
+}
+
+.seller-chat-card p {
+  color: rgba(255,255,255,0.82);
+  margin: 8px 0;
+}
+
+.seller-chat-card small {
+  color: rgba(255,255,255,0.55);
+}
+
+.reply-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.buyer-chat-list {
+  display: grid;
+  gap: 14px;
+}
+
+.buyer-chat-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.buyer-chat-card strong {
+  color: #111;
+}
+
+.buyer-chat-card p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.buyer-chat-card small {
+  color: #888;
+}
+
+.buyer-reply-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.55);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.chat-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #f4c430;
+  color: #111;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.seller-chat-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+}
+
+.seller-chat-room {
+  min-height: 520px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.chat-message-list {
+  height: 440px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-bubble {
+  max-width: 72%;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.chat-bubble.me {
+  align-self: flex-end;
+  background: rgba(244,196,48,0.18);
+  border: 1px solid rgba(244,196,48,0.35);
+}
+
+.chat-bubble.other {
+  align-self: flex-start;
+}
+
+.chat-bubble p {
+  margin: 0 0 6px;
+}
+
+.chat-bubble small {
+  color: rgba(255,255,255,0.55);
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.chat-input-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: none;
+}
+
+.chat-input-row button {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: #f4c430;
+  color: #111;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.buyer-chat-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 18px;
+}
+
+.buyer-chat-room {
+  min-height: 520px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.buyer-open-chat-btn {
+  align-self: center;
+  border: 1px solid rgba(244,196,48,0.55);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .buyer-chat-layout,
+  .seller-chat-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.seller-chat-card.active,
+.buyer-chat-card.active {
+  border-color: rgba(244,196,48,0.75);
+  background: rgba(244,196,48,0.1);
+}
+
+.chat-empty-text {
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+  margin-top: 180px;
+}
+
+.buyer-chat-room .chat-empty-text {
+  color: #777;
+}
+
+.seller-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-bell-btn {
+  position: relative;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.chat-bell-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ff4d4d;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-bell-wrap {
+  position: relative;
+}
+
+.chat-bell-dropdown {
+  position: absolute;
+  right: 0;
+  top: 52px;
+  width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: #111;
+  border: 1px solid rgba(244,196,48,0.35);
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.35);
+  padding: 10px;
+  z-index: 999;
+}
+
+.bell-message-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  color: white;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.bell-message-item strong {
+  display: block;
+  color: #f4c430;
+  margin-bottom: 4px;
+}
+
+.bell-message-item span {
+  display: block;
+  color: rgba(255,255,255,0.82);
+  font-size: 13px;
+}
+
+.bell-message-item small,
+.bell-empty {
+  color: rgba(255,255,255,0.55);
+  font-size: 12px;
+}
+
+.mark-notification-read-btn {
+  margin-top: 10px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: transparent;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.mark-buyer-notification-read-btn {
+  margin-top: 10px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: transparent;
+  color: #f4c430;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.store-follower-count {
+  font-size: 14px;
+  color: #666;
+  margin: 0 8px;
+}
+
+#followStoreBtn.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.followed-store-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.followed-store-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  font-weight: 900;
+}
+
+.followed-store-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.followed-store-info h3 {
+  margin: 0 0 6px;
+}
+
+.followed-store-info p {
+  margin: 0 0 8px;
+  color: #666;
+}
+
+.followed-store-info a {
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.chat-product-card {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px;
+  margin-bottom: 14px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border: 1px solid #eee;
+}
+
+.chat-product-img {
+  width: 86px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #f3f3f3;
+  flex-shrink: 0;
+}
+
+.chat-product-img.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-weight: 800;
+}
+
+.chat-product-title {
+  font-size: 16px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.chat-product-store {
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.chat-product-price {
+  font-size: 17px;
+  font-weight: 900;
+  color: #e74c3c;
+}
+
+.contact-menu {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.contact-menu.hidden {
+  display: none;
+}
+
+.contact-menu-card {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+
+.contact-menu-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.contact-menu-head h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#closeContactMenu {
+  border: none;
+  background: #f2f2f2;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.quick-question-btn {
+  width: 100%;
+  border: 1px solid #eee;
+  background: #fafafa;
+  padding: 14px 16px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.quick-question-btn:hover {
+  background: #111;
+  color: #fff;
+}
+
+.chat-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-list-img {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f2f2f2;
+  flex-shrink: 0;
+}
+
+.chat-list-img.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-weight: 800;
+}
+
+.chat-list-info strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.chat-list-info p {
+  margin: 2px 0;
+  color: #666;
+}
+
+.chat-list-info small {
+  color: #999;
+}
+
+.admin-top-favorite-section {
+  background: #fff;
+  color: #111;
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+
+.admin-top-favorite-section h3 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  color: #111;
+  font-weight: 900;
+}
+
+.admin-top-favorite-item {
+  display: grid;
+  grid-template-columns: 42px 90px 1fr 100px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.admin-top-favorite-item:last-child {
+  border-bottom: none;
+}
+
+.admin-top-rank {
+  font-size: 20px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.admin-top-car-img {
+  width: 90px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: #f2f2f2;
+}
+
+.admin-top-car-info strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.admin-top-car-info p {
+  margin: 0 0 4px;
+  color: #666;
+}
+
+.admin-top-car-info small {
+  color: #999;
+}
+
+.admin-top-favorite-count {
+  font-weight: 900;
+  color: #e74c3c;
+  text-align: right;
+}
+
+.admin-top-favorite-summary {
+  margin: -6px 0 16px;
+  color: #666;
+  font-weight: 700;
+}
+
+.admin-top-store-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-ranking-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
