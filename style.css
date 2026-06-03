@@ -5353,14 +5353,6 @@ body:has(.store-page) {
   margin-bottom: 10px;
 }
 
-.chat-product-card.in-message {
-  margin: 0;
-  background: rgba(255,255,255,0.95);
-  border-radius: 18px;
-  padding: 12px;
-  box-shadow: none;
-}
-
 .chat-room-header {
   background: rgba(255,255,255,0.03);
 }
@@ -5411,4 +5403,75 @@ body:has(.store-page) {
 
 .chat-more-btn {
   flex-shrink: 0 !important;
+}
+
+.chat-car-message {
+  align-self: flex-start !important;
+  max-width: 360px !important;
+  width: 100% !important;
+  margin-bottom: 16px !important;
+}
+
+.chat-product-card.in-message {
+  display: grid !important;
+  grid-template-columns: 96px 1fr !important;
+  gap: 14px !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  padding: 12px !important;
+  border-radius: 18px !important;
+
+  background: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.18) !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,0.28) !important;
+
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: 0.2s ease !important;
+}
+
+.chat-product-card.in-message:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(0,0,0,0.38) !important;
+}
+
+.chat-product-card.in-message .chat-product-img {
+  width: 96px !important;
+  height: 72px !important;
+  border-radius: 14px !important;
+  object-fit: cover !important;
+  background: #eeeeee !important;
+}
+
+.chat-product-card.in-message .chat-product-info {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.chat-product-card.in-message .chat-product-title {
+  display: block !important;
+  margin: 0 0 6px !important;
+
+  color: #111111 !important;
+  background: transparent !important;
+
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.chat-product-card.in-message .chat-product-price {
+  color: #ff3b30 !important;
+  background: transparent !important;
+
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+
+  white-space: nowrap !important;
 }

@@ -1313,7 +1313,7 @@ function renderSellerChatMessages(messages) {
     productMsg.className = "chat-car-message";
 
     productMsg.innerHTML = `
-      <div class="chat-product-card in-message">
+      <a class="chat-product-card in-message" href="detail.html?id=${car.id}">
         ${
           car.image
             ? `<img src="${car.image}" class="chat-product-img" />`
@@ -1326,7 +1326,7 @@ function renderSellerChatMessages(messages) {
             ${car.price ? `NT$ ${Number(car.price).toLocaleString()}` : "價格未填"}
           </div>
         </div>
-      </div>
+      </a>
     `;
 
     box.appendChild(productMsg);
