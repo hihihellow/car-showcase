@@ -224,29 +224,6 @@
   color: rgba(255,255,255,0.55);
 }
 
-@media (max-width: 900px) {
-  .buyer-chat-layout,
-  .seller-chat-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.seller-chat-card.active,
-.buyer-chat-card.active {
-  border-color: rgba(244,196,48,0.75);
-  background: rgba(244,196,48,0.1);
-}
-
-.chat-empty-text {
-  color: rgba(255,255,255,0.55);
-  text-align: center;
-  margin-top: 180px;
-}
-
-.buyer-chat-room .chat-empty-text {
-  color: #777;
-}
-
 .seller-topbar-actions {
   display: flex;
   align-items: center;
