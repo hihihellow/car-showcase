@@ -1236,9 +1236,10 @@ async function openSellerChatRoom(threadId) {
           <strong>${displayName}</strong>
           <span>買家詢問中</span>
         </div>
+      </div>
 
-     <button id="chatMoreBtn" class="chat-more-btn" type="button">☰</button>
-  
+      <button id="chatMoreBtn" class="chat-more-btn" type="button">☰</button>
+
       <div id="chatMoreMenu" class="chat-more-menu hidden">
         <button type="button">👤 對方資訊</button>
         <button type="button">📅 查詢預約</button>
