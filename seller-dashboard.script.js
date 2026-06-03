@@ -1149,9 +1149,12 @@ function renderSellerChats(threads) {
     card.className = "seller-chat-card";
     card.dataset.threadId = thread.id;
 
-    const avatar = thread.cars?.image
-      ? `<img src="${thread.cars.image}" class="chat-avatar" />`
-      : `<div class="chat-avatar empty">車</div>`;
+    const displayName = thread.buyer_name || thread.guest_name || "遊客";
+    const avatarText = displayName.slice(0, 1);
+
+    const avatar = thread.buyer_avatar
+      ? `<img src="${thread.buyer_avatar}" class="chat-avatar" />`
+      : `<div class="chat-avatar empty">${avatarText}</div>`;
 
     card.innerHTML = `
       <div class="chat-avatar-wrap">
@@ -1160,7 +1163,7 @@ function renderSellerChats(threads) {
 
       <div class="chat-row-main">
         <div class="chat-row-head">
-          <strong>${thread.cars?.title || "未知車輛"}</strong>
+          <strong>${displayName}</strong>
           <span>${thread.last_message_at ? new Date(thread.last_message_at).toLocaleTimeString("zh-TW", {
             hour: "2-digit",
             minute: "2-digit"
@@ -1217,20 +1220,22 @@ async function openSellerChatRoom(threadId) {
 
   currentSellerChatThread = thread;
 
+  const displayName = thread?.buyer_name || thread?.guest_name || "遊客";
+  const avatarText = displayName.slice(0, 1);
+
   sellerChatRoom.innerHTML = `
     <div class="chat-room-header">
       <div class="chat-room-user">
         ${
-          thread?.cars?.image
-            ? `<img src="${thread.cars.image}" class="chat-room-avatar" />`
-            : `<div class="chat-room-avatar empty">車</div>`
+          thread?.buyer_avatar
+            ? `<img src="${thread.buyer_avatar}" class="chat-room-avatar" />`
+            : `<div class="chat-room-avatar empty">${avatarText}</div>`
         }
 
         <div>
-          <strong>${thread?.cars?.title || "未知車輛"}</strong>
+          <strong>${displayName}</strong>
           <span>買家詢問中</span>
         </div>
-      </div>
 
      <button id="chatMoreBtn" class="chat-more-btn" type="button">☰</button>
   
@@ -1240,21 +1245,6 @@ async function openSellerChatRoom(threadId) {
         <button type="button">🚗 查看車輛</button>
         <button type="button" class="danger">🚫 封鎖此用戶</button>
         <button type="button" class="danger">🗑 刪除聊天紀錄</button>
-      </div>
-    </div>
-
-    <div class="chat-product-card messenger-product">
-      ${
-        thread?.cars?.image
-          ? `<img src="${thread.cars.image}" class="chat-product-img" />`
-          : `<div class="chat-product-img empty">車</div>`
-      }
-
-      <div class="chat-product-info">
-        <div class="chat-product-title">${thread?.cars?.title || "未知車輛"}</div>
-        <div class="chat-product-price">
-          ${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : "價格未填"}
-        </div>
       </div>
     </div>
 
@@ -1314,6 +1304,32 @@ function renderSellerChatMessages(messages) {
   if (!box) return;
 
   box.innerHTML = "";
+
+  if (currentSellerChatThread?.cars) {
+    const car = currentSellerChatThread.cars;
+
+    const productMsg = document.createElement("div");
+    productMsg.className = "chat-car-message";
+
+    productMsg.innerHTML = `
+      <div class="chat-product-card in-message">
+        ${
+          car.image
+            ? `<img src="${car.image}" class="chat-product-img" />`
+            : `<div class="chat-product-img empty">車</div>`
+        }
+
+        <div class="chat-product-info">
+          <div class="chat-product-title">${car.title || "未知車輛"}</div>
+          <div class="chat-product-price">
+            ${car.price ? `NT$ ${Number(car.price).toLocaleString()}` : "價格未填"}
+          </div>
+        </div>
+      </div>
+    `;
+
+    box.appendChild(productMsg);
+  }
 
   messages.forEach((msg) => {
     const item = document.createElement("div");

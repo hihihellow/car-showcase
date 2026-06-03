@@ -5281,3 +5281,95 @@ body:has(.store-page) {
     height: 620px;
   }
 }
+
+.seller-chat-layout.messenger-style {
+  grid-template-columns: 420px 1fr;
+}
+
+.chat-list-panel {
+  border-radius: 24px;
+}
+
+.seller-chat-list {
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px !important;
+  padding: 10px !important;
+}
+
+.seller-chat-card {
+  width: 100%;
+  min-height: 76px;
+  border: none !important;
+  border-radius: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 10px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+}
+
+.seller-chat-card:hover,
+.seller-chat-card.active {
+  background: rgba(255,255,255,0.08) !important;
+}
+
+.chat-avatar,
+.chat-room-avatar {
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 50% !important;
+}
+
+.chat-row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-row-head strong {
+  color: white !important;
+  font-size: 17px;
+}
+
+.chat-row-main p {
+  margin-top: 4px !important;
+  color: rgba(255,255,255,0.55) !important;
+  font-size: 14px;
+}
+
+.messenger-product {
+  display: none !important;
+}
+
+.chat-message-list {
+  padding-top: 18px !important;
+}
+
+.chat-car-message {
+  align-self: flex-start;
+  max-width: 72%;
+  margin-bottom: 10px;
+}
+
+.chat-product-card.in-message {
+  margin: 0;
+  background: rgba(255,255,255,0.95);
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: none;
+}
+
+.chat-room-header {
+  background: rgba(255,255,255,0.03);
+}
+
+.chat-room-user strong {
+  color: white !important;
+  font-size: 18px;
+}
+
+.chat-room-user span {
+  color: rgba(255,255,255,0.55);
+}
