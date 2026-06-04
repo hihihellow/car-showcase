@@ -1,0 +1,793 @@
+/* =========================
+   詳細頁版型
+========================= */
+.detail-left,
+.detail-right {
+  min-width: 0;
+}
+
+/* =========================
+   輪播主圖
+========================= */
+.carousel {
+  position: relative;
+}
+
+.detail-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #f3f3f3;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+/* =========================
+   左右箭頭
+========================= */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  border: none;
+  font-size: 28px;
+  padding: 10px 14px;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.arrow.left {
+  left: 12px;
+}
+
+.arrow.right {
+  right: 12px;
+}
+
+.arrow:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+/* =========================
+   聯絡賣家
+========================= */
+.contact-box {
+  margin-top: 24px;
+}
+
+/* ===== DETAIL NEW ===== */
+
+.detail-container {
+  display: flex;
+  gap: 40px;
+  padding: 30px;
+}
+
+.detail-left {
+  flex: 1;
+}
+
+.detail-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.thumbnail-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.thumb {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.thumb.active {
+  opacity: 1;
+  border: 2px solid #f5c518;
+}
+
+.detail-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.car-title {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.car-tags {
+  color: #666;
+}
+
+.car-info {
+  color: #444;
+}
+
+/* 🔴 價格重點 */
+.car-price {
+  font-size: 32px;
+  color: #e53935;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+/* ===== detail 資訊美編 ===== */
+
+.car-spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 22px;
+  margin-top: 8px;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.spec-item-full {
+  grid-column: 1 / -1;
+}
+
+.spec-label {
+  min-width: 88px;
+  padding: 8px 14px;
+  background: #e58f05;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.spec-value {
+  font-size: 17px;
+  color: #222;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.car-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.price-title {
+  font-size: 22px;
+  color: #333;
+  font-weight: 500;
+}
+
+.car-price {
+  font-size: 28px;
+  line-height: 1;
+  color: #d60000;
+  font-weight: 900;
+}
+
+.price-unit {
+  font-size: 28px;
+  color: #222;
+  font-weight: 700;
+}
+
+.contact-btn {
+  margin-top: 18px;
+  width: 100%;
+  background: #f5c518;
+  border: none;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.contact-btn:hover {
+  background: #d89c2c;
+}
+
+.contact-info {
+  margin-top: 14px;
+  display: none;
+  background: #fff8e1;
+  padding: 14px 16px;
+  border-radius: 12px;
+  line-height: 1.8;
+}
+
+.contact-info p {
+  margin: 0;
+}
+
+/* 手機版 */
+@media (max-width: 900px) {
+  .car-spec-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .spec-item-full {
+    grid-column: auto;
+  }
+
+  .spec-label {
+    min-width: 84px;
+  }
+
+  .car-price {
+    font-size: 42px;
+  }
+
+  .price-unit {
+    font-size: 24px;
+  }
+
+  .detail-container {
+  flex-direction: column;
+  }
+
+  .detail-main-img {
+  max-height: 420px;
+  }
+
+  .thumb {
+    width: 90px;
+    height: 70px;
+  }
+}
+
+/* =========================
+   詳細頁：車輛配備
+========================= */
+.equipment-section {
+  margin-top: 32px;
+  background: #d3b624;
+  color: #fff;
+  padding: 28px 32px 36px;
+  border-radius: 14px;
+}
+
+.equipment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #dc6524;
+  padding-bottom: 10px;
+}
+
+.equipment-deco {
+  display: inline-block;
+  width: 42px;
+  height: 18px;
+  background: #dc6524;
+  transform: skewX(-30deg);
+}
+
+.equipment-header h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.equipment-content {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 20px 36px;
+}
+
+.equipment-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #203968;
+}
+
+.equipment-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 36px;
+}
+
+.equipment-item {
+  font-size: 17px;
+  line-height: 1.7;
+  color: #203968;
+}
+
+@media (max-width: 900px) {
+  .equipment-content {
+    grid-template-columns: 1fr;
+  }
+
+  .equipment-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   detail 手機版修正
+========================= */
+@media (max-width: 768px) {
+  .detail-top-banner {
+    height: 88px;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .detail-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 16px 28px;
+  }
+
+  .detail-left,
+  .detail-right {
+    width: 100%;
+  }
+
+  .detail-image-wrapper {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .detail-main-img,
+  #mainImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .thumbnail-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .thumbnail-row::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .thumb {
+    flex: 0 0 88px;
+    width: 88px;
+    height: 66px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  .detail-right .car-title {
+    font-size: 24px;
+    line-height: 1.25;
+    margin-bottom: 12px;
+  }
+
+  .car-spec-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .spec-item,
+  .spec-item-full {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .spec-label {
+    min-width: auto;
+    width: 96px;
+    padding: 10px 8px;
+    font-size: 15px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .spec-value {
+    font-size: 16px;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+
+  .car-price-row {
+    margin-top: 18px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .price-title {
+    font-size: 18px;
+  }
+
+  .car-price {
+    font-size: 28px;
+  }
+
+  .contact-btn {
+    width: 100%;
+    font-size: 20px;
+    padding: 14px 16px;
+    border-radius: 12px;
+  }
+
+  .equipment-section {
+    margin: 24px 16px 32px;
+    padding: 20px 16px 24px;
+    border-radius: 14px;
+  }
+
+  .equipment-header h3 {
+    font-size: 20px;
+  }
+
+  .equipment-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .equipment-label {
+    font-size: 17px;
+  }
+
+  .equipment-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .equipment-item {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .arrow {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .arrow.left {
+    left: 10px;
+  }
+
+  .arrow.right {
+    right: 10px;
+  }
+}
+
+/* detail 頁 */
+#carDetail {
+  background: linear-gradient(180deg, #050505 0%, #101010 100%);
+  padding: 70px 48px 90px;
+}
+
+.detail-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 30px;
+  padding: 34px;
+  box-shadow: 0 28px 70px rgba(0,0,0,0.55);
+}
+
+.detail-main-img {
+  height: 520px;
+  border-radius: 24px;
+  border: 1px solid rgba(244,196,48,0.16);
+}
+
+.thumb {
+  border: 1px solid rgba(244,196,48,0.18);
+  background: #111;
+}
+
+.thumb.active {
+  border: 2px solid #f4c430;
+}
+
+.detail-right .car-title {
+  color: #fff;
+  font-size: 38px;
+  line-height: 1.25;
+}
+
+.car-spec-grid {
+  background: rgba(0,0,0,0.28);
+  border: 1px solid rgba(244,196,48,0.14);
+  border-radius: 22px;
+  padding: 22px;
+}
+
+.spec-label {
+  background: #f4c430;
+  color: #111;
+  border-radius: 999px;
+}
+
+.spec-value {
+  color: rgba(255,255,255,0.82);
+}
+
+.car-price-row {
+  background: linear-gradient(135deg, rgba(244,196,48,0.16), rgba(255,255,255,0.04));
+  border: 1px solid rgba(244,196,48,0.22);
+  border-radius: 22px;
+  padding: 20px 22px;
+}
+
+.price-title {
+  color: rgba(255,255,255,0.65);
+}
+
+.car-price {
+  color: #f4c430;
+}
+
+.contact-btn,
+.post-link-btn {
+  background: #f4c430;
+  color: #111;
+  border: none;
+  border-radius: 999px;
+  font-weight: 900;
+}
+
+.contact-info {
+  background: rgba(0,0,0,0.35);
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(244,196,48,0.18);
+}
+
+.equipment-section {
+  max-width: 1280px;
+  margin: 36px auto 0;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 30px;
+  color: #fff;
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  #carDetail {
+    padding: 36px 16px 60px;
+  }
+
+  .detail-container {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .detail-main-img {
+    height: 300px;
+  }
+
+  .detail-right .car-title {
+    font-size: 28px;
+  }
+
+  .car-spec-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* detail 車輛配備文字亮色 */
+.equipment-section .equipment-label,
+.equipment-section .equipment-item {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.equipment-section .equipment-header h3 {
+  color: #ffffff !important;
+}
+
+.equipment-section .equipment-label {
+  color: #f4c430 !important;
+}
+
+/* ===== 詳細頁美編升級：圖片區 / 小圖列 ===== */
+
+#carDetail {
+  overflow-x: hidden;
+}
+
+.detail-container {
+  align-items: flex-start;
+  gap: 34px;
+}
+
+.detail-left {
+  min-width: 0;
+}
+
+.detail-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 26px;
+  background: #080808;
+  box-shadow: 0 24px 55px rgba(0,0,0,0.45);
+}
+
+.detail-main-img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  display: block;
+  border-radius: 26px;
+}
+
+/* 小圖列：固定寬度，超過就隱藏成橫向滑動 */
+.thumbnail-row {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 4px 4px 12px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(244,196,48,0.75) rgba(255,255,255,0.08);
+}
+
+.thumbnail-row::-webkit-scrollbar {
+  height: 7px;
+}
+
+.thumbnail-row::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+}
+
+.thumbnail-row::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, #f4c430, #b8860b);
+  border-radius: 999px;
+}
+
+.thumb {
+  flex: 0 0 92px;
+  width: 92px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 12px;
+  opacity: 0.55;
+  border: 1px solid rgba(244,196,48,0.18);
+  transition: 0.2s ease;
+}
+
+.thumb:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.thumb.active {
+  opacity: 1;
+  border: 2px solid #f4c430;
+  box-shadow: 0 0 0 3px rgba(244,196,48,0.18);
+}
+
+/* 右側資訊再精緻一點 */
+.detail-right {
+  gap: 18px;
+}
+
+.car-spec-grid,
+.car-price-row {
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.detail-action-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.favorite-btn.detail-favorite,
+.contact-btn {
+  height: 54px;
+}
+
+/* 平板以下 */
+@media (max-width: 1024px) {
+  .detail-container {
+    flex-direction: column;
+  }
+
+  .detail-main-img {
+    height: 420px;
+  }
+}
+
+/* 手機版 */
+@media (max-width: 768px) {
+  #carDetail {
+    padding: 28px 12px 60px;
+  }
+
+  .detail-main-img {
+    height: 300px;
+  }
+
+  .thumb {
+    flex: 0 0 82px;
+    width: 82px;
+    height: 62px;
+  }
+
+  .detail-action-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail-store-box {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 16px;
+  background: rgba(20, 20, 20, 0.88);
+}
+
+.detail-store-label {
+  font-size: 13px;
+  color: #c9a646;
+  margin-bottom: 6px;
+}
+
+.detail-store-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.detail-store-desc {
+  color: #ccc;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.detail-store-link {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #d6b45b, #8f6b22);
+  color: #111;
+  font-weight: 700;
+  text-decoration: none;
+}
