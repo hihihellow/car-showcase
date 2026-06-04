@@ -192,38 +192,6 @@
   }
 }
 
-.notification-list {
-  display: grid;
-  gap: 14px;
-}
-
-.notification-card {
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-}
-
-.notification-card.unread {
-  border-color: rgba(244,196,48,0.55);
-  background: rgba(244,196,48,0.08);
-}
-
-.notification-card strong {
-  display: block;
-  color: #f4c430;
-  margin-bottom: 8px;
-}
-
-.notification-card p {
-  margin: 0 0 8px;
-  color: rgba(255,255,255,0.82);
-}
-
-.notification-card small {
-  color: rgba(255,255,255,0.55);
-}
-
 .seller-topbar-actions {
   display: flex;
   align-items: center;
@@ -279,64 +247,6 @@
   padding: 7px 12px;
   font-weight: 900;
   cursor: pointer;
-}
-
-.store-follower-count {
-  font-size: 14px;
-  color: #666;
-  margin: 0 8px;
-}
-
-#followStoreBtn.active {
-  background: #111;
-  color: #fff;
-  border-color: #111;
-}
-
-.followed-store-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: #fff;
-  padding: 16px;
-  border-radius: 14px;
-  margin-bottom: 14px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
-.followed-store-logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: #111;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-  font-weight: 900;
-}
-
-.followed-store-logo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.followed-store-info h3 {
-  margin: 0 0 6px;
-}
-
-.followed-store-info p {
-  margin: 0 0 8px;
-  color: #666;
-}
-
-.followed-store-info a {
-  color: #111;
-  font-weight: 700;
-  text-decoration: none;
 }
 
 .admin-top-favorite-section {
