@@ -119,3 +119,62 @@
     width: auto;
   }
 }
+
+/* ===== 會員中心車卡修正：收藏 / 最近瀏覽 ===== */
+
+.member-content .car-list {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.member-content .car-card {
+  position: relative;
+  background: #151515;
+  border: 1px solid rgba(244,196,48,0.18);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 42px rgba(0,0,0,0.45);
+}
+
+.member-content .car-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.member-content .car-content {
+  padding: 20px 22px 24px;
+  background: linear-gradient(180deg, #1a1a1a, #101010);
+}
+
+.member-content .car-title {
+  color: #fff;
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+.member-content .card-price {
+  color: #f4c430;
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.member-content .car-meta {
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .member-content .car-list {
+    grid-template-columns: 1fr;
+  }
+
+  .member-content .car-card img {
+    height: 210px;
+  }
+}
