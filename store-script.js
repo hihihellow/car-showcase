@@ -172,9 +172,22 @@ async function loadStorePage() {
     const card = document.createElement("div");
     card.className = "car-card";
 
+    const imageUrl = Array.isArray(car.images)
+      ? car.images[0]
+      : car.image || "";
+
     card.innerHTML = `
       <a href="detail.html?id=${car.id}" class="car-link">
         ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
+    
+        <div class="store-car-img-wrap">
+          ${
+            imageUrl
+              ? `<img src="${imageUrl}" alt="${car.title}" class="store-car-img">`
+              : `<div class="store-car-img empty">無圖片</div>`
+          }
+       </div>
+
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
           <div class="card-price">NT$ ${Number(car.price).toLocaleString()}</div>
