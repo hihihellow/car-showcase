@@ -833,12 +833,19 @@ html {
   box-shadow: 0 10px 24px rgba(0,0,0,0.35);
 }
 
-.featured-card .favorite-btn {
+.featured-card .compare-btn {
   top: 16px;
+  right: 16px;
 }
 
-.featured-card .compare-btn {
-  top: 68px;
+.featured-card .favorite-btn {
+  top: 210px;
+  right: 18px;
+  transform: rotate(-10deg);
+}
+
+.featured-card .favorite-btn:hover {
+  transform: rotate(-10deg) scale(1.08);
 }
 
 .featured-card .favorite-btn:hover,
