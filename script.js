@@ -317,7 +317,9 @@ function renderCars(carArray) {
 
   pageCars.forEach(car => {
     const card = document.createElement("div");
-    card.className = "car-card";
+    card.className = car.is_featured
+      ? "car-card featured-card"
+      : "car-card";
 
     card.innerHTML = `
       <button class="favorite-btn" data-id="${car.id}" type="button">🤍</button>
