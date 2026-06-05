@@ -1,0 +1,193 @@
+.admin-status-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 20px;
+}
+
+.admin-status-tab {
+  border: 1px solid rgba(244,196,48,0.28);
+  background: rgba(0,0,0,0.06);
+  color: #222;
+  padding: 10px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.admin-status-tab.active {
+  background: #111;
+  color: #f4c430;
+  border-color: #f4c430;
+}
+
+.car-review-note {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 80, 80, 0.1);
+  border: 1px solid rgba(255, 80, 80, 0.25);
+  color: #ff8b8b;
+  font-weight: 800;
+}
+
+.admin-store-filter {
+  width: 100%;
+  max-width: 280px;
+  padding: 12px 14px;
+  margin: 0 0 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
+
+.view-store-btn {
+  margin-left: 8px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(244,196,48,0.45);
+  background: #111;
+  color: #f4c430;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.admin-sidebar {
+  background: #111;
+  color: white;
+  padding: 24px;
+}
+
+.admin-sidebar h2 {
+  margin: 0 0 24px;
+  color: #f4c430;
+}
+
+.admin-section-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.25);
+  background: rgba(255,255,255,0.06);
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-section-btn.active {
+  background: #f4c430;
+  color: #111;
+}
+
+.admin-main {
+  padding: 24px;
+}
+
+.admin-section.hidden {
+  display: none;
+}
+
+.subscription-log-item {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.subscription-log-item strong {
+  font-size: 18px;
+}
+
+.subscription-log-item p {
+  margin: 8px 0;
+}
+
+.subscription-log-item small {
+  color: #777;
+}
+
+.admin-log-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 22px;
+}
+
+.admin-log-tools select,
+.admin-log-tools button {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(244,196,48,0.35);
+  font-weight: 800;
+}
+
+.admin-log-tools button {
+  background: #111;
+  color: #f4c430;
+  cursor: pointer;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.admin-stat-card.highlight {
+  border: 1px solid rgba(244,196,48,0.55);
+  background: linear-gradient(135deg, #fff, #fff8d8);
+}
+
+.admin-ranking-title {
+  margin: 38px 0 18px;
+  color: white;
+}
+
+.admin-ranking-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.admin-stat-card span {
+  display: block;
+  color: #777;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.admin-stat-card strong {
+  font-size: 36px;
+  color: #111;
+}
+
+@media (max-width: 900px) {
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
