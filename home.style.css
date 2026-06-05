@@ -724,35 +724,63 @@ html {
   }
 }
 
-/* ===== 首頁精選車輛：精品吊牌版 ===== */
+/* ===== 首頁精選車輛：精品斜切卡 ===== */
 
 .featured-card {
   position: relative;
-  border: 1.5px solid rgba(244,196,48,0.78);
+  overflow: hidden;
+  border: 1.5px solid rgba(244,196,48,0.82);
+  background: #0b0b0b;
   box-shadow:
-    0 0 0 1px rgba(244,196,48,0.12),
-    0 20px 56px rgba(244,196,48,0.10),
-    0 28px 72px rgba(0,0,0,0.72);
+    0 0 0 1px rgba(244,196,48,0.16),
+    0 26px 70px rgba(244,196,48,0.13),
+    0 34px 88px rgba(0,0,0,0.78);
 }
 
-.featured-card::before {
+/* 圖片稍微亮一點，不要像被黑布蓋住 */
+.featured-card img {
+  height: 250px;
+  filter: brightness(0.98) contrast(1.04);
+}
+
+/* 圖片跟資訊中間做斜切 */
+.featured-card .car-content {
+  position: relative;
+  margin-top: -26px;
+  padding: 54px 26px 30px;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(244,196,48,0.12), transparent 34%),
+    linear-gradient(180deg, #171717 0%, #0b0b0b 100%);
+  clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%);
+}
+
+/* 斜切金光線 */
+.featured-card .car-content::before {
   content: "";
   position: absolute;
-  inset: 0;
-  border-radius: 26px;
-  pointer-events: none;
-  background:
-    linear-gradient(135deg, rgba(244,196,48,0.08), transparent 34%),
-    linear-gradient(315deg, rgba(244,196,48,0.045), transparent 45%);
-  z-index: 2;
+  top: 20px;
+  left: -20px;
+  width: 130%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244,196,48,0.95),
+    rgba(255,230,120,0.75),
+    transparent
+  );
+  transform: rotate(-4deg);
+  transform-origin: left center;
+  box-shadow: 0 0 16px rgba(244,196,48,0.42);
 }
 
+/* 左上精品吊牌 */
 .featured-card .featured-badge {
   position: absolute;
   top: 0;
   left: 22px;
-  width: 58px;
-  height: 100px;
+  width: 62px;
+  height: 106px;
   z-index: 8;
 
   display: flex;
@@ -761,18 +789,18 @@ html {
   justify-content: center;
 
   background:
-    linear-gradient(180deg, rgba(30,30,30,0.92), rgba(8,8,8,0.94));
-  border: 1px solid rgba(244,196,48,0.55);
+    linear-gradient(180deg, rgba(24,24,24,0.96), rgba(5,5,5,0.96));
+  border: 1px solid rgba(244,196,48,0.62);
   border-top: none;
 
   color: #f4c430;
   font-size: 16px;
   font-weight: 950;
-  letter-spacing: 1.2px;
+  letter-spacing: 1.4px;
 
   box-shadow:
-    0 0 18px rgba(244,196,48,0.16),
-    0 12px 24px rgba(0,0,0,0.46);
+    0 0 18px rgba(244,196,48,0.18),
+    0 14px 28px rgba(0,0,0,0.5);
 
   clip-path: polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%);
 }
@@ -782,7 +810,6 @@ html {
   font-size: 22px;
   line-height: 1;
   margin-bottom: 5px;
-  opacity: 0.95;
 }
 
 .featured-card .featured-badge::after {
@@ -790,18 +817,52 @@ html {
   font-size: 8px;
   letter-spacing: 1.4px;
   margin-top: 4px;
-  color: rgba(244,196,48,0.72);
+  color: rgba(244,196,48,0.75);
 }
 
-.featured-card img {
-  filter: brightness(0.96) contrast(1.03);
+/* 右上收藏 / 比較按鈕改成精品細金框 */
+.featured-card .favorite-btn,
+.featured-card .compare-btn {
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(10,10,10,0.72);
+  color: #f4c430;
+  border: 1px solid rgba(244,196,48,0.58);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+}
+
+.featured-card .favorite-btn {
+  top: 16px;
+}
+
+.featured-card .compare-btn {
+  top: 68px;
+}
+
+.featured-card .favorite-btn:hover,
+.featured-card .compare-btn:hover {
+  background: #f4c430;
+  color: #111;
+  transform: scale(1.06);
+}
+
+.featured-card .car-title {
+  font-size: 23px;
+  letter-spacing: 0.4px;
+}
+
+.featured-card .card-price {
+  font-size: 31px;
+  text-shadow: 0 0 18px rgba(244,196,48,0.16);
 }
 
 .featured-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-9px);
   border-color: rgba(244,196,48,0.95);
   box-shadow:
-    0 0 0 1px rgba(244,196,48,0.22),
-    0 24px 64px rgba(244,196,48,0.16),
-    0 34px 88px rgba(0,0,0,0.8);
+    0 0 0 1px rgba(244,196,48,0.24),
+    0 28px 76px rgba(244,196,48,0.18),
+    0 38px 96px rgba(0,0,0,0.85);
 }
