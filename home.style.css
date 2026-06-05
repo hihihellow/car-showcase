@@ -724,15 +724,15 @@ html {
   }
 }
 
-/* ===== 首頁精選車輛：垂直布條版 ===== */
+/* ===== 首頁精選車輛：垂直布條精修版 ===== */
 
 .featured-card {
   position: relative;
-  border: 1.5px solid rgba(244,196,48,0.9);
+  border: 1.5px solid rgba(244,196,48,0.85);
   box-shadow:
-    0 0 0 1px rgba(244,196,48,0.22),
-    0 26px 70px rgba(244,196,48,0.16),
-    0 30px 80px rgba(0,0,0,0.75);
+    0 0 0 1px rgba(244,196,48,0.18),
+    0 20px 52px rgba(244,196,48,0.12),
+    0 26px 70px rgba(0,0,0,0.72);
 }
 
 .featured-card::before {
@@ -742,17 +742,17 @@ html {
   border-radius: 26px;
   pointer-events: none;
   background:
-    linear-gradient(135deg, rgba(244,196,48,0.16), transparent 35%),
-    linear-gradient(315deg, rgba(244,196,48,0.08), transparent 38%);
+    linear-gradient(135deg, rgba(244,196,48,0.10), transparent 32%),
+    linear-gradient(315deg, rgba(244,196,48,0.06), transparent 42%);
   z-index: 2;
 }
 
 .featured-card .featured-badge {
   position: absolute;
   top: 0;
-  left: 26px;
-  width: 82px;
-  height: 122px;
+  left: 24px;
+  width: 66px;
+  height: 106px;
   z-index: 8;
 
   display: flex;
@@ -760,46 +760,47 @@ html {
   align-items: center;
   justify-content: center;
 
-  background: linear-gradient(180deg, rgba(25,25,25,0.98), rgba(8,8,8,0.98));
+  background:
+    linear-gradient(180deg, rgba(18,18,18,0.98), rgba(6,6,6,0.98));
   border: 1px solid rgba(244,196,48,0.78);
   border-top: none;
 
   color: #f4c430;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 950;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
 
   box-shadow:
-    0 0 24px rgba(244,196,48,0.25),
-    0 16px 32px rgba(0,0,0,0.55);
+    0 0 20px rgba(244,196,48,0.22),
+    0 14px 28px rgba(0,0,0,0.52);
 
-  clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%);
+  clip-path: polygon(0 0, 100% 0, 100% 87%, 50% 100%, 0 87%);
 }
 
 .featured-card .featured-badge::before {
   content: "◇";
-  font-size: 30px;
+  font-size: 25px;
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .featured-card .featured-badge::after {
   content: "PREMIUM";
-  font-size: 11px;
-  letter-spacing: 2px;
-  margin-top: 5px;
-  color: rgba(244,196,48,0.8);
+  font-size: 9px;
+  letter-spacing: 1.6px;
+  margin-top: 4px;
+  color: rgba(244,196,48,0.78);
 }
 
 .featured-card img {
-  filter: brightness(0.82) contrast(1.08);
+  filter: brightness(0.9) contrast(1.05);
 }
 
 .featured-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-9px);
   border-color: #f4c430;
   box-shadow:
-    0 0 0 1px rgba(244,196,48,0.32),
-    0 30px 80px rgba(244,196,48,0.22),
-    0 36px 90px rgba(0,0,0,0.82);
+    0 0 0 1px rgba(244,196,48,0.28),
+    0 26px 68px rgba(244,196,48,0.18),
+    0 34px 88px rgba(0,0,0,0.82);
 }
