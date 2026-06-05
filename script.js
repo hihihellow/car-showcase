@@ -1398,6 +1398,7 @@ async function updateAuthUI() {
   const memberCenterBtn = document.getElementById("memberCenterBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const mobileMemberCenterBtn = document.getElementById("mobileMemberCenterBtn");
+  const logoutBtnMobile = document.getElementById("logoutBtnMobile");
 
   const guestOnlyEls = document.querySelectorAll(".guest-only");
   const userOnlyEls = document.querySelectorAll(".user-only");
@@ -1458,7 +1459,7 @@ async function updateAuthUI() {
     userOnlyEls.forEach((el) => el.classList.add("hidden"));
   }
 
-  logoutBtn.addEventListener("click", async () => {
+  async function handleLogout() {
     const { error: signOutError } = await supabase.auth.signOut();
 
     if (signOutError) {
@@ -1468,7 +1469,13 @@ async function updateAuthUI() {
     }
 
     window.location.href = "index.html";
-  });
+  }
+
+  logoutBtn.addEventListener("click", handleLogout);
+
+  if (logoutBtnMobile) {
+    logoutBtnMobile.addEventListener("click", handleLogout);
+  }
 }
 
 updateAuthUI();

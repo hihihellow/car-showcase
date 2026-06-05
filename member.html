@@ -48,8 +48,11 @@
         <a href="index.html#aboutSection" class="mobile-drawer-link">關於我們</a>
 
         <div class="mobile-drawer-actions">
-          <a href="member.html" class="header-btn btn-login">會員中心</a>
-          <button type="button" class="header-btn btn-register" id="logoutBtnMobile">登出</button>
+          <a href="login.html" class="header-btn btn-login guest-only hidden">登入</a>
+          <a href="login.html" class="header-btn btn-register guest-only hidden">註冊</a>
+
+          <a href="member.html" class="header-btn btn-login user-only" id="mobileMemberCenterBtn">會員中心</a>
+          <button type="button" class="header-btn btn-register user-only" id="logoutBtnMobile">登出</button>
         </div>
       </div>
     </div>
