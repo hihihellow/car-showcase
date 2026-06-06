@@ -562,15 +562,31 @@
   color: white;
 }
 
-.chat-list-top button {
-  width: 42px;
-  height: 42px;
+.chat-list-top button,
+.chat-compose-btn {
+  width: auto;
+  height: auto;
+  padding: 0;
   border: none;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-size: 18px;
+  border-radius: 0;
+  background: transparent;
+  color: #f4c430;
+  font-size: 22px;
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-compose-btn i {
+  color: #f4c430;
+  transition: 0.25s ease;
+}
+
+.chat-compose-btn:hover i {
+  color: #ffd75a;
+  transform: translateY(-2px);
 }
 
 .seller-chat-list {
