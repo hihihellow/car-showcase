@@ -703,20 +703,36 @@
 }
 
 .chat-more-btn {
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
+
   border: none;
-  border-radius: 50%;
   background: transparent;
-  color: white;
-  font-size: 28px;
+
+  color: #f4c430;
+
+  font-size: 22px;
+  font-weight: 700;
+
   cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 12px;
+  margin-top: 8px;
+}
+
+.chat-more-btn:hover {
+  color: #ffd75a;
+  transform: translateY(-2px);
 }
 
 .chat-more-menu {
   position: absolute;
-  right: 18px;
-  top: 64px;
+  right: 26px;
+  top: 56px;
   width: 230px;
   background: #202020;
   border: 1px solid rgba(255,255,255,0.12);

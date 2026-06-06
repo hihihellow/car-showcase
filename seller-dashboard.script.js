@@ -1238,7 +1238,9 @@ async function openSellerChatRoom(threadId) {
         </div>
       </div>
 
-      <button id="chatMoreBtn" class="chat-more-btn" type="button">☰</button>
+      <button id="chatMoreBtn" class="chat-more-btn" type="button">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
       <div id="chatMoreMenu" class="chat-more-menu hidden">
         <button type="button">👤 對方資訊</button>
