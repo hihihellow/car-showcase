@@ -786,6 +786,16 @@
   border-radius: 18px;
   background: rgba(255,255,255,0.12);
   color: white;
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.chat-bubble p {
+  margin: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .chat-bubble.me {
