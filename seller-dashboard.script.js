@@ -1191,7 +1191,7 @@ async function openSellerChatRoom(threadId) {
   if (!sellerChatRoom) return;
 
   currentSellerChatThreadId = Number(threadId);
-  sellerChatRoom.innerHTML = "<p>聊天內容讀取中...</p>";
+  sellerChatRoom.innerHTML = `<p class="chat-loading-text">讀取中...</p>`;
 
   await supabase
     .from("chat_messages")
