@@ -228,84 +228,7 @@ body:has(.store-page) {
   }
 }
 
-/* ===== Store 車卡美編 ===== */
-
-.store-car-list .car-card {
-  position: relative;
-  min-height: 360px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)),
-    #111;
-  border: 1px solid rgba(244,196,48,0.24);
-}
-
-.store-car-list .car-link {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.store-car-img-wrap {
-  width: 100%;
-  height: 220px;
-  background: #050505;
-  overflow: hidden;
-}
-
-.store-car-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: 0.35s ease;
-}
-
-.store-car-list .car-card:hover .store-car-img {
-  transform: scale(1.06);
-}
-
-.store-car-img.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,0.45);
-  font-weight: 900;
-}
-
-.store-car-list .car-content {
-  flex: 1;
-  padding: 22px 24px 24px;
-  background:
-    radial-gradient(circle at top right, rgba(244,196,48,0.12), transparent 35%),
-    linear-gradient(180deg, #171717, #0c0c0c);
-}
-
-.store-car-list .car-title {
-  color: #fff;
-  font-size: 22px;
-  margin: 0 0 12px;
-  font-weight: 900;
-}
-
-.store-car-list .card-price {
-  color: #f4c430;
-  font-size: 22px;
-  font-weight: 900;
-  margin-bottom: 10px;
-}
-
-.store-car-list .car-meta {
-  color: rgba(255,255,255,0.68);
-  font-size: 15px;
-}
-
-.store-car-list .featured-badge {
-  top: 14px;
-  left: 14px;
-  z-index: 5;
-}
-
-/* ===== Store 車卡：沿用首頁精品規格 ===== */
+/* ===== Store 車卡：跟首頁同規格 ===== */
 
 .store-car-list .car-card {
   position: relative;
@@ -314,8 +237,7 @@ body:has(.store-page) {
   background: #0b0b0b;
   border: 1px solid rgba(244,196,48,0.24);
   border-radius: 26px;
-  box-shadow:
-    0 20px 52px rgba(0,0,0,0.58);
+  box-shadow: 0 20px 52px rgba(0,0,0,0.58);
 }
 
 .store-car-list .car-link {
@@ -336,7 +258,6 @@ body:has(.store-page) {
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: 0.35s ease;
 }
 
 .store-car-list .car-content {
@@ -367,7 +288,7 @@ body:has(.store-page) {
   font-size: 15px;
 }
 
-/* 精選車：跟首頁一樣有精品感 */
+/* 精選車卡沿用首頁精品感，但取消 hover 放大 */
 .store-car-list .featured-card {
   border: 1.5px solid rgba(244,196,48,0.82);
   box-shadow:
@@ -413,26 +334,18 @@ body:has(.store-page) {
   width: 62px;
   height: 106px;
   z-index: 8;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  background:
-    linear-gradient(180deg, rgba(24,24,24,0.96), rgba(5,5,5,0.96));
+  background: linear-gradient(180deg, rgba(24,24,24,0.96), rgba(5,5,5,0.96));
   border: 1px solid rgba(244,196,48,0.62);
   border-top: none;
-
   color: #f4c430;
   font-size: 16px;
   font-weight: 950;
   letter-spacing: 1.4px;
-
-  box-shadow:
-    0 0 18px rgba(244,196,48,0.18),
-    0 14px 28px rgba(0,0,0,0.5);
-
+  box-shadow: 0 0 18px rgba(244,196,48,0.18), 0 14px 28px rgba(0,0,0,0.5);
   clip-path: polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%);
 }
 
@@ -451,11 +364,43 @@ body:has(.store-page) {
   color: rgba(244,196,48,0.75);
 }
 
+/* 取消 Store 車卡 hover 放大 */
 .store-car-list .car-card:hover {
-  transform: translateY(-9px);
-  border-color: rgba(244,196,48,0.95);
-  box-shadow:
-    0 0 0 1px rgba(244,196,48,0.24),
-    0 28px 76px rgba(244,196,48,0.18),
-    0 38px 96px rgba(0,0,0,0.85);
+  transform: none;
 }
+
+/* Store 的收藏 / 比較按鈕位置跟首頁一致 */
+.store-car-list .favorite-btn,
+.store-car-list .compare-btn {
+  position: absolute;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(10,10,10,0.72);
+  color: #f4c430;
+  border: 1px solid rgba(244,196,48,0.58);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.35);
+  z-index: 9;
+}
+
+.store-car-list .compare-btn {
+  top: 16px;
+}
+
+.store-car-list .favorite-btn {
+  top: 210px;
+  right: 18px;
+  transform: rotate(-10deg);
+}
+
+.store-car-list .favorite-btn:hover {
+  transform: rotate(-10deg) scale(1.08);
+}
+
+.store-car-list .compare-btn:hover {
+  background: #f4c430;
+  color: #111;
+  transform: scale(1.06);
+}
+

@@ -181,14 +181,17 @@ async function loadStorePage() {
     card.innerHTML = `
       <a href="detail.html?id=${car.id}" class="car-link">
         ${car.is_featured ? `<div class="featured-badge">精選</div>` : ""}
-    
+
         <div class="store-car-img-wrap">
           ${
             imageUrl
               ? `<img src="${imageUrl}" alt="${car.title}" class="store-car-img">`
               : `<div class="store-car-img empty">無圖片</div>`
           }
-       </div>
+        </div>
+
+        <button type="button" class="favorite-btn" data-car-id="${car.id}">♡</button>
+        <button type="button" class="compare-btn" data-car-id="${car.id}">↔</button>
 
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
