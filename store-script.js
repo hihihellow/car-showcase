@@ -191,7 +191,7 @@ async function loadStorePage() {
         </div>
 
         <button type="button" class="favorite-btn" data-car-id="${car.id}">♡</button>
-        <button type="button" class="compare-btn" data-car-id="${car.id}">↔</button>
+        <button type="button" class="compare-btn" data-car-id="${car.id}">⇄</button>
 
         <div class="car-content">
           <h2 class="car-title">${car.title}</h2>
