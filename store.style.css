@@ -304,3 +304,158 @@ body:has(.store-page) {
   left: 14px;
   z-index: 5;
 }
+
+/* ===== Store 車卡：沿用首頁精品規格 ===== */
+
+.store-car-list .car-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 420px;
+  background: #0b0b0b;
+  border: 1px solid rgba(244,196,48,0.24);
+  border-radius: 26px;
+  box-shadow:
+    0 20px 52px rgba(0,0,0,0.58);
+}
+
+.store-car-list .car-link {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.store-car-img-wrap {
+  width: 100%;
+  height: 250px;
+  background: #050505;
+  overflow: hidden;
+}
+
+.store-car-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: 0.35s ease;
+}
+
+.store-car-list .car-content {
+  flex: 1;
+  padding: 30px 26px 30px;
+  background:
+    radial-gradient(circle at 85% 8%, rgba(244,196,48,0.12), transparent 34%),
+    linear-gradient(180deg, #171717 0%, #0b0b0b 100%);
+}
+
+.store-car-list .car-title {
+  color: #fff;
+  font-size: 23px;
+  margin: 0 0 12px;
+  font-weight: 900;
+}
+
+.store-car-list .card-price {
+  color: #f4c430;
+  font-size: 31px;
+  font-weight: 900;
+  margin-bottom: 12px;
+  text-shadow: 0 0 18px rgba(244,196,48,0.16);
+}
+
+.store-car-list .car-meta {
+  color: rgba(255,255,255,0.72);
+  font-size: 15px;
+}
+
+/* 精選車：跟首頁一樣有精品感 */
+.store-car-list .featured-card {
+  border: 1.5px solid rgba(244,196,48,0.82);
+  box-shadow:
+    0 0 0 1px rgba(244,196,48,0.16),
+    0 26px 70px rgba(244,196,48,0.13),
+    0 34px 88px rgba(0,0,0,0.78);
+}
+
+.store-car-list .featured-card .store-car-img {
+  filter: brightness(0.98) contrast(1.04);
+}
+
+.store-car-list .featured-card .car-content {
+  position: relative;
+  margin-top: -26px;
+  padding: 54px 26px 30px;
+  clip-path: polygon(0 20%, 100% 0, 100% 100%, 0 100%);
+}
+
+.store-car-list .featured-card .car-content::before {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: -20px;
+  width: 130%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(244,196,48,0.95),
+    rgba(255,230,120,0.75),
+    transparent
+  );
+  transform: rotate(-4deg);
+  transform-origin: left center;
+  box-shadow: 0 0 16px rgba(244,196,48,0.42);
+}
+
+.store-car-list .featured-card .featured-badge {
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 62px;
+  height: 106px;
+  z-index: 8;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(180deg, rgba(24,24,24,0.96), rgba(5,5,5,0.96));
+  border: 1px solid rgba(244,196,48,0.62);
+  border-top: none;
+
+  color: #f4c430;
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: 1.4px;
+
+  box-shadow:
+    0 0 18px rgba(244,196,48,0.18),
+    0 14px 28px rgba(0,0,0,0.5);
+
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 50% 100%, 0 86%);
+}
+
+.store-car-list .featured-card .featured-badge::before {
+  content: "◇";
+  font-size: 22px;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+
+.store-car-list .featured-card .featured-badge::after {
+  content: "PREMIUM";
+  font-size: 8px;
+  letter-spacing: 1.4px;
+  margin-top: 4px;
+  color: rgba(244,196,48,0.75);
+}
+
+.store-car-list .car-card:hover {
+  transform: translateY(-9px);
+  border-color: rgba(244,196,48,0.95);
+  box-shadow:
+    0 0 0 1px rgba(244,196,48,0.24),
+    0 28px 76px rgba(244,196,48,0.18),
+    0 38px 96px rgba(0,0,0,0.85);
+}

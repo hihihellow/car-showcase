@@ -170,7 +170,9 @@ async function loadStorePage() {
 
   cars.forEach((car) => {
     const card = document.createElement("div");
-    card.className = "car-card";
+    card.className = car.is_featured
+      ? "car-card featured-card"
+      : "car-card";
 
     const imageUrl = Array.isArray(car.images)
       ? car.images[0]
