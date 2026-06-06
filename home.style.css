@@ -228,6 +228,12 @@ html {
     cursor: pointer;
   }
 
+  .header-search-btn i {
+    font-size: 16px;
+    color: #f4c430;
+    transition: all 0.25s ease;
+  }
+
   .header-search.show input {
     display: block;
     position: absolute;
