@@ -40,6 +40,7 @@ const editModeText = document.getElementById("editModeText");
 let editingCarId = null;
 let oldImages = [];
 let selectedImageFiles = [];
+let renderedSellerMessageIds = new Set();
 
 const imageInput = document.getElementById("imageInput");
 const imagePreviewList = document.getElementById("imagePreviewList");
@@ -441,6 +442,7 @@ let adminSellerThreads = [];
 let currentSellerChatThread = null;
 let sellerChatChannel = null;
 let sellerBellChannel = null;
+let sellerThreadListChannel = null;
 
 const sellerChatBadge = document.getElementById("sellerChatBadge");
 const sellerChatBell = document.getElementById("sellerChatBell");
@@ -1131,6 +1133,8 @@ async function loadSellerChats() {
 
   adminSellerThreads = data || [];
   renderSellerChats(data || []);
+
+  subscribeSellerThreadList(currentSellerStore.id);
 }
 
 function renderSellerChats(threads) {
@@ -1146,7 +1150,10 @@ function renderSellerChats(threads) {
   threads.forEach((thread) => {
     const card = document.createElement("button");
     card.type = "button";
-    card.className = "seller-chat-card";
+    card.className =
+      Number(thread.id) === Number(currentSellerChatThreadId)
+        ? "seller-chat-card active"
+        : "seller-chat-card";
     card.dataset.threadId = thread.id;
 
     const displayName = thread.buyer_name || thread.guest_name || "遊客";
@@ -1278,6 +1285,43 @@ async function openSellerChatRoom(threadId) {
   subscribeSellerChatRoom(currentSellerChatThreadId);
 }
 
+function subscribeSellerThreadList(storeId) {
+  if (sellerThreadListChannel) {
+    supabase.removeChannel(sellerThreadListChannel);
+  }
+
+  sellerThreadListChannel = supabase
+    .channel(`seller-thread-list-${storeId}`)
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "chat_threads",
+        filter: `store_id=eq.${storeId}`
+      },
+      async (payload) => {
+        const updatedThread = payload.new;
+
+        adminSellerThreads = adminSellerThreads.filter(
+          (thread) => Number(thread.id) !== Number(updatedThread.id)
+        );
+
+        adminSellerThreads.unshift({
+          ...updatedThread,
+          cars:
+            adminSellerThreads.find(
+              (thread) => Number(thread.id) === Number(updatedThread.id)
+            )?.cars || null
+        });
+
+        renderSellerChats(adminSellerThreads);
+        await updateSellerChatBadge();
+      }
+    )
+    .subscribe();
+}
+
 function subscribeSellerChatRoom(threadId) {
   if (sellerChatChannel) {
     supabase.removeChannel(sellerChatChannel);
@@ -1293,13 +1337,58 @@ function subscribeSellerChatRoom(threadId) {
         table: "chat_messages",
         filter: `thread_id=eq.${threadId}`
       },
-      async () => {
-        await openSellerChatRoom(threadId);
-        await loadSellerChats();
-        await updateSellerChatBadge();
+      async (payload) => {
+        const msg = payload.new;
+
+        if (Number(msg.thread_id) !== Number(currentSellerChatThreadId)) return;
+
+        appendSellerChatMessage(msg);
+
+        if (msg.sender_role === "buyer") {
+          await supabase
+            .from("chat_messages")
+            .update({ read_at: new Date().toISOString() })
+            .eq("id", msg.id);
+        }
+
+       await updateSellerChatBadge();
       }
     )
     .subscribe();
+}
+
+function escapeHTML(text = "") {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function appendSellerChatMessage(msg) {
+  const box = document.getElementById("sellerChatMessages");
+  if (!box || !msg) return;
+
+  if (renderedSellerMessageIds.has(msg.id)) return;
+  renderedSellerMessageIds.add(msg.id);
+
+  const item = document.createElement("div");
+  item.className = `chat-bubble ${msg.sender_role === "seller" ? "me" : "other"}`;
+
+  item.innerHTML = `
+    <p>${escapeHTML(msg.message)}</p>
+    <small>
+      ${new Date(msg.created_at).toLocaleDateString("zh-TW")}
+      ${new Date(msg.created_at).toLocaleTimeString("zh-TW", {
+        hour: "2-digit",
+        minute: "2-digit"
+      })}
+    </small>
+  `;
+
+  box.appendChild(item);
+  box.scrollTop = box.scrollHeight;
 }
 
 function renderSellerChatMessages(messages) {
@@ -1307,6 +1396,7 @@ function renderSellerChatMessages(messages) {
   if (!box) return;
 
   box.innerHTML = "";
+  renderedSellerMessageIds.clear();
 
   if (currentSellerChatThread?.cars) {
     const car = currentSellerChatThread.cars;
@@ -1335,21 +1425,7 @@ function renderSellerChatMessages(messages) {
   }
 
   messages.forEach((msg) => {
-    const item = document.createElement("div");
-    item.className = `chat-bubble ${msg.sender_role === "seller" ? "me" : "other"}`;
-
-    item.innerHTML = `
-      <p>${msg.message}</p>
-      <small>
-        ${new Date(msg.created_at).toLocaleDateString("zh-TW")}
-        ${new Date(msg.created_at).toLocaleTimeString("zh-TW", {
-          hour: "2-digit",
-          minute: "2-digit"
-        })}
-      </small>
-    `;
-
-    box.appendChild(item);
+    appendSellerChatMessage(msg);
   });
 
   box.scrollTop = box.scrollHeight;
@@ -1367,7 +1443,7 @@ async function sendSellerChatMessage() {
 
   const user = await getCurrentUser();
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("chat_messages")
     .insert([
       {
@@ -1376,7 +1452,9 @@ async function sendSellerChatMessage() {
         sender_role: "seller",
         message
       }
-    ]);
+    ])
+    .select("*")
+    .single();
 
   if (error) {
     console.error("送出訊息失敗:", error);
@@ -1393,8 +1471,7 @@ async function sendSellerChatMessage() {
     .eq("id", currentSellerChatThreadId);
 
   input.value = "";
-  await openSellerChatRoom(currentSellerChatThreadId);
-  await loadSellerChats();
+  appendSellerChatMessage(data);
 }
 
 async function replySellerChat(threadId) {
