@@ -781,21 +781,24 @@
 }
 
 .chat-bubble {
-  max-width: 68%;
+  max-width: min(68%, 420px);
+  min-width: 120px;
   padding: 12px 15px;
   border-radius: 18px;
   background: rgba(255,255,255,0.12);
   color: white;
 
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .chat-bubble p {
   margin: 0;
-  word-break: break-word;
+  line-height: 1.55;
+  word-break: normal;
   overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .chat-bubble.me {
@@ -971,6 +974,7 @@
   width: 100% !important;
   box-sizing: border-box !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
 }
 
 .chat-input-row {
