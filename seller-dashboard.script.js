@@ -1117,6 +1117,7 @@ async function loadSellerChats() {
     .select(`
       *,
       cars (
+        id,
         title,
         image,
         price
@@ -1303,16 +1304,17 @@ function subscribeSellerThreadList(storeId) {
       async (payload) => {
         const updatedThread = payload.new;
 
+        const oldThread = adminSellerThreads.find(
+          (thread) => Number(thread.id) === Number(updatedThread.id)
+        );
+
         adminSellerThreads = adminSellerThreads.filter(
           (thread) => Number(thread.id) !== Number(updatedThread.id)
         );
 
         adminSellerThreads.unshift({
           ...updatedThread,
-          cars:
-            adminSellerThreads.find(
-              (thread) => Number(thread.id) === Number(updatedThread.id)
-            )?.cars || null
+          cars: oldThread?.cars || null
         });
 
         renderSellerChats(adminSellerThreads);
