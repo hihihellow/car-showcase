@@ -2290,7 +2290,9 @@ async function openBuyerChatRoom(threadId) {
   if (!buyerChatRoom) return;
 
   currentBuyerChatThreadId = Number(threadId);
-  buyerChatRoom.innerHTML = "<p>聊天內容讀取中...</p>";
+  buyerChatRoom.innerHTML = `
+    <p class="chat-loading-text">聊天內容讀取中...</p>
+  `;
 
   await supabase
     .from("chat_messages")
@@ -2309,7 +2311,9 @@ async function openBuyerChatRoom(threadId) {
 
   if (error) {
     console.error("讀取聊天內容失敗:", error);
-    buyerChatRoom.innerHTML = "<p>讀取聊天內容失敗。</p>";
+    buyerChatRoom.innerHTML = `
+      <p class="chat-loading-text">讀取聊天內容失敗。</p>
+    `;
     return;
   }
 
