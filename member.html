@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="member.style.css" />
   <link rel="stylesheet" href="chat.style.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  />
 </head>
 <body>
   <header class="site-header">
@@ -105,12 +109,25 @@
       </div>
 
       <div id="chatTab" class="tab">
-        <h2>聊天室</h2>
-        <div class="buyer-chat-layout">
-          <div id="buyerChatList" class="buyer-chat-list"></div>
+        <div class="chat-page-title">
+          <h2>聊天</h2>
+          <p>查看你與車行的詢問紀錄</p>
+        </div>
+
+        <div class="buyer-chat-layout messenger-style">
+          <div class="chat-list-panel">
+            <div class="chat-list-top">
+              <h3>訊息</h3>
+              <button type="button" class="chat-compose-btn" title="訊息">
+                <i class="fa-solid fa-message"></i>
+              </button>
+            </div>
+
+            <div id="buyerChatList" class="buyer-chat-list"></div>
+          </div>
 
           <div id="buyerChatRoom" class="buyer-chat-room">
-            <p class="chat-empty-text">聊天室</p>
+            <p class="chat-empty-text">選擇左側聊天室開始對話</p>
           </div>
         </div>
       </div>

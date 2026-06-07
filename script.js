@@ -1934,44 +1934,51 @@ function renderBuyerChats(threads) {
   if (!buyerChatList) return;
 
   if (!threads.length) {
-    buyerChatList.innerHTML = "<p>目前沒有聊天紀錄。</p>";
+    buyerChatList.innerHTML = "<p class='chat-empty-list'>目前沒有聊天訊息。</p>";
     return;
   }
 
   buyerChatList.innerHTML = "";
 
   threads.forEach((thread) => {
-    const card = document.createElement("div");
-    card.className = "buyer-chat-card";
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className =
+      Number(thread.id) === Number(currentBuyerChatThreadId)
+        ? "seller-chat-card active"
+        : "seller-chat-card";
+
+    const displayName = thread.stores?.name || "車行";
+    const avatarText = displayName.slice(0, 1);
 
     card.innerHTML = `
-      <div class="chat-list-item">
-        ${
-          thread.cars?.image
-            ? `<img src="${thread.cars.image}" class="chat-list-img" />`
-            : `<div class="chat-list-img empty">車</div>`
-        }
-
-        <div class="chat-list-info">
-          <strong>${thread.cars?.title || "未知車輛"}</strong>
-          <p>車行：${thread.stores?.name || "未知車行"}</p>
-          <p>${thread.last_message || "尚無訊息"}</p>
-          <small>${new Date(thread.last_message_at).toLocaleString("zh-TW")}</small>
-        </div>
+      <div class="chat-avatar-wrap">
+        <div class="chat-avatar empty">${avatarText}</div>
       </div>
 
-      <button class="buyer-open-chat-btn" data-thread-id="${thread.id}">
-        開啟
-      </button>
+      <div class="chat-row-main">
+        <div class="chat-row-head">
+          <strong>${displayName}</strong>
+          <span>${thread.last_message_at ? new Date(thread.last_message_at).toLocaleTimeString("zh-TW", {
+            hour: "2-digit",
+            minute: "2-digit"
+          }) : ""}</span>
+        </div>
+
+        <p>${thread.last_message || "尚無訊息"}</p>
+      </div>
     `;
 
-    buyerChatList.appendChild(card);
-  });
+    card.addEventListener("click", async () => {
+      document.querySelectorAll(".buyer-chat-list .seller-chat-card").forEach((item) => {
+        item.classList.remove("active");
+      });
 
-  document.querySelectorAll(".buyer-open-chat-btn").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      await openBuyerChatRoom(btn.dataset.threadId);
+      card.classList.add("active");
+      await openBuyerChatRoom(thread.id);
     });
+
+    buyerChatList.appendChild(card);
   });
 }
 
@@ -2309,27 +2316,35 @@ async function openBuyerChatRoom(threadId) {
   );
 
   buyerChatRoom.innerHTML = `
-    <div class="chat-product-card">
-      ${
-        thread?.cars?.image
-          ? `<img src="${thread.cars.image}" class="chat-product-img" />`
-          : `<div class="chat-product-img empty">車</div>`
-      }
-
-      <div class="chat-product-info">
-        <div class="chat-product-title">${thread?.cars?.title || "未知車輛"}</div>
-        <div class="chat-product-store">車行：${thread?.stores?.name || "未知車行"}</div>
-        <div class="chat-product-price">
-          ${thread?.cars?.price ? `NT$ ${Number(thread.cars.price).toLocaleString()}` : "價格未填"}
+    <div class="chat-room-header">
+      <div class="chat-room-user">
+        <div class="chat-room-avatar empty">
+          ${(thread?.stores?.name || "車行").slice(0, 1)}
         </div>
+
+        <div>
+          <strong>${thread?.stores?.name || "車行"}</strong>
+          <span>車行回覆中</span>
+        </div>
+      </div>
+
+      <button id="chatMoreBtn" class="chat-more-btn" type="button">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div id="chatMoreMenu" class="chat-more-menu hidden">
+        <button type="button">🚗 查看車輛</button>
+        <button type="button">📅 預約看車</button>
+        <button type="button" class="danger">🗑 刪除聊天紀錄</button>
       </div>
     </div>
 
     <div id="buyerChatMessages" class="chat-message-list"></div>
 
     <div class="chat-input-row">
+      <button type="button" class="chat-plus-btn">＋</button>
       <input id="buyerChatInput" placeholder="輸入訊息..." />
-      <button id="buyerChatSendBtn" type="button">送出</button>
+      <button id="buyerChatSendBtn" type="button">➤</button>
     </div>
   `;
 
@@ -2346,6 +2361,10 @@ async function openBuyerChatRoom(threadId) {
       await sendBuyerChatMessage();
     }
   });
+
+  document.getElementById("chatMoreBtn")?.addEventListener("click", () => {
+    document.getElementById("chatMoreMenu")?.classList.toggle("hidden");
+  s});
 
   subscribeBuyerChatRoom(currentBuyerChatThreadId);
 }
