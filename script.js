@@ -1910,6 +1910,7 @@ async function loadBuyerChats() {
     .select(`
       *,
       cars (
+        id,
         title,
         image,
         price
@@ -2405,6 +2406,15 @@ function subscribeBuyerChatRoom(threadId) {
     .subscribe();
 }
 
+function escapeHTML(text = "") {
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function appendBuyerChatMessage(msg) {
   const box = document.getElementById("buyerChatMessages");
   if (!box || !msg) return;
@@ -2416,7 +2426,7 @@ function appendBuyerChatMessage(msg) {
   item.className = `chat-bubble ${msg.sender_role === "buyer" ? "me" : "other"}`;
 
   item.innerHTML = `
-    <p>${msg.message}</p>
+    <p>${escapeHTML(msg.message)}</p>
     <small>${new Date(msg.created_at).toLocaleString("zh-TW")}</small>
   `;
 
@@ -2480,7 +2490,6 @@ async function sendBuyerChatMessage() {
 
   input.value = "";
   appendBuyerChatMessage(data);
-  await loadBuyerChats();
 }
 
 async function replyBuyerChat(threadId) {
