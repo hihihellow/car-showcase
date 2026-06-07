@@ -1514,6 +1514,7 @@ let currentBuyerChatThreadId = null;
 let buyerChatThreads = [];
 let buyerChatChannel = null;
 let buyerBellChannel = null;
+let renderedBuyerMessageIds = new Set();
 
 tabs.forEach(tab => {
   tab.addEventListener("click", () => {
@@ -2364,7 +2365,7 @@ async function openBuyerChatRoom(threadId) {
 
   document.getElementById("chatMoreBtn")?.addEventListener("click", () => {
     document.getElementById("chatMoreMenu")?.classList.toggle("hidden");
-  s});
+  });
 
   subscribeBuyerChatRoom(currentBuyerChatThreadId);
 }
@@ -2384,13 +2385,43 @@ function subscribeBuyerChatRoom(threadId) {
         table: "chat_messages",
         filter: `thread_id=eq.${threadId}`
       },
-      async () => {
-        await openBuyerChatRoom(threadId);
-        await loadBuyerChats();
+      async (payload) => {
+        const msg = payload.new;
+
+        if (Number(msg.thread_id) !== Number(currentBuyerChatThreadId)) return;
+
+        appendBuyerChatMessage(msg);
+
+        if (msg.sender_role === "seller") {
+          await supabase
+            .from("chat_messages")
+            .update({ read_at: new Date().toISOString() })
+            .eq("id", msg.id);
+        }
+
         await updateBuyerChatBadge();
       }
     )
     .subscribe();
+}
+
+function appendBuyerChatMessage(msg) {
+  const box = document.getElementById("buyerChatMessages");
+  if (!box || !msg) return;
+
+  if (renderedBuyerMessageIds.has(msg.id)) return;
+  renderedBuyerMessageIds.add(msg.id);
+
+  const item = document.createElement("div");
+  item.className = `chat-bubble ${msg.sender_role === "buyer" ? "me" : "other"}`;
+
+  item.innerHTML = `
+    <p>${msg.message}</p>
+    <small>${new Date(msg.created_at).toLocaleString("zh-TW")}</small>
+  `;
+
+  box.appendChild(item);
+  box.scrollTop = box.scrollHeight;
 }
 
 function renderBuyerChatMessages(messages) {
@@ -2398,17 +2429,10 @@ function renderBuyerChatMessages(messages) {
   if (!box) return;
 
   box.innerHTML = "";
+  renderedBuyerMessageIds.clear();
 
   messages.forEach((msg) => {
-    const item = document.createElement("div");
-    item.className = `chat-bubble ${msg.sender_role === "buyer" ? "me" : "other"}`;
-
-    item.innerHTML = `
-      <p>${msg.message}</p>
-      <small>${new Date(msg.created_at).toLocaleString("zh-TW")}</small>
-    `;
-
-    box.appendChild(item);
+    appendBuyerChatMessage(msg);
   });
 
   box.scrollTop = box.scrollHeight;
@@ -2427,7 +2451,7 @@ async function sendBuyerChatMessage() {
     return;
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("chat_messages")
     .insert([
       {
@@ -2436,7 +2460,9 @@ async function sendBuyerChatMessage() {
         sender_role: "buyer",
         message
       }
-    ]);
+    ])
+    .select("*")
+    .single();
 
   if (error) {
     console.error("送出訊息失敗:", error);
@@ -2453,7 +2479,7 @@ async function sendBuyerChatMessage() {
     .eq("id", currentBuyerChatThreadId);
 
   input.value = "";
-  await openBuyerChatRoom(currentBuyerChatThreadId);
+  appendBuyerChatMessage(data);
   await loadBuyerChats();
 }
 
