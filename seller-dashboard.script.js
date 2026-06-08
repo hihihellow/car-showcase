@@ -37,6 +37,43 @@ const addCarBtn = document.getElementById("addCarBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 const editModeText = document.getElementById("editModeText");
 
+const submitLoadingOverlay = document.getElementById("submitLoadingOverlay");
+const submitLoadingText = document.getElementById("submitLoadingText");
+
+function showSubmitLoading(text = "車輛送審中...") {
+  if (submitLoadingText) {
+    submitLoadingText.textContent = text;
+  }
+
+  if (submitLoadingOverlay) {
+    submitLoadingOverlay.classList.remove("hidden");
+  }
+
+  if (addCarBtn) {
+    addCarBtn.disabled = true;
+
+    addCarBtn.dataset.originalText =
+      addCarBtn.textContent;
+
+    addCarBtn.textContent =
+      "送審中...";
+  }
+}
+
+function hideSubmitLoading() {
+  if (submitLoadingOverlay) {
+    submitLoadingOverlay.classList.add("hidden");
+  }
+
+  if (addCarBtn) {
+    addCarBtn.disabled = false;
+
+    addCarBtn.textContent =
+      addCarBtn.dataset.originalText ||
+      "送出審核";
+  }
+}
+
 let editingCarId = null;
 let oldImages = [];
 let selectedImageFiles = [];
@@ -113,6 +150,7 @@ if (imageInput) {
 
 if (addCarBtn) {
   addCarBtn.addEventListener("click", async () => {
+    if (addCarBtn.disabled) return;
     const title = document.getElementById("titleInput").value.trim();
     const brand = document.getElementById("brandInput").value.trim();
     const model = document.getElementById("modelInput").value.trim();
@@ -148,6 +186,14 @@ if (addCarBtn) {
       alert("請至少上傳一張照片");
       return;
     }
+
+    showSubmitLoading(
+      editingCarId ? "車輛更新中..." : "車輛送審中..."
+    );
+
+    const loadingStart = Date.now();
+
+    try {
 
     let images = [];
 
@@ -414,10 +460,24 @@ if (addCarBtn) {
     oldImages = [];
 
     addCarBtn.textContent = "送出";
+    addCarBtn.dataset.originalText = "送出";
+
     cancelEditBtn.classList.add("hidden");
     editModeText.classList.add("hidden");
 
-    loadAdminCars();
+    await loadAdminCars();
+
+    } finally {
+      const elapsed = Date.now() - loadingStart;
+
+      if (elapsed < 800) {
+        await new Promise(resolve =>
+          setTimeout(resolve, 800 - elapsed)
+        );
+      }
+
+      hideSubmitLoading();
+    }
   });
 }
 
