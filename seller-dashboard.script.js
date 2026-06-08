@@ -258,15 +258,6 @@ if (addCarBtn) {
         image: images && images.length > 0 ? images[0] : oldImages[0]
       };
 
-      if (
-        isSellerDashboard &&
-        ["active", "inactive", "rejected"].includes(editingCar?.status)
-      ) {
-        updateData.status = "pending_review";
-        updateData.review_note = null;
-        updateData.is_featured = false;
-      }
-
       if (isSellerDashboard && editingCar?.status === "rejected") {
         await loadSellerSubscription();
 
@@ -294,18 +285,40 @@ if (addCarBtn) {
         }
       }
 
-      let updateQuery = supabase
-        .from("cars")
-        .update(updateData)
-        .eq("id", Number(editingCarId));
+      let updatedCar = null;
+      let updateError = null;
 
-      if (isSellerDashboard && currentSellerStore) {
-        updateQuery = updateQuery.eq("store_id", currentSellerStore.id);
+      if (isSellerDashboard) {
+        const result = await supabase.rpc("seller_update_car_and_resubmit", {
+          p_car_id: Number(editingCarId),
+          p_title: title,
+          p_brand: brand,
+          p_model: model,
+          p_year: year,
+          p_cc: cc,
+          p_price: price,
+          p_region: region,
+          p_category: category,
+          p_mileage: Number.isNaN(mileage) ? null : mileage,
+          p_color: color || null,
+          p_description: description,
+          p_equipment: equipment || null,
+          p_image: images && images.length > 0 ? images[0] : oldImages[0]
+        });
+
+        updatedCar = result.data;
+        updateError = result.error;
+      } else {
+        const result = await supabase
+          .from("cars")
+          .update(updateData)
+          .eq("id", Number(editingCarId))
+          .select()
+          .maybeSingle();
+
+        updatedCar = result.data;
+        updateError = result.error;
       }
-
-      const { data: updatedCar, error: updateError } = await updateQuery
-        .select()
-        .maybeSingle();
 
       if (updateError) {
         console.error("更新車輛失敗:", updateError);
@@ -329,7 +342,7 @@ if (addCarBtn) {
         );
       }
 
-      if (selectedImageFiles.length > 0) {
+      if (editingCarId) {
         await supabase
           .from("car_images")
           .delete()
