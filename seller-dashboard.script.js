@@ -1178,14 +1178,14 @@ async function loadNotifications() {
 
 async function loadSellerChats() {
 
-  showPageLoading("聊天室載入中...");
-  try {
-
   if (!sellerChatList) return;
 
   if (!currentSellerStore) {
     currentSellerStore = await getMyStore();
   }
+
+  showPageLoading("聊天室載入中...");
+  try {
 
   if (!currentSellerStore) {
     sellerChatList.innerHTML = "<p>找不到車行資料。</p>";
