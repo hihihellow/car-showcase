@@ -284,34 +284,40 @@ function renderCompareBar() {
 }
 
 async function loadCarsFromSupabase() {
-  const { data, error } = await supabase
-    .from("cars")
-    .select("*")
-    .eq("status", "active")
-    .order("is_featured", { ascending: false })
-    .order("created_at", { ascending: false });
+  showPageLoading("車輛載入中...");
 
-  if (error) {
-    console.error("讀取 cars 失敗:", error);
-    return [];
+  try {
+    const { data, error } = await supabase
+      .from("cars")
+      .select("*")
+      .eq("status", "active")
+      .order("is_featured", { ascending: false })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("讀取 cars 失敗:", error);
+      return [];
+    }
+
+    const { data: activeStores, error: storeError } = await supabase
+      .from("stores")
+      .select("id")
+      .eq("status", "active");
+
+    if (storeError) {
+      console.error("讀取 active stores 失敗:", storeError);
+      return data || [];
+    }
+
+    const activeStoreIds = new Set((activeStores || []).map((store) => store.id));
+
+    return (data || []).filter((car) => {
+      if (!car.store_id) return true;
+      return activeStoreIds.has(car.store_id);
+    });
+  } finally {
+    hidePageLoading();
   }
-
-  const { data: activeStores, error: storeError } = await supabase
-    .from("stores")
-    .select("id")
-    .eq("status", "active");
-
-  if (storeError) {
-    console.error("讀取 active stores 失敗:", storeError);
-    return data || [];
-  }
-
-  const activeStoreIds = new Set((activeStores || []).map((store) => store.id));
-
-  return (data || []).filter((car) => {
-    if (!car.store_id) return true;
-    return activeStoreIds.has(car.store_id);
-  });
 }
 
 function renderCars(carArray) {
@@ -1916,7 +1922,9 @@ async function loadBuyerChats() {
     return;
   }
 
-  buyerChatList.innerHTML = "<p>聊天讀取中...</p>";
+  showPageLoading("聊天室載入中...");
+
+  try {
 
   const { data, error } = await supabase
     .from("chat_threads")
@@ -1943,6 +1951,10 @@ async function loadBuyerChats() {
 
   buyerChatThreads = data || [];
   renderBuyerChats(data || []);
+
+  } finally {
+    hidePageLoading();
+  }
 }
 
 function renderBuyerChats(threads) {
