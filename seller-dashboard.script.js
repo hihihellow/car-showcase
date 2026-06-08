@@ -5,6 +5,19 @@ const supabaseKey = "sb_publishable_DxGd6Yu_mXB1YqiUTxJdqA_CT17Rv27";
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+function showPageLoading(text = "載入中，請稍候...") {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  const label = document.getElementById("pageLoadingText");
+
+  if (label) label.textContent = text;
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function hidePageLoading() {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -548,7 +561,9 @@ sellerNavBtns.forEach((btn) => {
 async function loadAdminCars() {
   if (!adminCarList) return;
 
-  adminCarList.innerHTML = "<p>車輛讀取中...</p>";
+  showPageLoading("車輛資料載入中...");
+
+  try {
 
   let query = supabase
     .from("cars")
@@ -574,9 +589,12 @@ async function loadAdminCars() {
     return;
   }
 
-  adminCars = data || [];
-  renderAdminCars(adminCars);
-  updateOverviewCarCount();
+    adminCars = data || [];
+    renderAdminCars(adminCars);
+    updateOverviewCarCount();
+  } finally {
+    hidePageLoading();
+  }
 }
 
 function renderAdminCars(list) {
@@ -1159,6 +1177,10 @@ async function loadNotifications() {
 }
 
 async function loadSellerChats() {
+
+  showPageLoading("聊天室載入中...");
+  try {
+
   if (!sellerChatList) return;
 
   if (!currentSellerStore) {
@@ -1196,6 +1218,9 @@ async function loadSellerChats() {
   renderSellerChats(data || []);
 
   subscribeSellerThreadList(currentSellerStore.id);
+  } finally {
+    hidePageLoading();
+  }
 }
 
 function renderSellerChats(threads) {
