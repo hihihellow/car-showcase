@@ -90,6 +90,7 @@ function hideSubmitLoading() {
 let editingCarId = null;
 let oldImages = [];
 let selectedImageFiles = [];
+let imageItems = [];
 let renderedSellerMessageIds = new Set();
 
 const imageInput = document.getElementById("imageInput");
@@ -100,8 +101,11 @@ function renderImagePreview() {
 
   imagePreviewList.innerHTML = "";
 
-  selectedImageFiles.forEach((file, index) => {
-    const imageUrl = URL.createObjectURL(file);
+  imageItems.forEach((itemData, index) => {
+    const imageUrl =
+      itemData.type === "old"
+        ? itemData.url
+        : URL.createObjectURL(itemData.file);
 
     const item = document.createElement("div");
     item.className = "image-preview-item";
@@ -124,9 +128,9 @@ function renderImagePreview() {
       const index = Number(btn.dataset.index);
       if (index <= 0) return;
 
-      const temp = selectedImageFiles[index - 1];
-      selectedImageFiles[index - 1] = selectedImageFiles[index];
-      selectedImageFiles[index] = temp;
+      const temp = imageItems[index - 1];
+      imageItems[index - 1] = imageItems[index];
+      imageItems[index] = temp;
 
       renderImagePreview();
     });
@@ -135,11 +139,11 @@ function renderImagePreview() {
   document.querySelectorAll(".preview-down-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const index = Number(btn.dataset.index);
-      if (index >= selectedImageFiles.length - 1) return;
+      if (index >= imageItems.length - 1) return;
 
-      const temp = selectedImageFiles[index + 1];
-      selectedImageFiles[index + 1] = selectedImageFiles[index];
-      selectedImageFiles[index] = temp;
+      const temp = imageItems[index + 1];
+      imageItems[index + 1] = imageItems[index];
+      imageItems[index] = temp;
 
       renderImagePreview();
     });
@@ -148,7 +152,7 @@ function renderImagePreview() {
   document.querySelectorAll(".preview-remove-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const index = Number(btn.dataset.index);
-      selectedImageFiles.splice(index, 1);
+      imageItems.splice(index, 1);
       renderImagePreview();
     });
   });
@@ -157,6 +161,14 @@ function renderImagePreview() {
 if (imageInput) {
   imageInput.addEventListener("change", () => {
     selectedImageFiles = Array.from(imageInput.files);
+
+    selectedImageFiles.forEach((file) => {
+      imageItems.push({
+        type: "new",
+        file
+      });
+    });
+
     renderImagePreview();
   });
 }
@@ -195,8 +207,13 @@ if (addCarBtn) {
       return;
     }
 
-    if (!editingCarId && selectedImageFiles.length === 0) {
+    if (!editingCarId && imageItems.length === 0) {
       alert("請至少上傳一張照片");
+      return;
+    }
+
+    if (editingCarId && imageItems.length === 0) {
+      alert("請至少保留一張照片");
       return;
     }
 
@@ -210,17 +227,15 @@ if (addCarBtn) {
 
     let images = [];
 
-    if (selectedImageFiles.length > 0) {
-      for (let i = 0; i < selectedImageFiles.length; i++) {
-        const base64 = await fileToBase64(selectedImageFiles[i]);
+    for (const item of imageItems) {
+      if (item.type === "old") {
+        images.push(item.url);
+      }
+
+      if (item.type === "new") {
+        const base64 = await fileToBase64(item.file);
         images.push(base64);
       }
-    } else {
-      images = oldImages;
-    }
-
-    if (!images || images.length === 0) {
-      images = oldImages;
     }
     let savedCar = null;
 
@@ -243,9 +258,13 @@ if (addCarBtn) {
         image: images && images.length > 0 ? images[0] : oldImages[0]
       };
 
-      if (isSellerDashboard && editingCar?.status === "rejected") {
+      if (
+        isSellerDashboard &&
+        ["active", "inactive", "rejected"].includes(editingCar?.status)
+      ) {
         updateData.status = "pending_review";
-       updateData.review_note = null;
+        updateData.review_note = null;
+        updateData.is_featured = false;
       }
 
       if (isSellerDashboard && editingCar?.status === "rejected") {
@@ -463,6 +482,7 @@ if (addCarBtn) {
     document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
     selectedImageFiles = [];
+    imageItems = [];
     renderImagePreview();
     document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
@@ -764,9 +784,17 @@ async function startEditCar(carId) {
   document.getElementById("descInput").value = car.description || "";
   document.getElementById("imageInput").value = "";
   selectedImageFiles = [];
+
+  imageItems = oldImages.map((url) => ({
+    type: "old",
+    url
+  }));
+
   renderImagePreview();
 
-  addCarBtn.textContent = "儲存修改";
+  addCarBtn.textContent = isSellerDashboard
+    ? "儲存修改並送審"
+    : "儲存修改";
   cancelEditBtn.classList.remove("hidden");
   editModeText.classList.remove("hidden");
   editModeText.textContent = `目前正在編輯：#${car.admin_no || "未編號"}｜${car.title}`;
@@ -956,6 +984,7 @@ if (cancelEditBtn) {
     document.getElementById("colorInput").value = "";
     document.getElementById("imageInput").value = "";
     selectedImageFiles = [];
+    imageItems = [];
     renderImagePreview();
     document.getElementById("equipmentInput").value = "";
     document.getElementById("descInput").value = "";
