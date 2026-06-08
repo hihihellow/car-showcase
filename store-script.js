@@ -5,6 +5,19 @@ const supabase = createClient(
   "sb_publishable_DxGd6Yu_mXB1YqiUTxJdqA_CT17Rv27"
 );
 
+function showPageLoading(text = "載入中，請稍候...") {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  const label = document.getElementById("pageLoadingText");
+
+  if (label) label.textContent = text;
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function hidePageLoading() {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 // =========================
 // 車行店面頁 store.html
 // =========================
@@ -17,6 +30,10 @@ let currentUser = null;
 
 async function loadStorePage() {
   if (!storeInfo || !storeCarList) return;
+
+  showPageLoading("車行資料載入中...");
+
+  try {
 
   const params = new URLSearchParams(window.location.search);
   const slug = params.get("store") || params.get("slug");
@@ -205,6 +222,10 @@ async function loadStorePage() {
 
     storeCarList.appendChild(card);
   });
+
+  } finally {
+    hidePageLoading();
+  }
 }
 
 async function loadStoreFollowerStatus() {
