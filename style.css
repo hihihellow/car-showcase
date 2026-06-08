@@ -1183,3 +1183,41 @@ body:has(.post-form) {
 .header-search-btn {
   display: none;
 }
+
+.page-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(3px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-loading-overlay.hidden {
+  display: none !important;
+}
+
+.page-loading-box {
+  text-align: center;
+  color: #111;
+  font-weight: 900;
+}
+
+.page-loading-spinner {
+  width: 62px;
+  height: 62px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  border: 5px solid rgba(0,0,0,0.1);
+  border-top-color: #f4c430;
+  animation: pageSpin 0.8s linear infinite;
+}
+
+@keyframes pageSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -23,6 +23,19 @@ function fileToBase64(file) {
 let cars = [];
 let filteredCars = [];
 
+function showPageLoading(text = "載入中，請稍候...") {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  const label = document.getElementById("pageLoadingText");
+
+  if (label) label.textContent = text;
+  if (overlay) overlay.classList.remove("hidden");
+}
+
+function hidePageLoading() {
+  const overlay = document.getElementById("pageLoadingOverlay");
+  if (overlay) overlay.classList.add("hidden");
+}
+
 
 // =========================
 // 首頁功能
