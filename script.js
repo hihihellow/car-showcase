@@ -1501,6 +1501,31 @@ async function updateAuthUI() {
 
 updateAuthUI();
 
+async function setupMemberAdminEntry() {
+  if (!window.location.pathname.includes("member.html")) return;
+
+  const adminEntry = document.getElementById("memberAdminEntry");
+  if (!adminEntry) return;
+
+  const user = await getCurrentUser();
+
+  if (!user) {
+    adminEntry.classList.add("hidden");
+    return;
+  }
+
+  const { data, error } = await supabase.rpc("is_active_admin");
+
+  if (!error && data === true) {
+    adminEntry.classList.remove("hidden");
+  } else {
+    adminEntry.classList.add("hidden");
+  }
+}
+
+setupMemberAdminEntry();
+
+
 // 如果在 member.html，沒登入就踢回 login
 if (window.location.pathname.includes("member.html")) {
   supabase.auth.getUser().then(({ data }) => {

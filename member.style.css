@@ -178,3 +178,21 @@
     height: 210px;
   }
 }
+
+.member-admin-entry {
+  display: block;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+
+  color: #f4c430;
+  text-decoration: none;
+  font-weight: 900;
+
+  background: rgba(244,196,48,0.12);
+  border: 1px solid rgba(244,196,48,0.32);
+}
+
+.member-admin-entry:hover {
+  background: rgba(244,196,48,0.22);
+}
