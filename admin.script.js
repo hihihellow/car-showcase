@@ -1337,6 +1337,26 @@ function renderAdminStoreFilter() {
   });
 }
 
+async function requireAdmin() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    alert("請先登入管理員帳號");
+    window.location.href = "login.html";
+    return false;
+  }
+
+  const { data, error } = await supabase.rpc("is_active_admin");
+
+  if (error || data !== true) {
+    alert("你沒有管理員權限");
+    window.location.href = "index.html";
+    return false;
+  }
+
+  return true;
+}
+
 async function loadAdminCars() {
   if (!adminCarList) return;
 
@@ -1840,13 +1860,9 @@ async function activateStore(storeId) {
 async function approveCar(carId) {
   const targetCar = adminCars.find((car) => String(car.id) === String(carId));
 
-  const { error } = await supabase
-    .from("cars")
-    .update({
-      status: "active",
-      review_note: null
-    })
-    .eq("id", carId);
+  const { error } = await supabase.rpc("admin_approve_car", {
+    p_car_id: Number(carId)
+  });
 
   if (error) {
     console.error("審核通過失敗:", error);
@@ -1881,13 +1897,10 @@ async function rejectCar(carId) {
   const reason = prompt("請輸入退回原因：");
   if (reason === null) return;
 
-  const { error } = await supabase
-    .from("cars")
-    .update({
-      status: "rejected",
-      review_note: reason || "車輛資料未通過審核"
-    })
-    .eq("id", carId);
+  const { error } = await supabase.rpc("admin_reject_car", {
+    p_car_id: Number(carId),
+    p_review_note: reason || "車輛資料未通過審核"
+  });
 
   if (error) {
     console.error("退回失敗:", error);
@@ -2114,7 +2127,11 @@ async function getMyStore() {
   return data;
 }
 
-loadAdminCars();
+requireAdmin().then((ok) => {
+  if (ok) {
+    loadAdminCars();
+  }
+});
 
 // =========================
 // 詳細頁功能

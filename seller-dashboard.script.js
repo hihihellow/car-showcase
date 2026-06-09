@@ -258,7 +258,10 @@ if (addCarBtn) {
         image: images && images.length > 0 ? images[0] : oldImages[0]
       };
 
-      if (isSellerDashboard && editingCar?.status === "rejected") {
+      if (
+        isSellerDashboard &&
+        ["active", "inactive", "rejected"].includes(editingCar?.status)
+      ) {
         await loadSellerSubscription();
 
         if (!currentSellerStore) {
@@ -365,7 +368,7 @@ if (addCarBtn) {
         }
       }
 
-      if (isSellerDashboard && editingCar?.status === "rejected") {
+      if (isSellerDashboard) {
         alert("車輛已修改並重新送出審核。");
       } else {
         alert("車輛更新成功！");
